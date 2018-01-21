@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:focusableInTouchMode="true"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:text="앱 이름 : "
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinner_package_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2"
+        android:gravity="center_vertical"
+        android:spinnerMode="dropdown" />
+
+    <EditText
+        android:id="@+id/editTxt_package_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/spinner_package_name"
+        android:layout_below="@+id/spinner_package_name" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editTxt_interval"
+        android:layout_below="@+id/editTxt_package_name"
+        android:gravity="right|center_vertical"
+        android:text="모니터링 간격: "
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editTxt_interval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTxt_package_name"
+        android:layout_toEndOf="@+id/textView3"
+        android:hint="1000"
+        android:text="1000"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editTxt_interval"
+        android:layout_below="@+id/editTxt_package_name"
+        android:layout_toEndOf="@+id/editTxt_interval"
+        android:gravity="center"
+        android:text="ms" />
+
+    <LinearLayout
+        android:id="@+id/ll_threshold_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="테스트 시작/종료 판단 값 계산 파라미터"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/txtView_instantaneous_tput_calculation_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="마지막 " />
+
+                <EditText
+                    android:id="@+id/editText_time_threshold_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/txtView_instantaneous_tput_calculation_duration"
+                    android:hint="5"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="0dp"
+                    android:text="5000" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ms 간 평균 Tput이 " />
+
+                <EditText
+                    android:id="@+id/editText_tput_threshold_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="1"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="0dp"
+                    android:text="1.0" />
+
+                <TextView
+                    android:id="@+id/txtView_threshold_tput_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Mbps " />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="이상이면 기록 시작, 이하이면 기록을 종료 합니다." />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_chipset_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_threshold_container"
+        android:orientation="horizontal"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="106dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="CPU Freq. 경로"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/radioGroup2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="horizontal"
+                android:paddingBottom="0dp"
+                android:paddingTop="0dp">
+
+                <RadioButton
+                    android:id="@+id/radioButton_chipset_default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp"
+                    android:text="Default" />
+
+                <RadioButton
+                    android:id="@+id/radioButton_chipset_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp"
+                    android:text="경로 직접 입력" />
+
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/editText_cpu_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:hint="/sys/devices/system/cpu/"
+                android:inputType="text"
+                android:lines="1"
+                android:maxLines="1"
+                android:paddingBottom="5dp"
+                android:paddingTop="0dp"
+                android:scrollHorizontally="true"
+                android:text="/sys/devices/system/cpu/"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fl_thermal_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_chipset_selection"
+        android:orientation="horizontal"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/textView_thermal_group"
+            android:layout_width="107dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="Thermal 값 경로"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/radioGroup_thermal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <RadioButton
+                    android:id="@+id/radioButton_thermal_vts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp"
+                    android:text="vts(LG 단말)" />
+
+                <RadioButton
+                    android:id="@+id/radioButton_thermal_manual_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp"
+                    android:text="경로 직접 입력" />
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/editText_thermal_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:text="/sys/devices/virtual/thermal/"
+                android:inputType="text"
+                android:lines="1"
+                android:maxLines="1"
+                android:paddingBottom="5dp"
+                android:paddingTop="0dp"
+                android:scrollHorizontally="true"
+                android:textSize="14sp"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/direction_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fl_thermal_selection"
+        android:orientation="horizontal"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/textView_direction_group"
+            android:layout_width="107dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="모니터링 타입"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/radioGroup_direction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <RadioButton
+                    android:id="@+id/radioButton_dl_direction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="다운로드" />
+
+                <RadioButton
+                    android:id="@+id/radioButton_ul_direction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="업로드" />
+            </RadioGroup>
+        </LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_start_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/direction_section"
+        android:enabled="false"
+        android:focusable="true"
+        android:text="Service not bound yet..." />
+
+    <ImageButton
+        android:id="@+id/imgBtn_recording"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_alignBottom="@+id/btn_start_service"
+        android:layout_alignTop="@+id/btn_start_service"
+        android:layout_toStartOf="@+id/btn_start_service"
+        android:scaleType="fitXY"
+        android:src="@drawable/record_start" />
+
+    <TextView
+        android:id="@+id/txtView_result_summary"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btn_start_service"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:scrollbars="vertical"
+        android:textColor="#ffffffff" />
+
+</RelativeLayout>

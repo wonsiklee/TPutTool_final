@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_id_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5sp">
+
+        <LinearLayout
+            android:id="@+id/ll_server_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="10sp">
+
+            <TextView
+                android:id="@+id/txtView_server_addr"
+                android:layout_width="30sp"
+                android:layout_height="wrap_content"
+                android:text="주소"/>
+
+            <EditText
+                android:id="@+id/editText_server_addr"
+                android:layout_width="130sp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40sp"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:text="203.229.247.254"/>
+
+            <TextView
+                android:id="@+id/txtView_port_num"
+                android:layout_width="30sp"
+                android:layout_height="wrap_content"
+                android:text="포트"/>
+
+            <EditText
+                android:id="@+id/editText_port_num"
+                android:layout_width="50sp"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:inputType="number"
+                android:text="21"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_account_info"
+            android:layout_below="@+id/ll_server_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="10sp">
+
+            <TextView
+                android:id="@+id/txtView_id"
+                android:layout_width="30sp"
+                android:layout_height="wrap_content"
+                android:text="ID"/>
+
+            <EditText
+                android:id="@+id/editText_user_id"
+                android:layout_width="100sp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15sp"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:text="testbed02"/>
+
+            <TextView
+                android:id="@+id/txtView_password"
+                android:layout_width="30sp"
+                android:layout_height="wrap_content"
+                android:text="PW "/>
+
+            <EditText
+                android:id="@+id/editText_password"
+                android:layout_width="100sp"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="gprs@tbed!02"
+                android:textAlignment="center"
+                android:singleLine="true"
+                android:password="true"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_connect_disconnect"
+            android:layout_toEndOf="@+id/ll_account_info"
+            android:layout_alignTop="@+id/ll_account_info"
+            android:layout_alignBottom="@+id/ll_account_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_connect_disconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="연결"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_ftp_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="다운로드" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView_ftpFileList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_dashboard_black_24dp"/>
+
+</LinearLayout>

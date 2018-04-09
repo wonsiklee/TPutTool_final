@@ -29,7 +29,9 @@
         <service
             android:name=".service.DeviceMonitoringService"
             android:process=":remote">
-            <action android:name="com.lge.data.START_LOGGING"/>
+            <intent-filter>
+                <action android:name="com.lge.data.START_LOGGING"/>
+            </intent-filter>
         </service>
     </application>
 

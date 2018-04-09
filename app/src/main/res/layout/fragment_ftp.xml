@@ -123,7 +123,6 @@
     <ListView
         android:id="@+id/listView_ftpFileList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ic_dashboard_black_24dp"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

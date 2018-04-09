@@ -63,7 +63,7 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
     private int mDirection;
     private int mThermalType;
 
-    private EditText mEditTxtInstantaneousTputCalcuationDurationTime;
+    private EditText mEditTxtInstantaneousTputCalculationDurationTime;
     private EditText mEditTxtTputThresholdValue;
 
     private TextView mTxtViewResult;
@@ -281,8 +281,8 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
             sTemp = mEditTxtThermalPath.getText().toString();
             String sCpuThermalFilePath = (TextUtils.isEmpty(sTemp)) ? mEditTxtThermalPath.getHint().toString() : sTemp;
 
-            sTemp = mEditTxtInstantaneousTputCalcuationDurationTime.getText().toString();
-            int sInstantaneousTputCalculationDurationTime = (TextUtils.isEmpty(sTemp)) ? Integer.valueOf(mEditTxtInstantaneousTputCalcuationDurationTime.getHint().toString()) : Integer.valueOf(sTemp);
+            sTemp = mEditTxtInstantaneousTputCalculationDurationTime.getText().toString();
+            int sInstantaneousTputCalculationDurationTime = (TextUtils.isEmpty(sTemp)) ? Integer.valueOf(mEditTxtInstantaneousTputCalculationDurationTime.getHint().toString()) : Integer.valueOf(sTemp);
 
             sTemp = mEditTxtTputThresholdValue.getText().toString();
             float sTputThreshold = (TextUtils.isEmpty(sTemp)) ? Float.valueOf(mEditTxtTputThresholdValue.getHint().toString()) : Float.valueOf(sTemp);
@@ -518,7 +518,7 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
 
         // 3. InstantaneousTput calculation time length check
         try {
-            int sInstantaneousTputCalculationTimeLength = ("".equals(this.mEditTxtInstantaneousTputCalcuationDurationTime.getText().toString())) ? Integer.valueOf(this.mEditTxtInstantaneousTputCalcuationDurationTime.getHint().toString()) : Integer.valueOf(this.mEditTxtInstantaneousTputCalcuationDurationTime.getText().toString());
+            int sInstantaneousTputCalculationTimeLength = ("".equals(this.mEditTxtInstantaneousTputCalculationDurationTime.getText().toString())) ? Integer.valueOf(this.mEditTxtInstantaneousTputCalculationDurationTime.getHint().toString()) : Integer.valueOf(this.mEditTxtInstantaneousTputCalculationDurationTime.getText().toString());
             if (sInstantaneousTputCalculationTimeLength < 0 || sInstantaneousTputCalculationTimeLength < sSamplingInterval) {
                 throw new NumberFormatException();
             }
@@ -582,8 +582,8 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
         /*this.mEditTxtThermalPath.setText(CPUStatsReader.getVtsFilePath());*/
         this.mUIControlList.add(mEditTxtThermalPath);
 
-        this.mEditTxtInstantaneousTputCalcuationDurationTime = (EditText) this.mView.findViewById(R.id.editText_time_threshold_value);
-        this.mUIControlList.add(mEditTxtInstantaneousTputCalcuationDurationTime);
+        this.mEditTxtInstantaneousTputCalculationDurationTime = (EditText) this.mView.findViewById(R.id.editText_time_threshold_value);
+        this.mUIControlList.add(mEditTxtInstantaneousTputCalculationDurationTime);
 
         this.mEditTxtTputThresholdValue = (EditText) this.mView.findViewById(R.id.editText_tput_threshold_value);
         this.mUIControlList.add(mEditTxtTputThresholdValue);

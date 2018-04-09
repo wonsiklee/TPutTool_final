@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -13,14 +14,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.lge.tputmaster.R;
-import com.lge.tputmaster.adapters.FileListViewAdapter;
+import com.lge.tputmaster.adapters.LGFTPFileListViewAdapter;
 import com.lge.tputmaster.clients.LGFTPClient;
 import com.lge.tputmaster.clients.LGFTPOperationListener;
 
@@ -47,7 +50,7 @@ public class LGFTPFragment extends Fragment {
     private EditText mEditTextPassword;
 
     private ListView mFTPFileListView;
-    private FileListViewAdapter mFTPFileListVIewAdapter;
+    private LGFTPFileListViewAdapter mFTPFileListVIewAdapter;
 
     private ProgressBar mProgressBar;
     private LinearLayout.LayoutParams mLayoutParam;
@@ -113,20 +116,31 @@ public class LGFTPFragment extends Fragment {
             this.mBtnConnectDisconnect.setEnabled(false);
         }
 
-        //this.mFileList = null;
-        this.mFileList = new ArrayList<>();
-        FTPFile ff = new FTPFile();
-        ff.setName("dd");
-        this.mFileList.add(ff);
-        ff = new FTPFile();
-        ff.setName("ee");
-        ff = new FTPFile();
-        ff.setName("ff");
-
         this.mFTPFileListView = (ListView) this.mView.findViewById(R.id.listView_ftpFileList);
-        this.mFTPFileListVIewAdapter = new FileListViewAdapter();
-        this.mFTPFileListVIewAdapter.setFileList(this.mFileList);
-        this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+        this.mFTPFileListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "OnItemSelected() " + position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        this.mFTPFileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "onItemLongClicked()");
+                mFTPFileListVIewAdapter.enabledCheckBoxVisibility(true);
+                mFTPFileListView.setItemChecked(position, true);
+                return false;
+            }
+        });
+        this.mFTPFileListVIewAdapter = new LGFTPFileListViewAdapter(this.getContext());
+        this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
+        Log.d(TAG, "onResume() completed");
     }
 
     private void showProgressBar() {
@@ -170,19 +184,19 @@ public class LGFTPFragment extends Fragment {
                 Log.d(TAG, "fileList length : " + mFileList.size());
             }
 
-            mUIHandler.sendEmptyMessage(MSG_CONNECT_TO_SERVER_FINISHED);
+            mUIControlHandler.sendEmptyMessage(MSG_CONNECT_TO_SERVER_FINISHED);
         }
 
         @Override
         public void onGetFileListFinished(ArrayList<FTPFile> fileList) {
             Log.d(TAG, "onGetFileListFinished(ArrayList<FTPFile>)");
             if (fileList == null) {
-                Log.d(TAG, "fileList is null, this could mean login fail or server connection fail.");
+                Log.d(TAG, "fileList is null, this could mean either 'login fail' or 'server connection fail'");
             } else {
                 mFileList = fileList;
                 Log.d(TAG, "fileList length : " + mFileList.size());
             }
-            mUIHandler.sendEmptyMessage(MSG_GET_FILE_LIST_FINISHED);
+            mUIControlHandler.sendEmptyMessage(MSG_GET_FILE_LIST_FINISHED);
         }
 
         @Override
@@ -212,7 +226,7 @@ public class LGFTPFragment extends Fragment {
     };
 
     // UI Control handler
-    private Handler mUIHandler = new Handler() {
+    private Handler mUIControlHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -220,14 +234,23 @@ public class LGFTPFragment extends Fragment {
                     hideProgressBar();
                     break;
                 case MSG_CONNECT_TO_SERVER_FINISHED:
+                    Log.d(TAG, "MSG_CONNECT_TO_SERVER_FINISHED");
                     hideProgressBar();
                     debug_printCurrentFileList();
+                    // TODO 1 : assign the list to the adapter
+                    LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(LGFTPFragment.this.mFileList);
+                    // TODO 2 : refresh
+                    LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+
                     mBtnConnectDisconnect.setOnClickListener(mClickListenerDisconnect);
                     mBtnConnectDisconnect.setText("끊기");
                     break;
                 case MSG_DISCONNECT_FROM_SERVER_FINISHED:
+                    Log.d(TAG, "MSG_DISCONNECT_FROM_SERVER_FINISHED");
                     mBtnConnectDisconnect.setOnClickListener(mClickListenerConnect);
                     mBtnConnectDisconnect.setText("연결");
+                    LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(null);
+                    LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     break;
                 default:
                     break;
@@ -255,10 +278,11 @@ public class LGFTPFragment extends Fragment {
         public void onClick(View v) {
             mFileList = null;
             mFtpClient.disconnectFromServer();
-            mUIHandler.sendEmptyMessage(MSG_DISCONNECT_FROM_SERVER_FINISHED);
+            mUIControlHandler.sendEmptyMessage(MSG_DISCONNECT_FROM_SERVER_FINISHED);
         }
     };
 
+    static int count = 0;
     // dl start listener
     private View.OnClickListener mClickListenerStart = new View.OnClickListener() {
         @Override

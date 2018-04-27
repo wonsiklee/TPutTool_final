@@ -97,6 +97,19 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        new Thread() {
+            @Override
+            public void run() {
+                if (LGFTPFragment.this.mLGFtpClient.isAvailable()) {
+                    LGFTPFragment.this.mLGFtpClient.disconnectFromServer();
+                }
+            }
+        }.start();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 

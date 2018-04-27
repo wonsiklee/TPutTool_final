@@ -68,20 +68,8 @@ public class LGFTPClient {
     }
 
     public void disconnectFromServer() {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    logoutFromServer();
-                    mFTPClient.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                mOperationListener.onDisconnectToServerFinished();
-            }
-        }.start();
-
+        logoutFromServer();
+        mOperationListener.onDisconnectToServerFinished();
     }
 
     private boolean loginToServer(String userID, String password) {
@@ -99,10 +87,21 @@ public class LGFTPClient {
 
     private void logoutFromServer() {
         try {
-            this.mFTPClient.disconnect();
+            if (this.mFTPClient.isConnected()) {
+                this.mFTPClient.logout();
+                this.mFTPClient.disconnect();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isAvailable() {
+        return this.mFTPClient.isAvailable();
+    }
+
+    public boolean isConnected() {
+        return this.mFTPClient.isConnected();
     }
 
     private ArrayList<LGFTPFile> nonThreadicGetFileList() {

@@ -9,6 +9,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -50,8 +51,12 @@ public class LGFTPClient {
                         if (loginToServer(userID, password)) {
                             Log.d(TAG, "Logged in successfully");
                             fileList = nonThreadicGetFileList();
+                            LGFTPClient.this.mFTPClient.setKeepAlive(true);
                         }
                     }
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "connection error: " + e.getMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e(TAG, "connection error: " + e.getMessage());

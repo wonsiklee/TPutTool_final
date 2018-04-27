@@ -346,7 +346,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
             if (!"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
-                Toast.makeText(this.getContext(), this.mLGFtpClient.getCurrentWorkingDirectory(), Toast.LENGTH_LONG).show();
                 this.mLGFtpClient.changeWorkingDirectory("../");
                 return true;
             } else {

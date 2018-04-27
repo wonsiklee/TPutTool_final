@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 public class LGFTPClient {
     static final private String TAG = LGFTPClient.class.getSimpleName();
 
-    public FTPClient mFTPClient;
+    private FTPClient mFTPClient;
     private LGFTPOperationListener mOperationListener;
 
     public LGFTPClient(LGFTPOperationListener operationListener) {
@@ -117,7 +117,21 @@ public class LGFTPClient {
     @Getter private String mCurrentWorkingDirectory = "/";
 
     public void changeWorkingDirectory(final String path) {
-        new Thread() {
+
+        try {
+            mFTPClient.changeWorkingDirectory(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            mOperationListener.onChangeDirectoryFinished(nonThreadicGetFileList());
+            try {
+                mCurrentWorkingDirectory = mFTPClient.printWorkingDirectory();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /*new Thread() {
             @Override
             public void run() {
                 try {
@@ -134,6 +148,10 @@ public class LGFTPClient {
                 }
                 super.run();
             }
-        }.start();
+        }.start();*/
+    }
+
+    public String printWorkingDirectory() throws IOException {
+        return this.mFTPClient.printWorkingDirectory();
     }
 }

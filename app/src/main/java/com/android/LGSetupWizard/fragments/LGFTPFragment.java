@@ -1,6 +1,7 @@
 package com.android.LGSetupWizard.fragments;
 
 
+import android.app.LGFragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -68,8 +69,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LGFTPFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
-
-
     }
 
     @Nullable
@@ -148,7 +147,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
                             LGFTPFragment.this.mLGFtpClient.changeWorkingDirectory(file.getName());
 
                             try {
-                                Log.d(TAG, "working directrory : " + LGFTPFragment.this.mLGFtpClient.mFTPClient.printWorkingDirectory());
+                                Log.d(TAG, "working directrory : " + LGFTPFragment.this.mLGFtpClient.printWorkingDirectory());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -346,7 +345,12 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
             if (!"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
-                this.mLGFtpClient.changeWorkingDirectory("../");
+                new Thread() {
+                    @Override
+                    public void run() {
+                        LGFTPFragment.this.mLGFtpClient.changeWorkingDirectory("../");
+                    }
+                }.start();
                 return true;
             } else {
                 return false;

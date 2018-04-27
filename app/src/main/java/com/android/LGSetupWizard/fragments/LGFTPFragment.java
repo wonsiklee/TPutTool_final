@@ -147,7 +147,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
                             LGFTPFragment.this.mLGFtpClient.changeWorkingDirectory(file.getName());
 
                             try {
-                                Log.d(TAG, "working directrory : " + LGFTPFragment.this.mLGFtpClient.printWorkingDirectory());
+                                Log.d(TAG, "working directory : " + LGFTPFragment.this.mLGFtpClient.printWorkingDirectory());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

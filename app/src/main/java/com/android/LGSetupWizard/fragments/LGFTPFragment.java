@@ -275,7 +275,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
 
                 case MSG_CONNECT_TO_SERVER_FINISHED:
                     Log.d(TAG, "MSG_CONNECT_TO_SERVER_FINISHED");
-                    //hideProgressBar();
+                    hideProgressBar();
 
                     sendEmptyMessage(MSG_FILE_SET_CHANGED);
 

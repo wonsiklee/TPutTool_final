@@ -1,6 +1,8 @@
-package com.lge.tputmaster.clients;
+package com.android.LGSetupWizard.clients;
 
 import android.util.Log;
+
+import com.android.LGSetupWizard.data.LGFTPFile;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
 /**
@@ -19,7 +22,7 @@ import lombok.experimental.Accessors;
 public class LGFTPClient {
     static final private String TAG = LGFTPClient.class.getSimpleName();
 
-    private FTPClient mFTPClient;
+    public FTPClient mFTPClient;
     private LGFTPOperationListener mOperationListener;
 
     public LGFTPClient(LGFTPOperationListener operationListener) {
@@ -34,7 +37,7 @@ public class LGFTPClient {
             public void run() {
                 super.run();
 
-                ArrayList<FTPFile> fileList = null;
+                ArrayList<LGFTPFile> fileList = null;
                 Log.d(TAG, "connectToServer() " + serverAddress);
                 try {
                     mFTPClient.connect(serverAddress, portNum);
@@ -97,38 +100,40 @@ public class LGFTPClient {
         }
     }
 
-    public void getFileList() {
+    private ArrayList<LGFTPFile> nonThreadicGetFileList() {
+        ArrayList<LGFTPFile> retArray = new ArrayList<>();
+
+        try {
+            for (FTPFile f : this.mFTPClient.listFiles()) {
+                retArray.add(new LGFTPFile(f));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //return new ArrayList<>(Arrays.asList(lgftpFiles));
+        return retArray;
+    }
+
+    @Getter private String mCurrentWorkingDirectory = "/";
+
+    public void changeWorkingDirectory(final String path) {
         new Thread() {
             @Override
             public void run() {
-                super.run();
-                FTPFile[] files = null;
                 try {
-                    files = mFTPClient.listFiles();
+                    mFTPClient.changeWorkingDirectory(path);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    mOperationListener.onChangeDirectoryFinished(nonThreadicGetFileList());
+                    try {
+                        mCurrentWorkingDirectory = mFTPClient.printWorkingDirectory();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                mOperationListener.onGetFileListFinished(new ArrayList<>(Arrays.asList(files)));
+                super.run();
             }
         }.start();
-    }
-
-    private ArrayList<FTPFile> nonThreadicGetFileList() {
-        FTPFile[] files = null;
-        try {
-            files = mFTPClient.listFiles();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>(Arrays.asList(files));
-    }
-
-
-    public void changeDirectory(String path) {
-        try {
-            this.mFTPClient.changeWorkingDirectory(path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -1,4 +1,4 @@
-package com.lge.tputmaster.data;
+package com.android.LGSetupWizard.data;
 
 import java.util.ArrayList;
 

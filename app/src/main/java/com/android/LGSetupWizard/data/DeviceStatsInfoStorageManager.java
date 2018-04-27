@@ -1,8 +1,8 @@
-package com.lge.tputmaster.data;
+package com.android.LGSetupWizard.data;
 
-import com.lge.tputmaster.service.DeviceMonitoringStateChangedListener;
-import com.lge.tputmaster.statsreader.CPUStatsReader;
-import com.lge.tputmaster.statsreader.NetworkStatsReader;
+import com.android.LGSetupWizard.service.DeviceMonitoringStateChangedListener;
+import com.android.LGSetupWizard.statsreader.CPUStatsReader;
+import com.android.LGSetupWizard.statsreader.NetworkStatsReader;
 
 import android.content.Context;
 import android.os.Build;

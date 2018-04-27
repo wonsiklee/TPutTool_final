@@ -1,22 +1,25 @@
-package com.lge.tputmaster.adapters;
+package com.android.LGSetupWizard.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lge.tputmaster.R;
+import com.android.LGSetupWizard.data.LGFTPFile;
+import com.android.LGSetupWizard.R;
+
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -27,13 +30,50 @@ import lombok.experimental.Accessors;
 public class LGFTPFileListViewAdapter extends BaseAdapter {
     private static String TAG = LGFTPFileListViewAdapter.class.getSimpleName();
 
-    @Setter private ArrayList<FTPFile> mFileList;
+    @Setter private ArrayList<LGFTPFile> mFileList;
+
+    @Setter @Getter
+    private ArrayList<Integer> mSelectedFilePositionList;
 
     private Context mContext;
 
     public LGFTPFileListViewAdapter(Context context) {
         Log.d(TAG, "constructor : LGFTPFileListViewAdapter()");
         this.mContext = context;
+        this.mSelectedFilePositionList = new ArrayList<>();
+    }
+
+    public void toggleFileSelectedStatusAt(int position) {
+        if (this.isFileSelectedAt(position)) {
+            int targetIndex = 0;
+
+            for (int i = 0; i != this.mSelectedFilePositionList.size(); ++i) {
+                if (this.mSelectedFilePositionList.get(i) == position) {
+                    targetIndex = i;
+                }
+            }
+
+            this.mSelectedFilePositionList.remove(targetIndex);
+        } else {
+            this.mSelectedFilePositionList.add(position);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void clearSelectedFilePositionList() {
+        this.mSelectedFilePositionList.clear();
+    }
+
+    public ArrayList<LGFTPFile> getSelectedFile() {
+        ArrayList<LGFTPFile> sSelectedFileList = new ArrayList<>();
+        for (Integer position: this.mSelectedFilePositionList) {
+            sSelectedFileList.add(this.mFileList.get(position));
+        }
+        return sSelectedFileList;
+    }
+
+    private boolean isFileSelectedAt(int position) {
+        return this.mSelectedFilePositionList.contains(position);
     }
 
     @Override
@@ -59,6 +99,7 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         return position;
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder sHolder = null;
@@ -71,7 +112,7 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
             sHolder.mIcon = (ImageView) convertView.findViewById(R.id.imageView_file_icon);
             sHolder.mFileName = (TextView) convertView.findViewById(R.id.txtView_file_name);
             sHolder.mFileSize = (TextView) convertView.findViewById(R.id.txtView_file_size);
-            sHolder.mIsChecked = (CheckBox) convertView.findViewById(R.id.checkbox_file_selected);
+            sHolder.mIsSelected = (CheckBox) convertView.findViewById(R.id.checkbox_file_selected);
 
             convertView.setTag(sHolder);
         } else {
@@ -79,11 +120,12 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         }
 
         Log.d(TAG, "checkbox visibility : " + mIsCheckboxShown);
-        if (mIsCheckboxShown) {
-            sHolder.mIsChecked.setVisibility(View.VISIBLE);
+        sHolder.mIsSelected.setVisibility(View.INVISIBLE);
+        /*if (mIsCheckboxShown) {
+            sHolder.mIsSelected.setVisibility(View.VISIBLE);
         } else {
-            sHolder.mIsChecked.setVisibility(View.INVISIBLE);
-        }
+            sHolder.mIsSelected.setVisibility(View.INVISIBLE);
+        }*/
 
         FTPFile ff = this.mFileList.get(position);
         if (FTPFile.DIRECTORY_TYPE == ff.getType()) {
@@ -96,27 +138,28 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
 
         sHolder.mFileName.setText(ff.getName());
         sHolder.mFileSize.setText((ff.getSize() / 1024/ 1024) + " MB");
+        if (this.isFileSelectedAt(position)) {
+            Log.d(TAG, "selected : " + position);
+            convertView.setBackgroundColor(R.color.selected_color);
+        } else {
+            Log.d(TAG, "not selected : " + position);
+            convertView.setBackgroundColor(Color.WHITE);
+        }
 
         Log.d(TAG, "getView() : completed");
         return convertView;
     }
 
-    /*public ArrayList<FTPFile> getSelectedFileList() {
-        ArrayList<FTPFile> sSelectedFileList = new ArrayList<>();
-
-        return sSelectedFileList;
-    }*/
-
     private boolean mIsCheckboxShown = false;
-    public void enabledCheckBoxVisibility(boolean b) {
-        this.mIsCheckboxShown = true;
-        this.notifyDataSetChanged();
+    public void setCheckBoxVisibility(boolean b) {
+        this.mIsCheckboxShown = b;
+        //this.notifyDataSetChanged();
     }
 
     private class ViewHolder {
         public ImageView mIcon;
         public TextView mFileName;
         public TextView mFileSize;
-        public CheckBox mIsChecked;
+        public CheckBox mIsSelected;
     }
 }

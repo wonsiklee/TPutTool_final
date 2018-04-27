@@ -1,4 +1,4 @@
-package com.lge.tputmaster;
+package com.android.LGSetupWizard;
 
 // Declare any non-default types here with import statements
 

@@ -1,6 +1,6 @@
-package com.lge.tputmaster;
+package com.android.LGSetupWizard;
 
-import com.lge.tputmaster.adapters.FragmentPagerAdapter;
+import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
@@ -107,4 +107,10 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     public void onPageScrollStateChanged(int state) {
         // do nothing
     }
+
+   /* @Override
+    public void onBackPressed() {
+        if (this.mNavigation.getSelectedItemId() == this.mFragmentPagerAdapter.getItem(position).getId()) {
+        super.onBackPressed();
+    }*/
 }

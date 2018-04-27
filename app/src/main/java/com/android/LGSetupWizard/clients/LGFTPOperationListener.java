@@ -1,7 +1,8 @@
-package com.lge.tputmaster.clients;
+package com.android.LGSetupWizard.clients;
 
 import android.support.annotation.Nullable;
-import org.apache.commons.net.ftp.FTPFile;
+
+import com.android.LGSetupWizard.data.LGFTPFile;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 
 public interface LGFTPOperationListener {
     // server connection
-    void onConnectToServerFinished(@Nullable ArrayList<FTPFile> fileNames);
+    void onConnectToServerFinished(@Nullable ArrayList<LGFTPFile> fileNames);
     void onDisconnectToServerFinished();
 
     // download
@@ -20,6 +21,6 @@ public interface LGFTPOperationListener {
     void onDownloadFinished();
 
     // file exploring
-    void onGetFileListFinished(ArrayList<FTPFile> fileList);
-    void onChangeDirectoryFinished();
+    void onGetFileListFinished(ArrayList<LGFTPFile> fileList);
+    void onChangeDirectoryFinished(ArrayList<LGFTPFile> fileList);
 }

@@ -1,4 +1,4 @@
-package com.lge.tputmaster.clients;
+package com.android.LGSetupWizard.clients;
 
 import android.util.Log;
 
@@ -68,6 +68,8 @@ public class LGNIAClient {
         @Override
         public void run() {
             queryServerIP();
+            //mServerIP = "113.217.230.29";
+            mPortNum = 5001;
             openConnection();
             executeReceiveLoop();
             closeConnection();
@@ -136,14 +138,17 @@ public class LGNIAClient {
         }
 
         private void queryServerIP() {
+            Log.d(TAG, "queryServerIP() ENTER");
             URL url;
             HttpURLConnection urlConnection = null;
             try {
+                Log.d(TAG, "1");
                 url = new URL("http://speed.nia.or.kr/mobile/ispIPCall.asp?route_id=8");
                 urlConnection = (HttpURLConnection) url.openConnection();
+                Log.d(TAG, "2");
                 InputStream is = urlConnection.getInputStream();
                 InputStreamReader isr = new InputStreamReader(is);
-
+                Log.d(TAG, "3");
                 int data;
                 String content = "";
                 while ((data = isr.read()) != -1) {
@@ -154,16 +159,21 @@ public class LGNIAClient {
                 this.mServerIP = array[0].split("=")[1];
                 this.mPortNum = Integer.valueOf(array[1].split("=")[1]);
             } catch (MalformedURLException e) {
+                Log.d(TAG, "MalformedURLException : " + e.getMessage());
                 e.printStackTrace();
             } catch (IOException e) {
+                Log.d(TAG, "IOException : " + e.getMessage());
                 e.printStackTrace();
             } catch (NumberFormatException e) {
+                Log.d(TAG, "NumberFormatException : " + e.getMessage());
                 e.printStackTrace();
             }finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
             }
+
+            Log.d(TAG, "queryServerIP() EXIT");
         }
 
         private void closeConnection() {

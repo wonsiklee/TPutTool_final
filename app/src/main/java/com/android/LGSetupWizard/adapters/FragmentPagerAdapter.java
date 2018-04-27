@@ -1,12 +1,12 @@
-package com.lge.tputmaster.adapters;
+package com.android.LGSetupWizard.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.lge.tputmaster.fragments.ConfigurationFragment;
-import com.lge.tputmaster.fragments.LGFTPFragment;
-import com.lge.tputmaster.fragments.LGNIAFragment;
+import com.android.LGSetupWizard.fragments.LGFTPFragment;
+import com.android.LGSetupWizard.fragments.LGNIAFragment;
+import com.android.LGSetupWizard.fragments.ConfigurationFragment;
 
 import java.util.ArrayList;
 

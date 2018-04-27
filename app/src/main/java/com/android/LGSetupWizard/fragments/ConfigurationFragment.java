@@ -1,11 +1,11 @@
-package com.lge.tputmaster.fragments;
+package com.android.LGSetupWizard.fragments;
 
-import com.lge.tputmaster.IDeviceMonitoringService;
-import com.lge.tputmaster.IDeviceMonitoringServiceCallback;
-import com.lge.tputmaster.adapters.PackageNameSpinnerAdapter;
-import com.lge.tputmaster.statsreader.CPUStatsReader;
-import com.lge.tputmaster.R;
-import com.lge.tputmaster.service.DeviceMonitoringService;
+import com.android.LGSetupWizard.IDeviceMonitoringService;
+import com.android.LGSetupWizard.IDeviceMonitoringServiceCallback;
+import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.statsreader.CPUStatsReader;
+import com.android.LGSetupWizard.adapters.PackageNameSpinnerAdapter;
+import com.android.LGSetupWizard.service.DeviceMonitoringService;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -279,6 +279,7 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
             String sCpuClockFilePath = (TextUtils.isEmpty(sTemp)) ? mEditTxtCPUClockPath.getHint().toString() : sTemp;
 
             sTemp = mEditTxtThermalPath.getText().toString();
+            Log.d(TAG, "sTemp : " + sTemp);
             String sCpuThermalFilePath = (TextUtils.isEmpty(sTemp)) ? mEditTxtThermalPath.getHint().toString() : sTemp;
 
             sTemp = mEditTxtInstantaneousTputCalculationDurationTime.getText().toString();
@@ -579,7 +580,8 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
         this.mUIControlList.add(this.mRdoBtnThermalManual);
 
         this.mEditTxtThermalPath = (EditText) this.mView.findViewById(R.id.editText_thermal_path);
-        /*this.mEditTxtThermalPath.setText(CPUStatsReader.getVtsFilePath());*/
+        Log.d(TAG, "get text : " + this.mEditTxtThermalPath.getText());
+        //this.mEditTxtThermalPath.setText(CPUStatsReader.getVtsFilePath());
         this.mUIControlList.add(mEditTxtThermalPath);
 
         this.mEditTxtInstantaneousTputCalculationDurationTime = (EditText) this.mView.findViewById(R.id.editText_time_threshold_value);

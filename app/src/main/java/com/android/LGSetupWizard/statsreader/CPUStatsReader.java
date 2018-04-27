@@ -1,6 +1,6 @@
-package com.lge.tputmaster.statsreader;
+package com.android.LGSetupWizard.statsreader;
 
-import com.lge.tputmaster.data.DeviceStatsInfoStorageManager;
+import com.android.LGSetupWizard.data.DeviceStatsInfoStorageManager;
 
 import android.util.Log;
 
@@ -149,11 +149,14 @@ public class CPUStatsReader {
         if (THERMAL_ZONE_COUNT == -1) {
             THERMAL_ZONE_COUNT = getNumOfThermalZones(mThermalZoneFilePath);
         }
+        Log.d(TAG, "THERMAL_ZONE_COUNT : " + THERMAL_ZONE_COUNT);
 
         for (File path : mThermalZoneFileArray) {
             String tmp = cmdCat(path.toString() + "/type").replace("\n", "");
             //tmp = tmp.substring(0, tmp.length()-1);
-            if ("vts".equals(tmp)) {
+            Log.d(TAG, "filePath = " + path.toString());
+            Log.d(TAG, "type value : " + tmp);
+            if (tmp != null && tmp.contains("vts")) {
                 tmp = path.getPath() + "/temp";
                 mVtsThermalZoneFilePath = tmp;
                 return tmp;

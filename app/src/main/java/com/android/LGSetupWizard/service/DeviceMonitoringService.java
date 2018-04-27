@@ -1,4 +1,4 @@
-package com.lge.tputmaster.service;
+package com.android.LGSetupWizard.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -12,11 +12,11 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.lge.tputmaster.IDeviceMonitoringService;
-import com.lge.tputmaster.IDeviceMonitoringServiceCallback;
-import com.lge.tputmaster.data.DeviceStatsInfo;
-import com.lge.tputmaster.data.DeviceStatsInfoStorageManager;
-import com.lge.tputmaster.R;
+import com.android.LGSetupWizard.IDeviceMonitoringService;
+import com.android.LGSetupWizard.IDeviceMonitoringServiceCallback;
+import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.data.DeviceStatsInfo;
+import com.android.LGSetupWizard.data.DeviceStatsInfoStorageManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

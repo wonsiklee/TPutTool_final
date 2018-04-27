@@ -1,4 +1,4 @@
-package com.lge.tputmaster.clients;
+package com.android.LGSetupWizard.clients;
 
 /**
  * Created by wonsik.lee on 2017-06-07.

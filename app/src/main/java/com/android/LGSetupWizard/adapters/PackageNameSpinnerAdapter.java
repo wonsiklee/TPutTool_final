@@ -1,4 +1,4 @@
-package com.lge.tputmaster.adapters;
+package com.android.LGSetupWizard.adapters;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.lge.tputmaster.R;
+import com.android.LGSetupWizard.R;
 
 import java.util.ArrayList;
 import java.util.Comparator;

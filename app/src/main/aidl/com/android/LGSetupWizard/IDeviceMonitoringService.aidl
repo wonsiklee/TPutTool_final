@@ -1,8 +1,8 @@
 // IDeviceMonitoringService.aidl
-package com.lge.tputmaster;
+package com.android.LGSetupWizard;
 
 // Declare any non-default types here with import statements
-import com.lge.tputmaster.IDeviceMonitoringServiceCallback;
+import com.android.LGSetupWizard.IDeviceMonitoringServiceCallback;
 
 interface IDeviceMonitoringService {
     boolean registerCallback(IDeviceMonitoringServiceCallback callback);

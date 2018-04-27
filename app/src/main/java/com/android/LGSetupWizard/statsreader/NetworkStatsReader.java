@@ -1,4 +1,4 @@
-package com.lge.tputmaster.statsreader;
+package com.android.LGSetupWizard.statsreader;
 
 import android.content.Context;
 import android.net.TrafficStats;

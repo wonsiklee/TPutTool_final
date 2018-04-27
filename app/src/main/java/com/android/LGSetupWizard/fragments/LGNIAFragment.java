@@ -1,8 +1,8 @@
-package com.lge.tputmaster.fragments;
+package com.android.LGSetupWizard.fragments;
 
-import com.lge.tputmaster.R;
-import com.lge.tputmaster.clients.LGNIAClient;
-import com.lge.tputmaster.clients.LGNIADownloadStateChangeListener;
+import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.clients.LGNIAClient;
+import com.android.LGSetupWizard.clients.LGNIADownloadStateChangeListener;
 
 import android.content.Context;
 import android.os.Bundle;

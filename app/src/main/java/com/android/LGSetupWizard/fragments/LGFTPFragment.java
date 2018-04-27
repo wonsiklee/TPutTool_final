@@ -348,8 +348,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
             if (!"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
                 Toast.makeText(this.getContext(), this.mLGFtpClient.getCurrentWorkingDirectory(), Toast.LENGTH_LONG).show();
                 this.mLGFtpClient.changeWorkingDirectory("../");
+                return true;
+            } else {
+                return false;
             }
-            return true;
         }
         return false;
     }

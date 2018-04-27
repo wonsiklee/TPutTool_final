@@ -119,13 +119,7 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
             sHolder = (ViewHolder) convertView.getTag();
         }
 
-        Log.d(TAG, "checkbox visibility : " + mIsCheckboxShown);
         sHolder.mIsSelected.setVisibility(View.INVISIBLE);
-        /*if (mIsCheckboxShown) {
-            sHolder.mIsSelected.setVisibility(View.VISIBLE);
-        } else {
-            sHolder.mIsSelected.setVisibility(View.INVISIBLE);
-        }*/
 
         FTPFile ff = this.mFileList.get(position);
         if (FTPFile.DIRECTORY_TYPE == ff.getType()) {
@@ -134,26 +128,15 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
             sHolder.mIcon.setImageDrawable(this.mContext.getDrawable(R.drawable.ic_file));
         }
 
-        Log.d(TAG, "sHolder : " + sHolder + ", " + ff.toString());
-
         sHolder.mFileName.setText(ff.getName());
         sHolder.mFileSize.setText((ff.getSize() / 1024/ 1024) + " MB");
         if (this.isFileSelectedAt(position)) {
-            Log.d(TAG, "selected : " + position);
             convertView.setBackgroundColor(R.color.selected_color);
         } else {
-            Log.d(TAG, "not selected : " + position);
             convertView.setBackgroundColor(Color.WHITE);
         }
 
-        Log.d(TAG, "getView() : completed");
         return convertView;
-    }
-
-    private boolean mIsCheckboxShown = false;
-    public void setCheckBoxVisibility(boolean b) {
-        this.mIsCheckboxShown = b;
-        //this.notifyDataSetChanged();
     }
 
     private class ViewHolder {

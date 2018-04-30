@@ -1,7 +1,5 @@
 package com.android.LGSetupWizard.fragments;
 
-
-import android.app.LGFragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,7 +19,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
@@ -358,6 +355,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
             if (this.mLGFtpClient != null && !"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
+                LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
                 new Thread() {
                     @Override
                     public void run() {

@@ -103,11 +103,13 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        Log.d(TAG, "onPageScrolled()");
         // do nothing
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        Log.d(TAG, "onPageScrollStateChanger()");
         // do nothing
     }
 
@@ -132,7 +134,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
             return;
         } else {
             this.isDoubleTouched = true;
-            Toast.makeText(this, "종료할라면 한번 더!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "종료할라면 한번 더 터치!!", Toast.LENGTH_SHORT).show();
             this.mHandler.sendEmptyMessageDelayed(MSG_RESET_FIRST_TOUCH, 1000);
         }
     }

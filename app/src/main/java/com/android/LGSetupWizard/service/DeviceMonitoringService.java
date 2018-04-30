@@ -405,9 +405,9 @@ public class DeviceMonitoringService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind()");
+        Log.d(TAG, "onUnbind() : " + intent);
         if (this.mServiceLogicHandler.hasMessages(EVENT_FIRE_UP_FORCED_RECORDING_LOOP) ||
-                this.mServiceLogicHandler.hasMessages(EVENT_RECORD_STATS_INFO_FORCIBLY)) {
+            this.mServiceLogicHandler.hasMessages(EVENT_RECORD_STATS_INFO_FORCIBLY)) {
             this.mServiceLogicHandler.sendEmptyMessage(EVENT_STOP_FORCED_RECORDING_LOOP);
         } else if (this.mServiceLogicHandler.hasMessages(EVENT_FIRE_UP_MONITORING_LOOP) ||
                 this.mServiceLogicHandler.hasMessages(EVENT_ENTER_IDLE_MONITORING_STATE) ||

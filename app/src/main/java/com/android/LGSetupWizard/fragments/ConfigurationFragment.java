@@ -172,6 +172,10 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy()");
+        if (this.mConnection != null) {
+            this.getContext().unbindService(this.mConnection);
+        }
         super.onDestroy();
     }
 

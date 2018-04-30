@@ -102,7 +102,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         new Thread() {
             @Override
             public void run() {
-                if (LGFTPFragment.this.mLGFtpClient.isAvailable()) {
+                if (LGFTPFragment.this.mLGFtpClient != null && LGFTPFragment.this.mLGFtpClient.isAvailable()) {
                     LGFTPFragment.this.mLGFtpClient.disconnectFromServer();
                 }
             }
@@ -357,7 +357,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            if (!"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
+            if (this.mLGFtpClient != null && !"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
                 new Thread() {
                     @Override
                     public void run() {
@@ -365,8 +365,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
                     }
                 }.start();
                 return true;
-            } else {
-                return false;
             }
         }
         return false;

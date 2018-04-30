@@ -3,6 +3,8 @@ package com.android.LGSetupWizard;
 import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
@@ -10,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
@@ -108,9 +111,29 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         // do nothing
     }
 
-   /* @Override
+    private boolean isDoubleTouched = false;
+    private final static int MSG_RESET_FIRST_TOUCH = 0x1;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == MSG_RESET_FIRST_TOUCH) {
+                isDoubleTouched = false;
+            }
+        }
+    };
+
+    @Override
     public void onBackPressed() {
-        if (this.mNavigation.getSelectedItemId() == this.mFragmentPagerAdapter.getItem(position).getId()) {
-        super.onBackPressed();
-    }*/
+        Log.d(TAG, "isDoubleTouched " + this.isDoubleTouched);
+        if (this.isDoubleTouched) {
+            this.mHandler.removeMessages(MSG_RESET_FIRST_TOUCH);
+            super.onBackPressed();
+            return;
+        } else {
+            this.isDoubleTouched = true;
+            Toast.makeText(this, "종료할라면 한번 더!!", Toast.LENGTH_SHORT).show();
+            this.mHandler.sendEmptyMessageDelayed(MSG_RESET_FIRST_TOUCH, 1000);
+        }
+    }
 }

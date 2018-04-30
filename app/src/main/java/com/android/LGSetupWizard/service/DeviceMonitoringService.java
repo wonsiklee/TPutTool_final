@@ -76,6 +76,8 @@ public class DeviceMonitoringService extends Service {
                             mCallbacks.getBroadcastItem(i).onMonitoringStarted();
                         } catch (RemoteException e) {
                             e.printStackTrace();
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
                         }
                     }
                     mCallbacks.finishBroadcast();
@@ -94,7 +96,6 @@ public class DeviceMonitoringService extends Service {
                         sendEmptyMessage(EVENT_EXIT_IDLE_MONITORING_STATE);
                         break;
                     } else {
-                        Log.d(TAG, "dddddddddddddddddddddddddddddddd");
                         for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                             l.onDeviceMonitoringLoopStopped();
                         }
@@ -105,6 +106,8 @@ public class DeviceMonitoringService extends Service {
                             try {
                                 mCallbacks.getBroadcastItem(i).onMonitoringStopped();
                             } catch (RemoteException e) {
+                                e.printStackTrace();
+                            } catch (NullPointerException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -435,7 +438,7 @@ public class DeviceMonitoringService extends Service {
         this.mServiceLogicHandler.sendMessage(sMsg);
     }
 
-    RemoteCallbackList<IDeviceMonitoringServiceCallback> mCallbacks = new RemoteCallbackList<>();
+    private RemoteCallbackList<IDeviceMonitoringServiceCallback> mCallbacks = new RemoteCallbackList<>();
 
     private IDeviceMonitoringService.Stub mBinder = new IDeviceMonitoringService.Stub() {
 

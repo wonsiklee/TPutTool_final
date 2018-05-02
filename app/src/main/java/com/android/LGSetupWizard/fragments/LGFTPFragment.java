@@ -173,8 +173,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
             }
         });
 
-        this.mFTPFileListVIewAdapter = new LGFTPFileListViewAdapter(this.getContext());
-        this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
+        if (this.mFTPFileListVIewAdapter == null) {
+            this.mFTPFileListVIewAdapter = new LGFTPFileListViewAdapter(this.getContext());
+            this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
+        }
+
         Log.d(TAG, "onResume() completed");
     }
 
@@ -265,6 +268,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
             Log.d(TAG, "onDownloadFinished() " + result);
             new MediaScanning(LGFTPFragment.this.getContext(), file);
             LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
+            LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
         }
     };
 

@@ -25,7 +25,9 @@ import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.LGFTPOperationListener;
+import com.android.LGSetupWizard.data.MediaScanning;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -259,8 +261,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         }
 
         @Override
-        public void onDownloadFinished() {
-            Log.d(TAG, "onDownloadFinished()");
+        public void onDownloadFinished(boolean result, File file) {
+            Log.d(TAG, "onDownloadFinished() " + result);
+            new MediaScanning(LGFTPFragment.this.getContext(), file);
+            LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
         }
     };
 
@@ -335,10 +339,23 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "DL button start onClick()");
-            ArrayList<LGFTPFile> sSelectedFileList = LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFile();
+            final ArrayList<LGFTPFile> sSelectedFileList = LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFile();
             Log.d(TAG, "Selected file count : " + sSelectedFileList.size());
             for (LGFTPFile file: sSelectedFileList) {
                 Log.d(TAG, "\t" + file.toString());
+            }
+
+            if (sSelectedFileList.size() > 0) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            LGFTPFragment.this.mLGFtpClient.retrieveFileOutputStream(sSelectedFileList.get(0));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
             }
         }
     };

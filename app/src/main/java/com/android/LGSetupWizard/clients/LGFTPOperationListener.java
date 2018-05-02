@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -18,7 +19,7 @@ public interface LGFTPOperationListener {
     // download
     void onDownloadProgressPublished(float progress);
     void onDownloadStarted();
-    void onDownloadFinished();
+    void onDownloadFinished(boolean result, File file);
 
     // file exploring
     void onGetFileListFinished(ArrayList<LGFTPFile> fileList);

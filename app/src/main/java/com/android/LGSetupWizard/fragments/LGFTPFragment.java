@@ -62,6 +62,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     final static int MSG_CONNECT_TO_SERVER_FINISHED = 0x00;
     final static int MSG_FILE_SET_CHANGED = 0x01;
     final static int MSG_DISCONNECT_FROM_SERVER_FINISHED = 0x02;
+    final static int MSG_NOTIFY_DATA_SET_CHANGED = 0x03;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -254,21 +255,20 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         }
 
         @Override
-        public void onDownloadProgressPublished(float progress) {
-            Log.d(TAG, "onDownloadProgressPublished(float progress) : " + progress);
+        public void onDownloadProgressPublished(float tputValue, long downloadedBytes) {
+            Log.d(TAG, "onDownloadProgressPublished(float tputValue, long downloadedBytes) : " + tputValue);
         }
 
         @Override
-        public void onDownloadStarted() {
-            Log.d(TAG, "onDownloadStarted()");
+        public void onDownloadStarted(long fileSize) {
+            Log.d(TAG, "onDownloadStarted(long fileSize) : " + fileSize);
         }
 
         @Override
         public void onDownloadFinished(boolean result, File file) {
             Log.d(TAG, "onDownloadFinished() " + result);
             new MediaScanning(LGFTPFragment.this.getContext(), file);
-            LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
-            LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+            mUIControlHandler.sendEmptyMessage(MSG_NOTIFY_DATA_SET_CHANGED);
         }
     };
 
@@ -277,6 +277,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                case MSG_NOTIFY_DATA_SET_CHANGED:
+                    LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
+                    LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+                    break;
                 case MSG_FILE_SET_CHANGED:
                     debug_printCurrentFileList();
 

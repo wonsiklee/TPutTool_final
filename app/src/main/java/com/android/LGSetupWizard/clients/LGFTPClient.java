@@ -1,5 +1,6 @@
 package com.android.LGSetupWizard.clients;
 
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -164,11 +165,13 @@ public class LGFTPClient {
             switch (msg.what) {
                 case MSG_START_LOOP:
                     sendEmptyMessage(MSG_CACULATE_TPUT);
+                    mOperationListener.onDownloadStarted(msg.getData().getLong("file_size"));
                     break;
                 case MSG_CACULATE_TPUT:
                     Log.d(TAG, "mDownloadedBytes = " + mDownloadedBytes + ", mElapsedTime = " + ((float) mElapsedTime/ 1000) + " secs");
                     LGFTPClient.this.mAvgTPut = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
-                    Log.d(TAG, "TPut : " + LGFTPClient.this.mAvgTPut + " Mbps");
+                    Log.d(TAG, "Avg TPut : " + LGFTPClient.this.mAvgTPut + " Mbps");
+                    mOperationListener.onDownloadProgressPublished(LGFTPClient.this.mAvgTPut, mDownloadedBytes);
                     sendEmptyMessageDelayed(MSG_CACULATE_TPUT, 1000);
                     break;
                 case MSG_STOP_LOOP:
@@ -232,7 +235,12 @@ public class LGFTPClient {
             sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
 
             this.mStartTime = System.currentTimeMillis();
-            LGFTPClient.this.mTputCalculationLoopHandler.sendEmptyMessage(MSG_START_LOOP);
+            Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_LOOP);
+            Bundle b  = new Bundle();
+            b.putLong("file_size", targetFile.getSize());
+            msg.setData(b);
+            //LGFTPClient.this.mTputCalculationLoopHandler.sendEmptyMessage(MSG_START_LOOP);
+            LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
             ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
             if (ret) {
                 Log.d(TAG, "downloaded successfully");

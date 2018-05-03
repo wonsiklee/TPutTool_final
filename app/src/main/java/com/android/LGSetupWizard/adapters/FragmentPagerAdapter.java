@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.android.LGSetupWizard.fragments.LGFTPFragment;
+import com.android.LGSetupWizard.fragments.LGIperfFragment;
 import com.android.LGSetupWizard.fragments.LGNIAFragment;
 import com.android.LGSetupWizard.fragments.ConfigurationFragment;
 
@@ -21,6 +22,7 @@ public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
         this.mFragmentArrayList.add(new ConfigurationFragment());
         this.mFragmentArrayList.add(new LGNIAFragment());
         this.mFragmentArrayList.add(new LGFTPFragment());
+        this.mFragmentArrayList.add(new LGIperfFragment());
     }
 
     @Override

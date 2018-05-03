@@ -43,7 +43,7 @@ public class LGIperfFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView()");
         if (mView == null) {
-            mView = inflater.inflate(R.layout.fragment_nia, container, false);
+            mView = inflater.inflate(R.layout.fragment_iperf, container, false);
             //this.initUIControls();
 
             mLGIperfClient = new LGIperfClient();

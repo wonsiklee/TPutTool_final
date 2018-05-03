@@ -38,6 +38,10 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
                 Log.d(TAG, "onNavigationItemSelected() " + "2");
                 mViewPager.setCurrentItem(2);
                 return true;
+            case R.id.navigation_iperf:
+                Log.d(TAG, "onNavigationItemSelected() " + "2");
+                mViewPager.setCurrentItem(3);
+                return true;
         }
         return false;
     }

@@ -3,6 +3,7 @@
     <string name="title_configuration">설정</string>
     <string name="title_nia">NIA</string>
     <string name="title_ftp">FTP</string>
+    <string name="title_iperf">Iperf</string>
     <string name="str_start_nia_test">테스트 시작</string>
     <string name="str_stop_nia_test">테스트 중지</string>
     <string name="str_package_name_all_traffic">All traffic</string>

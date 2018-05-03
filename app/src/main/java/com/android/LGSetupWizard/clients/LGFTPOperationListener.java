@@ -17,8 +17,8 @@ public interface LGFTPOperationListener {
     void onDisconnectToServerFinished();
 
     // download
-    void onDownloadProgressPublished(float progress);
-    void onDownloadStarted();
+    void onDownloadProgressPublished(float tputValue, long downloadedBytes);
+    void onDownloadStarted(long fileSize);
     void onDownloadFinished(boolean result, File file);
 
     // file exploring

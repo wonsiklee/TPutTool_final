@@ -251,10 +251,13 @@ public class LGFTPClient {
             Log.d(TAG, "************************************************************");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            Log.e(TAG, "FileNotFoundException : " + e.getMessage());
         } catch (FTPConnectionClosedException e) {
             e.printStackTrace();
+            Log.e(TAG, "FTPConnectionClosedException : " + e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+            Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
             LGFTPClient.this.mTputCalculationLoopHandler.sendEmptyMessage(MSG_STOP_LOOP);
             if (sOutputStream != null) {

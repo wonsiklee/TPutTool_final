@@ -64,7 +64,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     final static int MSG_FILE_SET_CHANGED = 0x01;
     final static int MSG_DISCONNECT_FROM_SERVER_FINISHED = 0x02;
     final static int MSG_NOTIFY_DATA_SET_CHANGED = 0x03;
-    final static int MSG_NOTIFY_DOWNLOAD_FAILED = 0x04;
+    final static int MSG_NOTIFY_DOWNLOAD_FINISHED = 0x04;
+
+    final static private String KEY_DOWNLOAD_FILE_NAME = "file_name";
+    final static private String KEY_DOWNLOAD_RESULT = "file_size";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -258,12 +261,12 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
 
         @Override
         public void onDownloadProgressPublished(float tputValue, long downloadedBytes) {
-            Log.d(TAG, "onDownloadProgressPublished(float tputValue, long downloadedBytes) : " + tputValue);
+            Log.d(TAG, "onDownloadProgressPublished(float tputValue, long downloadedBytes) : " + tputValue + ", " + downloadedBytes + " bytes");
         }
 
         @Override
-        public void onDownloadStarted(long fileSize) {
-            Log.d(TAG, "onDownloadStarted(long fileSize) : " + fileSize);
+        public void onDownloadStarted(LGFTPFile file) {
+            Log.d(TAG, "onDownloadStarted() : " + file.getName() + ", size : " + file.getSize());
         }
 
         @Override
@@ -271,9 +274,15 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
             Log.d(TAG, "onDownloadFinished() " + result);
             if (result) {
                 new MediaScanning(LGFTPFragment.this.getContext(), file);
-            } else {
-                mUIControlHandler.sendEmptyMessage(MSG_NOTIFY_DOWNLOAD_FAILED);
             }
+
+            Message msg = mUIControlHandler.obtainMessage(MSG_NOTIFY_DOWNLOAD_FINISHED);
+            Bundle b = new Bundle();
+            b.putBoolean(KEY_DOWNLOAD_RESULT, result);
+            b.putString(KEY_DOWNLOAD_FILE_NAME, file.getName());
+            msg.setData(b);
+
+            mUIControlHandler.sendMessage(msg);
             mUIControlHandler.sendEmptyMessage(MSG_NOTIFY_DATA_SET_CHANGED);
         }
     };
@@ -283,13 +292,20 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_NOTIFY_DOWNLOAD_FAILED:
-                    Toast.makeText(LGFTPFragment.this.getContext(), "Download failed ", Toast.LENGTH_LONG).show();
+                case MSG_NOTIFY_DOWNLOAD_FINISHED:
+                    Bundle b = msg.getData();
+                    boolean sDownloadResult = b.getBoolean(KEY_DOWNLOAD_RESULT);
+                    String sDownloadFileName = b.getString(KEY_DOWNLOAD_FILE_NAME);
+                    Toast.makeText(LGFTPFragment.this.getContext(),"FileName : " + sDownloadFileName +
+                                                                        "\nDownload " + ((sDownloadResult) ? " completed" : " FAILED!!!"),
+                                    Toast.LENGTH_LONG).show();
                     break;
+
                 case MSG_NOTIFY_DATA_SET_CHANGED:
                     LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     break;
+
                 case MSG_FILE_SET_CHANGED:
                     debug_printCurrentFileList();
 
@@ -367,7 +383,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
                     @Override
                     public void run() {
                         try {
-                            LGFTPFragment.this.mLGFtpClient.retrieveFileOutputStream(sSelectedFileList.get(0));
+                            LGFTPFragment.this.mLGFtpClient.retrieveFileOutputStream(sSelectedFileList);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

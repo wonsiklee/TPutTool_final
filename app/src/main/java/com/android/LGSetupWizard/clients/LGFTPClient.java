@@ -157,30 +157,32 @@ public class LGFTPClient {
     private float mAvgTPut;
 
     final static private int MSG_START_LOOP = 0x00;
-    final static private int MSG_CACULATE_TPUT = 0x01;
+    final static private int MSG_CALCULATE_TPUT = 0x01;
     final static private int MSG_STOP_LOOP = 0x02;
+
+    final static private String KEY_FILE_SIZE = "file_size";
 
     private Handler mTputCalculationLoopHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_START_LOOP:
-                    sendEmptyMessage(MSG_CACULATE_TPUT);
-                    mOperationListener.onDownloadStarted(msg.getData().getLong("file_size"));
+                    sendEmptyMessage(MSG_CALCULATE_TPUT);
+                    mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE_SIZE));
                     break;
-                case MSG_CACULATE_TPUT:
+                case MSG_CALCULATE_TPUT:
                     Log.d(TAG, "mDownloadedBytes = " + mDownloadedBytes + ", mElapsedTime = " + ((float) mElapsedTime/ 1000) + " secs");
                     LGFTPClient.this.mAvgTPut = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
                     Log.d(TAG, "Avg TPut : " + LGFTPClient.this.mAvgTPut + " Mbps");
                     mOperationListener.onDownloadProgressPublished(LGFTPClient.this.mAvgTPut, mDownloadedBytes);
-                    sendEmptyMessageDelayed(MSG_CACULATE_TPUT, 1000);
+                    sendEmptyMessageDelayed(MSG_CALCULATE_TPUT, 1000);
                     break;
                 case MSG_STOP_LOOP:
                     if (this.hasMessages(MSG_START_LOOP)) {
                         this.removeMessages(MSG_START_LOOP);
                     }
-                    if (this.hasMessages(MSG_CACULATE_TPUT)) {
-                        this.removeMessages(MSG_CACULATE_TPUT);
+                    if (this.hasMessages(MSG_CALCULATE_TPUT)) {
+                        this.removeMessages(MSG_CALCULATE_TPUT);
                     }
                     LGFTPClient.this.mDownloadedBytes = 0;
                     LGFTPClient.this.mStartTime = 0;
@@ -193,6 +195,16 @@ public class LGFTPClient {
             }
         }
     };
+
+    public boolean retrieveFileOutputStream(ArrayList<LGFTPFile> targetFileList) throws Exception {
+        for (LGFTPFile file: targetFileList) {
+            if (!this.retrieveFileOutputStream(file)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean retrieveFileOutputStream(LGFTPFile targetFile) throws Exception {
         boolean ret = false;
         Log.d(TAG, "retrieve " + targetFile);
@@ -238,9 +250,9 @@ public class LGFTPClient {
             this.mStartTime = System.currentTimeMillis();
             Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_LOOP);
             Bundle b  = new Bundle();
-            b.putLong("file_size", targetFile.getSize());
+            b.putSerializable(KEY_FILE_SIZE, targetFile);
+            //b.putLong(KEY_FILE_SIZE, targetFile.getSize());
             msg.setData(b);
-            //LGFTPClient.this.mTputCalculationLoopHandler.sendEmptyMessage(MSG_START_LOOP);
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
             ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
             if (ret) {

@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
@@ -63,6 +64,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
     final static int MSG_FILE_SET_CHANGED = 0x01;
     final static int MSG_DISCONNECT_FROM_SERVER_FINISHED = 0x02;
     final static int MSG_NOTIFY_DATA_SET_CHANGED = 0x03;
+    final static int MSG_NOTIFY_DOWNLOAD_FAILED = 0x04;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -267,7 +269,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         @Override
         public void onDownloadFinished(boolean result, File file) {
             Log.d(TAG, "onDownloadFinished() " + result);
-            new MediaScanning(LGFTPFragment.this.getContext(), file);
+            if (result) {
+                new MediaScanning(LGFTPFragment.this.getContext(), file);
+            } else {
+                mUIControlHandler.sendEmptyMessage(MSG_NOTIFY_DOWNLOAD_FAILED);
+            }
             mUIControlHandler.sendEmptyMessage(MSG_NOTIFY_DATA_SET_CHANGED);
         }
     };
@@ -277,6 +283,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                case MSG_NOTIFY_DOWNLOAD_FAILED:
+                    Toast.makeText(LGFTPFragment.this.getContext(), "Download failed ", Toast.LENGTH_LONG).show();
+                    break;
                 case MSG_NOTIFY_DATA_SET_CHANGED:
                     LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();

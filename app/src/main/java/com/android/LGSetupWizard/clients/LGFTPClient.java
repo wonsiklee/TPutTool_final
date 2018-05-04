@@ -9,6 +9,7 @@ import android.util.Log;
 import com.android.LGSetupWizard.data.LGFTPFile;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.CopyStreamEvent;
@@ -250,6 +251,8 @@ public class LGFTPClient {
             Log.d(TAG, "************************************************************");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (FTPConnectionClosedException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -260,7 +263,7 @@ public class LGFTPClient {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                mOperationListener.onDownloadFinished(true, sDownloadFile);
+                mOperationListener.onDownloadFinished(ret, sDownloadFile);
             }
         }
         return ret;

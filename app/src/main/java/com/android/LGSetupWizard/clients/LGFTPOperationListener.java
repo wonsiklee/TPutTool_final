@@ -19,7 +19,7 @@ public interface LGFTPOperationListener {
     // download
     void onDownloadProgressPublished(float tputValue, long downloadedBytes);
     void onDownloadStarted(long fileSize);
-    void onDownloadFinished(boolean result, File file);
+    void onDownloadFinished(boolean wasSuccessful, File file);
 
     // file exploring
     void onGetFileListFinished(ArrayList<LGFTPFile> fileList);

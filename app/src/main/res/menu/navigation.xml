@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--android:icon="@drawable/ic_home_black_24dp"-->
     <item
         android:id="@+id/navigation_configuration"
-        android:title="@string/title_configuration" />
+        android:title="@string/title_configuration"
+        android:icon="@drawable/ic_settings" />
 
-    <!--android:icon="@drawable/ic_dashboard_black_24dp"-->
     <item
         android:id="@+id/navigation_nia"
-        android:title="@string/title_nia" />
+        android:title="@string/title_nia"
+        android:icon="@drawable/ic_n" />
 
-    <!--android:icon="@drawable/ic_notifications_black_24dp"-->
     <item
         android:id="@+id/navigation_ftp"
-        android:title="@string/title_ftp" />
+        android:title="@string/title_ftp"
+        android:icon="@drawable/ic_f" />
 
-    <!--android:icon="@drawable/ic_notifications_black_24dp"-->
     <item
         android:id="@+id/navigation_iperf"
-        android:title="@string/title_iperf" />
+        android:title="@string/title_iperf"
+        android:icon="@drawable/ic_i" />
+
+    <item
+        android:id="@+id/navigation_http"
+        android:title="@string/title_http"
+        android:icon="@drawable/ic_h" />
 </menu>

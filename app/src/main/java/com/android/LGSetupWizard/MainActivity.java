@@ -1,18 +1,18 @@
 package com.android.LGSetupWizard;
 
-import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
-
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
 
 public class MainActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
@@ -39,8 +39,12 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
                 mViewPager.setCurrentItem(2);
                 return true;
             case R.id.navigation_iperf:
-                Log.d(TAG, "onNavigationItemSelected() " + "2");
+                Log.d(TAG, "onNavigationItemSelected() " + "3");
                 mViewPager.setCurrentItem(3);
+                return true;
+            case R.id.navigation_http:
+                Log.d(TAG, "onNavigationItemSelected() " + "4");
+                mViewPager.setCurrentItem(4);
                 return true;
         }
         return false;

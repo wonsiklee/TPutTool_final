@@ -45,7 +45,7 @@ public class LGFTPClient {
 
     //
     public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password) {
-        new Thread() {
+        /*new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -80,7 +80,37 @@ public class LGFTPClient {
                     mOperationListener.onConnectToServerFinished(fileList);
                 }
             }
-        }.start();
+        }.start();*/
+
+        ArrayList<LGFTPFile> fileList = null;
+        Log.d(TAG, "connectToServer() " + serverAddress);
+        try {
+            mFTPClient.connect(serverAddress, portNum);
+            int reply = mFTPClient.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                mFTPClient.disconnect();
+                Log.d(TAG, "connection failed, FTPReply code : " + reply);
+            } else {
+                Log.d(TAG, "successfully connected");
+                if (loginToServer(userID, password)) {
+                    Log.d(TAG, "Logged in successfully");
+                    fileList = nonThreadicGetFileList();
+                    // keep alive 2 mins.
+                    LGFTPClient.this.mFTPClient.setKeepAlive(true);
+                    LGFTPClient.this.mFTPClient.setControlKeepAliveTimeout(120);
+                    // buffer size 25 Mbytes,
+                    LGFTPClient.this.mFTPClient.setBufferSize(26214400);
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+            Log.e(TAG, "connection error: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "connection error: " + e.getMessage());
+        } finally {
+            mOperationListener.onConnectToServerFinished(fileList);
+        }
     }
 
     public void disconnectFromServer() {
@@ -285,21 +315,21 @@ public class LGFTPClient {
     }
 
     public void retrieveFileUsingFileStream(LGFTPFile targetFile) {
-        String remoteFile2 = targetFile.getName();
-        File downloadFile2 = new File("D:/Downloads/song.mp3");
-        OutputStream outputStream2 = null;
-        InputStream inputStream = null;
+        String sRemoteFile2 = targetFile.getName();
+        File sDownloadFile2 = new File("D:/Downloads/song.mp3");
+        OutputStream sOutputStream = null;
+        InputStream sInputStream = null;
         try {
-            outputStream2 = new BufferedOutputStream(new FileOutputStream(downloadFile2));
-            inputStream = this.mFTPClient.retrieveFileStream(remoteFile2);
-            byte[] bytesArray = new byte[4096];
-            int bytesRead = -1;
-            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                outputStream2.write(bytesArray, 0, bytesRead);
+            sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile2));
+            sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFile2);
+            byte[] sBytesArray = new byte[4096];
+            int sBytesRead = -1;
+            while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
+                sOutputStream.write(sBytesArray, 0, sBytesRead);
             }
 
-            boolean success = this.mFTPClient.completePendingCommand();
-            if (success) {
+            boolean sIsSuccess = this.mFTPClient.completePendingCommand();
+            if (sIsSuccess) {
                 Log.d(TAG, "File #2 has been downloaded successfully.");
             }
         } catch (FileNotFoundException e) {
@@ -308,15 +338,15 @@ public class LGFTPClient {
             e.printStackTrace();
         } finally {
             try {
-                if (outputStream2 != null) {
-                    outputStream2.close();
+                if (sOutputStream != null) {
+                    sOutputStream.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             try {
-                if (inputStream != null) {
-                    inputStream.close();
+                if (sInputStream != null) {
+                    sInputStream.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 public class LGFTPFileListViewAdapter extends BaseAdapter {
     private static String TAG = LGFTPFileListViewAdapter.class.getSimpleName();
 
-    @Setter private ArrayList<LGFTPFile> mFileList;
+    @Setter @Getter private ArrayList<LGFTPFile> mFileList;
 
     @Setter @Getter
     private ArrayList<Integer> mSelectedFilePositionList;

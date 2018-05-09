@@ -22,6 +22,5 @@ public interface LGFTPOperationListener {
     void onDownloadFinished(boolean wasSuccessful, File file);
 
     // file exploring
-    void onGetFileListFinished(ArrayList<LGFTPFile> fileList);
-    void onChangeDirectoryFinished(ArrayList<LGFTPFile> fileList);
+    void onChangeWorkingDirectoryFinished(ArrayList<LGFTPFile> fileList);
 }

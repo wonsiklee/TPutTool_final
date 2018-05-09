@@ -45,42 +45,6 @@ public class LGFTPClient {
 
     //
     public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password) {
-        /*new Thread() {
-            @Override
-            public void run() {
-                super.run();
-
-                ArrayList<LGFTPFile> fileList = null;
-                Log.d(TAG, "connectToServer() " + serverAddress);
-                try {
-                    mFTPClient.connect(serverAddress, portNum);
-                    int reply = mFTPClient.getReplyCode();
-                    if (!FTPReply.isPositiveCompletion(reply)) {
-                        mFTPClient.disconnect();
-                        Log.d(TAG, "connection failed, FTPReply code : " + reply);
-                    } else {
-                        Log.d(TAG, "successfully connected");
-                        if (loginToServer(userID, password)) {
-                            Log.d(TAG, "Logged in successfully");
-                            fileList = nonThreadicGetFileList();
-                            // keep alive 2 mins.
-                            LGFTPClient.this.mFTPClient.setKeepAlive(true);
-                            LGFTPClient.this.mFTPClient.setControlKeepAliveTimeout(120);
-                            // buffer size 25 Mbytes,
-                            LGFTPClient.this.mFTPClient.setBufferSize(26214400);
-                        }
-                    }
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "connection error: " + e.getMessage());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "connection error: " + e.getMessage());
-                } finally {
-                    mOperationListener.onConnectToServerFinished(fileList);
-                }
-            }
-        }.start();*/
 
         ArrayList<LGFTPFile> fileList = null;
         Log.d(TAG, "connectToServer() " + serverAddress);
@@ -172,7 +136,7 @@ public class LGFTPClient {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            mOperationListener.onChangeDirectoryFinished(nonThreadicGetFileList());
+            mOperationListener.onChangeWorkingDirectoryFinished(nonThreadicGetFileList());
             try {
                 mCurrentWorkingDirectory = mFTPClient.printWorkingDirectory();
             } catch (IOException e) {

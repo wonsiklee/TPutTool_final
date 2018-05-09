@@ -2,7 +2,6 @@ package com.android.LGSetupWizard.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -10,7 +9,7 @@ import android.widget.Button;
 
 import com.android.LGSetupWizard.R;
 
-public class FileDownloadProgressDialog extends Dialog implements View.OnClickListener, Dialog.OnClickListener{
+public class FileDownloadProgressDialog extends Dialog implements View.OnClickListener {
 
     private static final String TAG = FileDownloadProgressDialog.class.getSimpleName();
 
@@ -24,12 +23,17 @@ public class FileDownloadProgressDialog extends Dialog implements View.OnClickLi
     }
 
     @Override
-    public void onClick(DialogInterface dialog, int which) {
-        Log.d(TAG, "dialog on click");
+    public void onClick(View v) {
+        this.dismissDialog();
     }
 
     @Override
-    public void onClick(View v) {
-        Log.d(TAG, "asdf");
+    public void onBackPressed() {
+        this.dismissDialog();
+    }
+
+    private void dismissDialog() {
+        Log.d(TAG, "dismiss()");
+        this.dismiss();
     }
 }

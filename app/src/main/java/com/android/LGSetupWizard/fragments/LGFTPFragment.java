@@ -115,20 +115,17 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         super.onResume();
 
         this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
-        this.mNetworkOperationProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        this.mFileDownloadProgressDialog = new FileDownloadProgressDialog(this.getContext());
+        this.mFileDownloadProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 Log.d(TAG, "network operation progress bar is dismissed");
-            }
-        });
-        this.mNetworkOperationProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                Log.d(TAG, "network operation progress bar is cancelled");
-            }
-        });
+                LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_CANCELLED);
 
-        this.mFileDownloadProgressDialog = new FileDownloadProgressDialog(this.getContext());
+                /* TODO : UI has been handled within the handler message code above
+                *  but need to cleanup the download thread.*/
+            }
+        });
 
         if (this.mLGFtpClient == null) {
             this.mLGFtpClient = new LGFTPClient(this.mLGFTPOperationListener);
@@ -247,7 +244,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 Log.d(TAG, "fileList length : " + mFileList.size());
             }
 
-            mUIControlHandler.sendEmptyMessage(MSG_CONNECT_TO_SERVER_FINISHED);
+            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_CONNECT_TO_SERVER_FINISHED);
         }
 
         @Override
@@ -281,7 +278,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 new MediaScanning(LGFTPFragment.this.getContext(), file);
             }
 
-            Message msg = mUIControlHandler.obtainMessage(MSG_DOWNLOAD_FILE_FINISHED);
+            Message msg = mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();
             b.putBoolean(KEY_DOWNLOAD_RESULT, result);
             b.putString(KEY_DOWNLOAD_FILE_NAME, file.getName());
@@ -296,8 +293,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static int MSG_CHANGE_WORKING_DIRECTORY_FINISHED = 0x03;
     final static int MSG_FILE_SET_CHANGED = 0x04;
     final static int MSG_FILE_DOWNLOAD_STARTED = 0x05;
-    final static int MSG_DOWNLOAD_FILE_FINISHED = 0x06;
-    final static int MSG_CLEAR_SELECTED_FILE_LIST = 0x07;
+    final static int MSG_FILE_DOWNLOAD_CANCELLED = 0x06;
+    final static int MSG_FILE_DOWNLOAD_FINISHED = 0x07;
+    final static int MSG_CLEAR_SELECTED_FILE_LIST = 0x08;
+
 
     // UI Control handler
     private Handler mUIControlHandler = new Handler() {
@@ -351,8 +350,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.showDownloadProgressBar();
                     break;
 
-                case MSG_DOWNLOAD_FILE_FINISHED:
-                    Log.d(TAG, "MSG_DOWNLOAD_FILE_FINISHED");
+                case MSG_FILE_DOWNLOAD_CANCELLED:
+                    Log.d(TAG, "MSG_FILE_DOWNLOAD_CANCELLED");
+                    LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
+                    LGFTPFragment.this.dismissDownloadProgressBar();
+                    break;
+
+                case MSG_FILE_DOWNLOAD_FINISHED:
+                    Log.d(TAG, "MSG_FILE_DOWNLOAD_FINISHED");
                     Bundle b = msg.getData();
                     boolean sDownloadResult = b.getBoolean(KEY_DOWNLOAD_RESULT);
                     String sDownloadFileName = b.getString(KEY_DOWNLOAD_FILE_NAME);
@@ -361,6 +366,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             Toast.LENGTH_LONG).show();
 
                     LGFTPFragment.this.dismissDownloadProgressBar();
+                    LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                     break;
 
                 case MSG_CLEAR_SELECTED_FILE_LIST:
@@ -422,6 +428,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     @Override
                     public void run() {
                         try {
+                            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
                             LGFTPFragment.this.mLGFtpClient.retrieveFileOutputStream(sSelectedFileList);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -432,16 +439,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
     };
 
-    // dl stop listener
-    private View.OnClickListener mClickListenerStop = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.d(TAG, "DL button stop onClick()");
-        }
-    };
-
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
+        Log.d(TAG, "onKey() called + " + keyCode);
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
             if (this.mLGFtpClient != null && !"/".equals(this.mLGFtpClient.getCurrentWorkingDirectory())) {
                 LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();

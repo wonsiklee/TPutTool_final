@@ -45,7 +45,6 @@ public class LGFTPClient {
 
     //
     public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password) {
-
         ArrayList<LGFTPFile> fileList = null;
         Log.d(TAG, "connectToServer() " + serverAddress);
         try {
@@ -320,5 +319,14 @@ public class LGFTPClient {
 
     public String printWorkingDirectory() throws IOException {
         return this.mFTPClient.printWorkingDirectory();
+    }
+
+    public boolean stopDownload() {
+        try {
+            return this.mFTPClient.abort();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.android.LGSetupWizard.fragments;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,7 +39,7 @@ import lombok.experimental.Accessors;
  * Created by wonsik.lee on 2017-06-13.
  */
 @Accessors(prefix = "m")
-public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener {
+public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener {
     private static final String TAG = LGFTPFragment.class.getSimpleName();
 
     private View mView;
@@ -116,16 +117,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
         this.mFileDownloadProgressDialog = new FileDownloadProgressDialog(this.getContext());
-        this.mFileDownloadProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                Log.d(TAG, "network operation progress bar is dismissed");
-                LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_CANCELLED);
-
-                /* TODO : UI has been handled within the handler message code above
-                *  but need to cleanup the download thread.*/
-            }
-        });
+        this.mFileDownloadProgressDialog.setOnDismissListener(this);
 
         if (this.mLGFtpClient == null) {
             this.mLGFtpClient = new LGFTPClient(this.mLGFTPOperationListener);
@@ -284,7 +276,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             b.putString(KEY_DOWNLOAD_FILE_NAME, file.getName());
             msg.setData(b);
 
-            mUIControlHandler.sendMessage(msg);
+            LGFTPFragment.this.mUIControlHandler.sendMessage(msg);
         }
     };
 
@@ -462,6 +454,28 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         } else {
             // if it's not a file, then should follow the following steps.
             LGFTPFragment.this.changeWorkingDirectory("Changing working directory", "Retrieving file list...", file.getName());
+        }
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        if (dialog instanceof FileDownloadProgressDialog) {
+            Log.d(TAG, "onDismiss()");
+
+            Log.d(TAG, "network operation progress bar is dismissed");
+
+            /* TODO : UI has been handled within the handler message code above
+             *  but need to cleanup the download thread.*/
+            new Thread() {
+                @Override
+                public void run() {
+                    if (LGFTPFragment.this.mLGFtpClient.stopDownload()) {
+                        mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_CANCELLED);
+                    }
+                }
+            }.start();
+        } else {
+            Log.d(TAG, "not a FileDownloadProgressDialog.");
         }
     }
 }

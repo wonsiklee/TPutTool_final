@@ -17,6 +17,7 @@ import com.android.LGSetupWizard.R;
 
 import org.apache.commons.net.ftp.FTPFile;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import lombok.Getter;
@@ -64,7 +65,7 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         this.mSelectedFilePositionList.clear();
     }
 
-    public ArrayList<LGFTPFile> getSelectedFile() {
+    public ArrayList<LGFTPFile> getSelectedFileList() {
         ArrayList<LGFTPFile> sSelectedFileList = new ArrayList<>();
         for (Integer position: this.mSelectedFilePositionList) {
             sSelectedFileList.add(this.mFileList.get(position));
@@ -137,6 +138,14 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    public int getSelectedFileCount() {
+        return this.mSelectedFilePositionList.size();
+    }
+
+    public boolean isSelectedFileListEmpty() {
+        return (this.mSelectedFilePositionList.size() == 0) ? true : false;
     }
 
     private class ViewHolder {

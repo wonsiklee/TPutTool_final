@@ -18,6 +18,7 @@
             android:textSize="20dp" />
 
         <TextView
+            android:id="@+id/txtView_download_progress_file_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -42,27 +43,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal" >
 
         <TextView
             android:id="@+id/txtView_downloading_file_name"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="left"
             android:layout_marginEnd="10dp"
+            android:layout_weight="1"
             android:gravity="left"
             android:maxLines="1"
             android:minLines="1"
-            android:text="downloading file name....downloading file name....downloading file name....downloading file name....downloading file name....downloading file name...." />
+            android:text="downloading file name...." />
 
         <TextView
-            android:id="@+id/txtView_download_progress_value"
-            android:layout_width="50dp"
+            android:id="@+id/txtView_download_progress_percentage"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
+            android:layout_weight="1"
             android:gravity="end"
             android:text="100 %" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/txtView_downloading_mbytes_transferred"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transferred : 0 MBytes" />
+        <TextView
+            android:id="@+id/txtView_download_progress_avg_tput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="0.0 Mbps" />
     </LinearLayout>
 
     <LinearLayout

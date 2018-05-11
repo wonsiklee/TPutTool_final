@@ -419,7 +419,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private View.OnClickListener mClickListenerConnect = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            LGFTPFragment.this.showNetworkOperationProgressBar("Login", "Logging in...");
+            LGFTPFragment.this.showNetworkOperationProgressBar("Log in", "Logging in...");
             LGFTPFragment.this.mFileList = null;
             new Thread() {
                 @Override

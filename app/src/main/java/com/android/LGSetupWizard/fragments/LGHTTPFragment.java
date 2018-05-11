@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,12 +53,15 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private EditText mEditTxtRepeatCount;
     private Button mBtnStartDl;
     private TextView mTxtViewHTTPResult;
+    private TextView mTxtViewHTTPResultHistory;
     private CheckBox mCheckBoxEnableFileIO;
+    private ProgressBar mProgressBarHttpProgress;
 
     // listeners and HTTP Client
     private LGHTTPClient mLGHTTPClient;
     private int mRepeatCount;
-    private int mRepeatInterval = 10000;
+    private int mMaxCount;
+    private int mRepeatInterval = 5000;
     private Handler mTargetHandler;
 
     private static DataPool DATA_POOL = new DataPool();
@@ -75,14 +79,15 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
             try {
                 String tmp = LGHTTPFragment.this.mEditTxtRepeatCount.getText().toString();
-                LGHTTPFragment.this.mRepeatCount = Integer.valueOf(tmp);
+                LGHTTPFragment.this.mMaxCount = Integer.valueOf(tmp);
+                LGHTTPFragment.this.mRepeatCount = 0;
             } catch (NumberFormatException e) {
                 Log.d(TAG, "numberFormatException " + e + "\ntmp");
                 Toast.makeText(LGHTTPFragment.this.getContext(), "숫자만 됩니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Log.d(TAG, "Repeat count : " + mRepeatCount);
+            Log.d(TAG, "Repeat count : " + mMaxCount);
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(START_TEST);
         }
     };
@@ -92,6 +97,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         public void onClick(View view) {
             Log.d(TAG, "StopTestClickListener.onClick()");
             LGHTTPFragment.this.mRepeatCount = 0;
+            LGHTTPFragment.this.mMaxCount = 0;
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(END_TEST);
         }
     };
@@ -101,16 +107,13 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (mIsInProgress) {
-                this.sendEmptyMessageDelayed(0, 2000);
                 mLGHTTPClient.publishAvgTPut();
+                this.sendEmptyMessageDelayed(0, 2000);
             }
         }
     };
     public boolean mIsInProgress = false;
     private Handler mHttpTestControlHandler = new Handler() {
-
-
-
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -123,7 +126,6 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     LGHTTPFragment.this.mRdoBtnOkHttp.setClickable(false);
                     LGHTTPFragment.this.mRdoBtnApache.setClickable(false);
                     this.sendEmptyMessage(HTTP_DL_START);
-                    mGrepAvgTPutHandler.sendEmptyMessageDelayed(0, 1000);
                     break;
 
                 case HTTP_DL_START:
@@ -132,13 +134,15 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     boolean enableFileIO = LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked();
                     mLGHTTPClient.startHTTPDownload(fileAddr, enableFileIO);
                     mIsInProgress = true;
+                    mGrepAvgTPutHandler.sendEmptyMessageDelayed(0, 1000);
                     break;
 
                 case HTTP_DL_FINISHED:
                     Log.d(TAG, "HTTP_DL_FINISHED");
-                    mRepeatCount--;
+                    mRepeatCount++;
+                    mIsInProgress = false;
                     Toast.makeText(LGHTTPFragment.this.getContext(), "TEST Finished : " + DATA_POOL.totalSize + " bytes received \nfor " + DATA_POOL.totalDuration + ",\nTput : " + DATA_POOL.avgTPut + " Mbps", Toast.LENGTH_LONG).show();
-                    if (mRepeatCount > 0) {
+                    if (mRepeatCount < mMaxCount) {
                         this.sendEmptyMessageDelayed(HTTP_DL_START, LGHTTPFragment.this.mRepeatInterval);
                     } else {
                         this.sendEmptyMessage(END_TEST);
@@ -148,7 +152,6 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 case END_TEST:
                     Log.d(TAG, "END_TEST");
                     mLGHTTPClient.stopDownload();
-                    mIsInProgress = false;
                     this.removeMessages(START_TEST);
                     this.removeMessages(HTTP_DL_START);
                     mGrepAvgTPutHandler.removeMessages(0);
@@ -156,6 +159,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     LGHTTPFragment.this.mBtnStartDl.setText(R.string.str_start_nia_test);
                     LGHTTPFragment.this.mRdoBtnOkHttp.setClickable(true);
                     LGHTTPFragment.this.mRdoBtnApache.setClickable(true);
+                    LGHTTPFragment.this.mTxtViewHTTPResultHistory.append("\n");
                     break;
 
             }
@@ -167,6 +171,13 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         @Override
         public void onDownloadStarted() {
             Log.d(TAG, "onDownloadStarted()");
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("OkHttp started, Test no." + (mRepeatCount + 1) + "\n");
+                    LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(0);
+                }
+            });
         }
 
         @Override
@@ -179,21 +190,25 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    LGHTTPFragment.this.mTxtViewHTTPResult.append("\n*********************************\n");
-                    LGHTTPFragment.this.mTxtViewHTTPResult.append("AvgTput : " + DATA_POOL.avgTPut + " Mbps");
-                    LGHTTPFragment.this.mTxtViewHTTPResult.append("\n***********************************\n");
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("\n********************************\n");
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("Test no." + (mRepeatCount + 1) + ", AvgTput : " + String.format("%.2f", DATA_POOL.avgTPut) + " Mbps");
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("\n********************************\n\n");
+
+                    LGHTTPFragment.this.mTxtViewHTTPResultHistory.append("#" + (mRepeatCount + 1) + ": " + String.format("%.2f", DATA_POOL.avgTPut) + " Mbps\n");
                 }
             });
 
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(HTTP_DL_FINISHED);
+            LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(100);
         }
 
         @Override
-        public void onTPutPublished(final float tput) {
+        public void onTPutPublished(final float tput, final int progress) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    LGHTTPFragment.this.mTxtViewHTTPResult.append("\nAvgTput : " + tput + " Mbps");
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("CurrentTput : " + String.format("%.2f", tput) + " Mbps\n");
+                    LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(progress);
                 }
             });
         }
@@ -227,7 +242,6 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
-        this.mTxtViewHTTPResult.setText("");
         this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
     }
 
@@ -275,10 +289,18 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         this.mCheckBoxEnableFileIO = (CheckBox) this.mView.findViewById(R.id.checkBox_enable_file_io);
 
         this.mBtnStartDl = (Button) this.mView.findViewById(R.id.btn_start_http_dl_test);
+        this.mBtnStartDl.setOnClickListener(this.mStartTestClickListener);
+
+        this.mProgressBarHttpProgress = (ProgressBar) this.mView.findViewById(R.id.progressBar_http_progress);
+        this.mProgressBarHttpProgress.setMax(100);
 
         this.mTxtViewHTTPResult = (TextView) this.mView.findViewById(R.id.txtView_http_result);
         this.mTxtViewHTTPResult.setMovementMethod(new ScrollingMovementMethod());
         this.mTxtViewHTTPResult.setMaxLines(20);
+
+        this.mTxtViewHTTPResultHistory = (TextView) this.mView.findViewById(R.id.txtView_http_result_history);
+        this.mTxtViewHTTPResultHistory.setMovementMethod(new ScrollingMovementMethod());
+        this.mTxtViewHTTPResultHistory.setMaxLines(20);
     }
 
     @Override

@@ -8,5 +8,5 @@ public interface LGHTTPDownloadStateChangeListener {
     void onDownloadStarted();
     void onDownloadFinished(long totalSize, long totalDuration);
     void onError(String error);
-    void onTPutPublished(float tput);
+    void onTPutPublished(float tput, int progress);
 }

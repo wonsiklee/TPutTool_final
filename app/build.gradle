@@ -40,7 +40,6 @@ dependencies {
     compile 'com.android.support:support-v4:26.+'
     compile 'com.android.support:recyclerview-v7:26.+'
     compile 'commons-net:commons-net:3.6'
-    compile 'com.squareup.okhttp:okhttp:2.6.0'
     testCompile 'junit:junit:4.12'
     provided 'org.projectlombok:lombok:1.16.12'
     provided 'org.glassfish:javax.annotation:10.0-b28'

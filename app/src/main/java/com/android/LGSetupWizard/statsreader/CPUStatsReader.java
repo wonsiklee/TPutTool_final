@@ -1,6 +1,6 @@
 package com.android.LGSetupWizard.statsreader;
 
-import com.android.LGSetupWizard.data.DeviceStatsInfoStorageManager;
+import com.android.LGSetupWizard.data.IDeviceStatsInfoStorageManager;
 
 import android.util.Log;
 
@@ -60,9 +60,9 @@ public class CPUStatsReader {
         }
     }
 
-    public static float getThermalInfo(String filePath, DeviceStatsInfoStorageManager.THERMAL_TYPE thermalType) {
+    public static float getThermalInfo(String filePath, IDeviceStatsInfoStorageManager.THERMAL_TYPE thermalType) {
         try {
-            if (thermalType == DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS) {
+            if (thermalType == IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS) {
                 String val = cmdCat(filePath);
                 if (val.length() == 2) { // in case only two digits.
                     return Float.valueOf(val);

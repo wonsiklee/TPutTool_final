@@ -2,7 +2,7 @@ package com.android.LGSetupWizard.fragments;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.clients.LGNIAClient;
-import com.android.LGSetupWizard.clients.LGNIADownloadStateChangeListener;
+import com.android.LGSetupWizard.clients.ILGNIADownloadStateChangeListener;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -172,7 +172,7 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
     };
 
 
-    private LGNIADownloadStateChangeListener mNIADownloadStateChangeListener = new LGNIADownloadStateChangeListener() {
+    private ILGNIADownloadStateChangeListener mNIADownloadStateChangeListener = new ILGNIADownloadStateChangeListener() {
         @Override
         public void onDownloadStarted() {
             Log.d(TAG, "onDownloadStarted()");

@@ -1,6 +1,6 @@
 package com.android.LGSetupWizard.data;
 
-import com.android.LGSetupWizard.service.DeviceMonitoringStateChangedListener;
+import com.android.LGSetupWizard.service.IDeviceMonitoringStateChangedListener;
 import com.android.LGSetupWizard.statsreader.CPUStatsReader;
 import com.android.LGSetupWizard.statsreader.NetworkStatsReader;
 
@@ -37,8 +37,8 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class DeviceStatsInfoStorageManager implements DeviceMonitoringStateChangedListener {
-    private static final String TAG = DeviceStatsInfoStorageManager.class.getSimpleName();
+public class IDeviceStatsInfoStorageManager implements IDeviceMonitoringStateChangedListener {
+    private static final String TAG = IDeviceStatsInfoStorageManager.class.getSimpleName();
 
     private static boolean DBG = true;
 
@@ -55,7 +55,7 @@ public class DeviceStatsInfoStorageManager implements DeviceMonitoringStateChang
 
     private Context mContext;
 
-    private static DeviceStatsInfoStorageManager mInstance;
+    private static IDeviceStatsInfoStorageManager mInstance;
 
     // actual data will be stored in the following buffer
     @Getter private LinkedList<DeviceStatsInfo> mDeviceStatsRecordList;
@@ -79,16 +79,16 @@ public class DeviceStatsInfoStorageManager implements DeviceMonitoringStateChang
         THERMAL_XO, THERMAL_VTS
     }
 
-    private DeviceStatsInfoStorageManager(Context context) {
+    private IDeviceStatsInfoStorageManager(Context context) {
         this.mDeviceStatsRecordList = new LinkedList<>();
         this.mInstantaneousTPutCircularArray = new CircularArray<>();
         this.mContext = context;
         this.mCallCount = 1;
     }
 
-    public static DeviceStatsInfoStorageManager getInstance(Context context) {
+    public static IDeviceStatsInfoStorageManager getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new DeviceStatsInfoStorageManager(context);
+            mInstance = new IDeviceStatsInfoStorageManager(context);
         }
         return mInstance;
     }

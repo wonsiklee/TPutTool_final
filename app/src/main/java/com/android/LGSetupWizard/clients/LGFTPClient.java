@@ -36,10 +36,10 @@ public class LGFTPClient {
     static final private String TAG = LGFTPClient.class.getSimpleName();
 
     private FTPClient mFTPClient;
-    private LGFTPOperationListener mOperationListener;
+    private ILGFTPOperationListener mOperationListener;
     private boolean mIsForcedAbortion;
 
-    public LGFTPClient(LGFTPOperationListener operationListener) {
+    public LGFTPClient(ILGFTPOperationListener operationListener) {
         this.mFTPClient = new FTPClient();
         this.mOperationListener = operationListener;
         mIsForcedAbortion = false;
@@ -50,7 +50,7 @@ public class LGFTPClient {
         ArrayList<LGFTPFile> fileList = null;
         Log.d(TAG, "connectToServer() " + serverAddress);
         try {
-            mFTPClient.connect(serverAddress, portNum);
+            this.mFTPClient.connect(serverAddress, portNum);
             int reply = mFTPClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 mFTPClient.disconnect();
@@ -162,10 +162,12 @@ public class LGFTPClient {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_START_TPUT_CALCULATION_LOOP:
+                    Log.d(TAG, "MSG_START_TPUT_CALCULATION_LOOP");
                     sendEmptyMessage(MSG_CALCULATE_TPUT);
                     break;
 
                 case MSG_CALCULATE_TPUT:
+                    Log.d(TAG, "MSG_CALCULATE_TPUT");
                     Log.d(TAG, "mDownloadedBytes = " + mDownloadedBytes + ", mElapsedTime = " + ((float) mElapsedTime/ 1000) + " secs");
                     LGFTPClient.this.mAvgTPut = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
                     Log.d(TAG, "Avg TPut : " + LGFTPClient.this.mAvgTPut + " Mbps");
@@ -174,6 +176,7 @@ public class LGFTPClient {
                     break;
 
                 case MSG_STOP_TPUT_CALCULATION_LOOP:
+                    Log.d(TAG, "MSG_STOP_TPUT_CALCULATION_LOOP");
                     if (this.hasMessages(MSG_START_TPUT_CALCULATION_LOOP)) {
                         this.removeMessages(MSG_START_TPUT_CALCULATION_LOOP);
                     }
@@ -197,6 +200,7 @@ public class LGFTPClient {
             if (!this.retrieveFileOutputStream(file)) {
                 return false;
             }
+            Thread.sleep(1000);
         }
         return true;
     }
@@ -249,9 +253,12 @@ public class LGFTPClient {
             msg.setData(b);
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
 
+            Log.d(TAG, "1111111");
             LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
-
+            Log.d(TAG, "2222222");
             ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
+            Log.d(TAG, "ret = " + ret);
+            Log.d(TAG, "mIsForcedAbortion : " + mIsForcedAbortion);
             if (mIsForcedAbortion) {
                 ret = false;
             }

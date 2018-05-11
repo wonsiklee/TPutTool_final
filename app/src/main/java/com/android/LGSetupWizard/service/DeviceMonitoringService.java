@@ -16,7 +16,7 @@ import com.android.LGSetupWizard.IDeviceMonitoringService;
 import com.android.LGSetupWizard.IDeviceMonitoringServiceCallback;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.data.DeviceStatsInfo;
-import com.android.LGSetupWizard.data.DeviceStatsInfoStorageManager;
+import com.android.LGSetupWizard.data.IDeviceStatsInfoStorageManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -50,7 +50,7 @@ public class DeviceMonitoringService extends Service {
     private static final int EVENT_RECORD_STATS_INFO_FORCIBLY = 0x21;
     private static final int EVENT_STOP_FORCED_RECORDING_LOOP = 0x22;
 
-    private ArrayList<DeviceMonitoringStateChangedListener> mDeviceLoggingStateListenerList;
+    private ArrayList<IDeviceMonitoringStateChangedListener> mDeviceLoggingStateListenerList;
 
     enum MonitoringType { BY_UID, BY_ALL_TRAFFIC }
 
@@ -65,7 +65,7 @@ public class DeviceMonitoringService extends Service {
                 case EVENT_FIRE_UP_MONITORING_LOOP:
                     this.mMonitoringType = (MonitoringType) msg.obj;
                     Log.d(TAG, "EVENT_FIRE_UP_MONITORING_LOOP arg=" + this.mMonitoringType);
-                    for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
+                    for (IDeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                         l.onDeviceMonitoringLoopStarted();
                     }
 
@@ -96,7 +96,7 @@ public class DeviceMonitoringService extends Service {
                         sendEmptyMessage(EVENT_EXIT_IDLE_MONITORING_STATE);
                         break;
                     } else {
-                        for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
+                        for (IDeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                             l.onDeviceMonitoringLoopStopped();
                         }
 
@@ -145,7 +145,7 @@ public class DeviceMonitoringService extends Service {
 
                 case EVENT_READ_DEVICE_STATS: {
                     Log.d(TAG, "EVENT_READ_DEVICE_STATS");
-                    DeviceStatsInfoStorageManager dsis = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
+                    IDeviceStatsInfoStorageManager dsis = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
 
 
                     DeviceStatsInfo sDeviceStatsInfo = ((this.mMonitoringType == MonitoringType.BY_UID) ?
@@ -169,7 +169,7 @@ public class DeviceMonitoringService extends Service {
                 case EVENT_ENTER_RECORDING_STATE:
                     Log.d(TAG, "EVENT_ENTER_RECORDING_STATE");
 
-                    for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
+                    for (IDeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                         l.onDeviceRecordingStarted();
                     }
 
@@ -184,8 +184,8 @@ public class DeviceMonitoringService extends Service {
                     }
                     mCallbacks.finishBroadcast();
 
-                    DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).migrateFromTPutCalculationBufferToRecordBuffer();
-                    DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).addToStorage((DeviceStatsInfo) msg.obj);
+                    IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).migrateFromTPutCalculationBufferToRecordBuffer();
+                    IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).addToStorage((DeviceStatsInfo) msg.obj);
                     sendEmptyMessageDelayed(EVENT_RECORD_CURRENT_STATS, mLoggingInterval);
 
                     break;
@@ -193,19 +193,19 @@ public class DeviceMonitoringService extends Service {
                 case EVENT_RECORD_CURRENT_STATS: {
                     DeviceStatsInfo sDeviceStatsInfo = null;
                     if (this.mMonitoringType == MonitoringType.BY_UID) {
-                        sDeviceStatsInfo = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).readCurrentDeviceStatsInfoByUid(mTargetUid, mCPUTemperatureFilePath, mCPUClockFilePath, mTargetPackageName, mDirection, mThermalType);
+                        sDeviceStatsInfo = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).readCurrentDeviceStatsInfoByUid(mTargetUid, mCPUTemperatureFilePath, mCPUClockFilePath, mTargetPackageName, mDirection, mThermalType);
                     } else {
-                        sDeviceStatsInfo = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).readCurrentDeviceStatsInfoByTotalBytes(mCPUTemperatureFilePath, mCPUClockFilePath, mDirection, mThermalType);
+                        sDeviceStatsInfo = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).readCurrentDeviceStatsInfoByTotalBytes(mCPUTemperatureFilePath, mCPUClockFilePath, mDirection, mThermalType);
                     }
 
-                    DeviceStatsInfoStorageManager dsis = DeviceStatsInfoStorageManager.getInstance(getApplicationContext());
+                    IDeviceStatsInfoStorageManager dsis = IDeviceStatsInfoStorageManager.getInstance(getApplicationContext());
                     long len = dsis.getTimeLengthOfInstantaneousTputBuffer();
                     Log.d(TAG, "EVENT_RECORD_CURRENT_STATS : length= " + len + " ms, " + dsis.getInstantaneousTput(mDirection) + " Mbps");
 
-                    DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).addToTPutCalculationBuffer(sDeviceStatsInfo);
-                    DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).addToStorage(sDeviceStatsInfo);
+                    IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).addToTPutCalculationBuffer(sDeviceStatsInfo);
+                    IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).addToStorage(sDeviceStatsInfo);
 
-                    if (DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).getInstantaneousTput(mDirection) < mTputThresholdValue) {
+                    if (IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).getInstantaneousTput(mDirection) < mTputThresholdValue) {
                         sendEmptyMessage(EVENT_EXIT_RECORDING_STATE);
                     } else {
                         sendEmptyMessageDelayed(EVENT_RECORD_CURRENT_STATS, mLoggingInterval);
@@ -220,10 +220,10 @@ public class DeviceMonitoringService extends Service {
 
                     for (int i = 0; i < N; ++i) {
                         try {
-                            DeviceStatsInfoStorageManager manager = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
+                            IDeviceStatsInfoStorageManager manager = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
 
                             Log.d(TAG, "*********************** Test Result Start ******************************");
-                            LinkedList<DeviceStatsInfo> list = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).getDeviceStatsRecordList();
+                            LinkedList<DeviceStatsInfo> list = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).getDeviceStatsRecordList();
                             int index = 0;
                             for (DeviceStatsInfo info : list) {
                                 Log.d(TAG, "i = " + index++ + ", timeStamp = " + info.getTimeStamp() + ", RxBytes = " + info.getRxBytes() + " bytes");
@@ -246,7 +246,7 @@ public class DeviceMonitoringService extends Service {
                     }
                     mCallbacks.finishBroadcast();
 
-                    for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
+                    for (IDeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                         l.onDeviceRecordingStopped(mCutOffTPut);
                     }
 
@@ -257,7 +257,7 @@ public class DeviceMonitoringService extends Service {
                 case EVENT_FIRE_UP_FORCED_RECORDING_LOOP:
                     this.mMonitoringType = (MonitoringType) msg.obj;
                     Log.d(TAG, "EVENT_FIRE_UP_FORCED_RECORDING_LOOP : " + this.mMonitoringType);
-                    for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
+                    for (IDeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                         l.onDeviceRecordingStarted();
                     }
 
@@ -278,7 +278,7 @@ public class DeviceMonitoringService extends Service {
                 case EVENT_RECORD_STATS_INFO_FORCIBLY: {
                     Log.d(TAG, "EVENT_RECORD_STATS_INFO_FORCIBLY : " + this.mMonitoringType.toString());
                     DeviceStatsInfo sDeviceStatsInfo = null;
-                    DeviceStatsInfoStorageManager dsis = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
+                    IDeviceStatsInfoStorageManager dsis = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
                     if (this.mMonitoringType == MonitoringType.BY_UID) {
                         Log.d(TAG, "mTargetUid : " + mTargetUid);
                         Log.d(TAG, "mTargetPackageName : " + mTargetPackageName);
@@ -302,10 +302,10 @@ public class DeviceMonitoringService extends Service {
 
                     for (int i = 0; i < N; ++i) {
                         try {
-                            DeviceStatsInfoStorageManager manager = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
+                            IDeviceStatsInfoStorageManager manager = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext());
 
                             Log.d(TAG, "*********************** Test Result Start ******************************");
-                            LinkedList<DeviceStatsInfo> list = DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).getDeviceStatsRecordList();
+                            LinkedList<DeviceStatsInfo> list = IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).getDeviceStatsRecordList();
                             int index = 0;
                             for (DeviceStatsInfo info : list) {
                                 Log.d(TAG, "i = " + index++ + ", timeStamp = " + info.getTimeStamp() + ", RxBytes = " + info.getRxBytes() + " bytes");
@@ -328,7 +328,7 @@ public class DeviceMonitoringService extends Service {
                     }
                     mCallbacks.finishBroadcast();
 
-                    for (DeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
+                    for (IDeviceMonitoringStateChangedListener l : mDeviceLoggingStateListenerList) {
                         l.onDeviceRecordingStopped(mCutOffTPut);
                     }
 
@@ -356,9 +356,9 @@ public class DeviceMonitoringService extends Service {
     @Setter
     private float mTputThresholdValue;
     @Setter
-    private DeviceStatsInfoStorageManager.TEST_TYPE mDirection;
+    private IDeviceStatsInfoStorageManager.TEST_TYPE mDirection;
     @Setter
-    private DeviceStatsInfoStorageManager.THERMAL_TYPE mThermalType;
+    private IDeviceStatsInfoStorageManager.THERMAL_TYPE mThermalType;
     @Setter
     private float mCutOffTPut;
 
@@ -371,7 +371,7 @@ public class DeviceMonitoringService extends Service {
         this.mLoggingInterval = 1000;
     }
 
-    public void setOnLoggingStateChangedListener(DeviceMonitoringStateChangedListener dlsc) {
+    public void setOnLoggingStateChangedListener(IDeviceMonitoringStateChangedListener dlsc) {
         if (this.mDeviceLoggingStateListenerList == null) {
             this.mDeviceLoggingStateListenerList = new ArrayList<>();
         }
@@ -382,7 +382,7 @@ public class DeviceMonitoringService extends Service {
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate()");
-        this.setOnLoggingStateChangedListener(DeviceStatsInfoStorageManager.getInstance(this.getApplicationContext()));
+        this.setOnLoggingStateChangedListener(IDeviceStatsInfoStorageManager.getInstance(this.getApplicationContext()));
     }
 
     @Override
@@ -476,9 +476,9 @@ public class DeviceMonitoringService extends Service {
             setLoggingInterval(interval);
             setInstantaneousTputCalculationTimeLength(instantaneousTputCalculationTime);
             setTputThresholdValue(tputThresholdValue);
-            DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).setInstantaneousTputCalculationTimeLength(mInstantaneousTputCalculationTimeLength);
-            setDirection((direction == SHARED_PREFERENCES_DL_DIRECTION) ? DeviceStatsInfoStorageManager.TEST_TYPE.DL_TEST : DeviceStatsInfoStorageManager.TEST_TYPE.UL_TEST);
-            setThermalType((thermalType == THERMAL_VTS) ? DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS : DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_XO);
+            IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).setInstantaneousTputCalculationTimeLength(mInstantaneousTputCalculationTimeLength);
+            setDirection((direction == SHARED_PREFERENCES_DL_DIRECTION) ? IDeviceStatsInfoStorageManager.TEST_TYPE.DL_TEST : IDeviceStatsInfoStorageManager.TEST_TYPE.UL_TEST);
+            setThermalType((thermalType == THERMAL_VTS) ? IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS : IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_XO);
             setCutOffTPut(cutOffTPut);
 
             mIsInMonitoring = true;
@@ -503,9 +503,9 @@ public class DeviceMonitoringService extends Service {
             setLoggingInterval(interval);
             setInstantaneousTputCalculationTimeLength(instantaneousTputCalculationTime);
             setTputThresholdValue(tputThresholdValue);
-            DeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).setInstantaneousTputCalculationTimeLength(mInstantaneousTputCalculationTimeLength);
-            setDirection((direction == SHARED_PREFERENCES_DL_DIRECTION) ? DeviceStatsInfoStorageManager.TEST_TYPE.DL_TEST : DeviceStatsInfoStorageManager.TEST_TYPE.UL_TEST);
-            setThermalType((thermalType == THERMAL_VTS) ? DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS : DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_XO);
+            IDeviceStatsInfoStorageManager.getInstance(DeviceMonitoringService.this.getApplicationContext()).setInstantaneousTputCalculationTimeLength(mInstantaneousTputCalculationTimeLength);
+            setDirection((direction == SHARED_PREFERENCES_DL_DIRECTION) ? IDeviceStatsInfoStorageManager.TEST_TYPE.DL_TEST : IDeviceStatsInfoStorageManager.TEST_TYPE.UL_TEST);
+            setThermalType((thermalType == THERMAL_VTS) ? IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS : IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_XO);
             setCutOffTPut(cutOffTPut);
 
             mIsInMonitoring = true;
@@ -527,8 +527,8 @@ public class DeviceMonitoringService extends Service {
             setCPUClockFilePath(cpuFreqPath);
             setCPUTemperatureFilePath(cpuThermalPath);
             setLoggingInterval(interval);
-            setDirection((direction == SHARED_PREFERENCES_DL_DIRECTION) ? DeviceStatsInfoStorageManager.TEST_TYPE.DL_TEST : DeviceStatsInfoStorageManager.TEST_TYPE.UL_TEST);
-            setThermalType((thermalType == THERMAL_VTS) ? DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS : DeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_XO);
+            setDirection((direction == SHARED_PREFERENCES_DL_DIRECTION) ? IDeviceStatsInfoStorageManager.TEST_TYPE.DL_TEST : IDeviceStatsInfoStorageManager.TEST_TYPE.UL_TEST);
+            setThermalType((thermalType == THERMAL_VTS) ? IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_VTS : IDeviceStatsInfoStorageManager.THERMAL_TYPE.THERMAL_XO);
             setCutOffTPut(cutOffTPut);
 
             mIsForciblyRecording = true;

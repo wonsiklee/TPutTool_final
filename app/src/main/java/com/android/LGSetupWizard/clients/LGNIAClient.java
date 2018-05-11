@@ -20,7 +20,7 @@ import java.net.URL;
 public class LGNIAClient {
     private static String TAG = LGNIAClient.class.getSimpleName();
 
-    private LGNIADownloadStateChangeListener mStateListener;
+    private ILGNIADownloadStateChangeListener mStateListener;
     private DownloadRunnable mDownloadRunnable;
     private boolean mIsOkToGo = true;
 
@@ -43,7 +43,7 @@ public class LGNIAClient {
         this.mDownloadRunnable.publishAvgTPut();
     }
 
-    public void setOnStateChangedListener(LGNIADownloadStateChangeListener listener) {
+    public void setOnStateChangedListener(ILGNIADownloadStateChangeListener listener) {
         this.mStateListener = listener;
     }
 

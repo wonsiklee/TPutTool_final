@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * Created by wonsik.lee on 2018-01-01.
  */
 
-public interface LGFTPOperationListener {
+public interface ILGFTPOperationListener {
     // server connection
     void onConnectToServerFinished(@Nullable ArrayList<LGFTPFile> fileNames);
     void onDisconnectToServerFinished();

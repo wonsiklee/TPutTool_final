@@ -11,14 +11,12 @@ import android.widget.TextView;
 
 import com.android.LGSetupWizard.R;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
-public class FileDownloadProgressDialog extends Dialog implements View.OnClickListener {
+public class LGFTPFileDownloadProgressDialog extends Dialog implements View.OnClickListener {
 
-    private static final String TAG = FileDownloadProgressDialog.class.getSimpleName();
+    private static final String TAG = LGFTPFileDownloadProgressDialog.class.getSimpleName();
 
     private TextView mTxtViewPercentage;
     private Button mBtnCancelDownload;
@@ -28,10 +26,10 @@ public class FileDownloadProgressDialog extends Dialog implements View.OnClickLi
     private TextView mTxtViewDownloadingFileName;
     private TextView mTxtViewDownloadingFileCount;
 
-    @Setter @Getter    private int mTotalFileCount;
-    @Setter @Getter    private int mCurrentFileCount;
+    /*@Setter @Getter    private int mTotalFileCount;
+    @Setter @Getter    private int mCurrentFileCount;*/
 
-    public FileDownloadProgressDialog(Context context) {
+    public LGFTPFileDownloadProgressDialog(Context context) {
         super(context);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.download_progress_popup);
@@ -66,6 +64,10 @@ public class FileDownloadProgressDialog extends Dialog implements View.OnClickLi
         this.mTxtViewPercentage.setText(String.format("%.2f", percentage) + " %");
         this.mTxtViewBytesTransferred.setText("Transferred : " + String.format("%.2f", bytesTransferred / 1024.0f / 1024) + " MBytes");
         this.mTxtViewAvgTput.setText("Avg TPut : " + String.format("%.2f", tputValue) + " Mbps");
+    }
+
+    public void updateFileCount(int totalCount, int currentFileCount) {
+        this.mTxtViewDownloadingFileCount.setText(currentFileCount + " / " + totalCount);
     }
 
     public void setDownloadingFileName(String downloadingFileName) {

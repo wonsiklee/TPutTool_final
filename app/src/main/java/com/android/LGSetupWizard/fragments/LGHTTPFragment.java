@@ -24,12 +24,18 @@ import com.android.LGSetupWizard.clients.LGHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
 
+import lombok.experimental.Accessors;
+
 /**
  * Created by yunsik.lee on 2018-05-03.
  */
 
+@Accessors(prefix = "m")
 public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
+
+    private String testAddr = "http://www.lge.co.kr/upload/SW_PDS/SNDRealtekW7_64b_v6273.exe";
+    //private String testAddr = null;
 
     private static final int START_TEST = 0x00;
     private static final int HTTP_DL_START = 0x01;
@@ -122,7 +128,9 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
                 case HTTP_DL_START:
                     Log.d(TAG, "HTTP_DL_START - Remaining count : " + mRepeatCount);
-                    mLGHTTPClient.startHTTPDownload();
+                    String fileAddr = LGHTTPFragment.this.mEditTxtFileAddr.getText().toString();
+                    boolean enableFileIO = LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked();
+                    mLGHTTPClient.startHTTPDownload(fileAddr, enableFileIO);
                     mIsInProgress = true;
                     break;
 
@@ -189,6 +197,16 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 }
             });
         }
+
+        @Override
+        public void onError(final String error) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("\nerror occured : " + error);
+                }
+            });
+        }
     };
 
     @Override
@@ -242,6 +260,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
     private void initUIControls() {
         this.mEditTxtFileAddr = (EditText) this.mView.findViewById(R.id.editTxt_file_addr);
+        if (testAddr != null)
+            this.mEditTxtFileAddr.setText(testAddr);
 
         this.mRdoBtnOkHttp = (RadioButton) this.mView.findViewById(R.id.rdoBtn_http_stack_okhttp);
         this.mRdoBtnOkHttp.setOnCheckedChangeListener(this);

@@ -3,16 +3,13 @@ package com.android.LGSetupWizard.clients;
 import android.os.Environment;
 import android.util.Log;
 
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import lombok.experimental.Accessors;
 
@@ -63,6 +60,9 @@ public class LGOKHTTPClient implements LGHTTPClient {
         private long mDuration;
         private long mCurrentTime;
         private long mTotalSize;
+        private long mFullSize;
+        private File directory;
+        private File fileToBeDownloaded;
 
         public DownloadRunnable() {
         }
@@ -75,7 +75,7 @@ public class LGOKHTTPClient implements LGHTTPClient {
 
         public void publishAvgTPut() {
             if (mStateListener != null) {
-                mStateListener.onTPutPublished(getAvgTPut());
+                mStateListener.onTPutPublished(getAvgTPut(), getProgress());
             }
         }
 
@@ -87,43 +87,16 @@ public class LGOKHTTPClient implements LGHTTPClient {
             return avgTput;
         }
 
+        public int getProgress() {
+            int sProgress = (int) ((mTotalSize * 100 / mFullSize));
+            Log.d(TAG, "sProgress : " + sProgress + " %");
+            return sProgress;
+        }
+
         private void requestFileDownload(String fileUrl) {
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder()
-                    .url(fileUrl)
-                    .build();
-            CallbackToDownloadFile cbToDownloadFile = new CallbackToDownloadFile(
-                    Environment.getExternalStorageDirectory(),
-                    getFileNameFrom(fileUrl)
-            );
-            client.newCall(request).enqueue(cbToDownloadFile);
-        }
-
-        private String getFileNameFrom(String url) {
-            int lastIndexOfSlash = url.lastIndexOf('/') + 1;
-            return url.substring(lastIndexOfSlash, url.length());
-        }
-
-        private class CallbackToDownloadFile implements Callback {
-
-            private File directory;
-            private File fileToBeDownloaded;
-
-            public CallbackToDownloadFile(File directory, String fileName) {
-                this.directory = directory;
-                this.fileToBeDownloaded = new File(this.directory.getAbsolutePath() + "/" + fileName);
-            }
-
-            @Override
-            public void onFailure(Request request, IOException e) {
-                Log.d(TAG, "onFailure, request=" + request + " e=" + e);
-                if (mStateListener != null) {
-                    mStateListener.onError("onFailure, request=" + request + " e=" + e);
-                }
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
+            directory = Environment.getExternalStorageDirectory();
+            fileToBeDownloaded = new File(directory.getAbsolutePath() + "/" + getFileNameFrom(fileUrl));
+            try {
                 OutputStream os = null;
                 if (mEnableFileIO) {
                     if (!this.directory.exists()) {
@@ -147,9 +120,11 @@ public class LGOKHTTPClient implements LGHTTPClient {
                     os = new FileOutputStream(this.fileToBeDownloaded);
                 }
 
-                InputStream is = response.body().byteStream();
+                HttpURLConnection localHttpURLConnection = (HttpURLConnection) new URL(fileUrl).openConnection();
+                mFullSize = getHeaderFieldLong(localHttpURLConnection, "Content-Length", -1L);
+                BufferedInputStream localBufferedInputStream = new BufferedInputStream(localHttpURLConnection.getInputStream(), 1048576);
 
-                final int BUFFER_SIZE = 2048;
+                final int BUFFER_SIZE = 1048576;
                 byte[] data = new byte[BUFFER_SIZE];
 
                 int count;
@@ -161,7 +136,7 @@ public class LGOKHTTPClient implements LGHTTPClient {
                         mStateListener.onDownloadStarted();
                     }
 
-                    while ((count = is.read(data)) != -1 && mIsOkToGo) {
+                    while ((count = localBufferedInputStream.read(data)) != -1 && mIsOkToGo) {
                         mTotalSize += count;
                         if (mEnableFileIO && os != null) {
                             os.write(data, 0, count);
@@ -180,9 +155,30 @@ public class LGOKHTTPClient implements LGHTTPClient {
                         os.flush();
                         os.close();
                     }
-                    is.close();
+                    localBufferedInputStream.close();
+                    localHttpURLConnection.disconnect();
                 }
+            } catch (IOException localException) {
+                Log.d(TAG, "Exception", localException);
+                return;
             }
+        }
+
+        private String getFileNameFrom(String url) {
+            int lastIndexOfSlash = url.lastIndexOf('/') + 1;
+            return url.substring(lastIndexOfSlash, url.length());
+        }
+
+        private long getHeaderFieldLong(HttpURLConnection paramHttpURLConnection, String paramString, long paramLong)
+        {
+            if (paramHttpURLConnection == null) {
+                return paramLong;
+            }
+            try {
+                long l = Long.parseLong(paramHttpURLConnection.getHeaderField(paramString));
+                return l;
+            } catch (NumberFormatException localNumberFormatException) {}
+            return paramLong;
         }
     }
 }

@@ -1,8 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <ToggleButton
+            android:id="@+id/switch_iperf_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:checked="false"
+            android:textOn="@string/iperf_version3"
+            android:textOff="@string/iperf_version2"
+            />
 
-</LinearLayout>
+        <ToggleButton
+            android:id ="@+id/toggleBtn_iperf_start_n_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textOn="@string/iperf_stop"
+            android:textOff="@string/iperf_start"
+             />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_iperf_advanced"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/iperf_advanced"/>
+        <EditText
+            android:id="@+id/editText_iperf_command"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/btn_iperf_advanced"/>
+    </RelativeLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark">
+        <TextView
+            android:id="@+id/tv_iperf_output"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            />
+    </ScrollView>
+
+    </LinearLayout>

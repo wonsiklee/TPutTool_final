@@ -7,5 +7,6 @@ package com.android.LGSetupWizard.clients;
 public interface LGHTTPDownloadStateChangeListener {
     void onDownloadStarted();
     void onDownloadFinished(long totalSize, long totalDuration);
+    void onError(String error);
     void onTPutPublished(float tput);
 }

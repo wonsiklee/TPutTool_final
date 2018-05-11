@@ -5,7 +5,7 @@ package com.android.LGSetupWizard.clients;
  */
 
 public interface LGHTTPClient {
-    void startHTTPDownload();
+    void startHTTPDownload(String fileAddr, boolean enableFileIO);
     void stopDownload();
     void publishAvgTPut();
     void setOnStateChangedListener(LGHTTPDownloadStateChangeListener listener);

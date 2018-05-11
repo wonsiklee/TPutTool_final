@@ -17,4 +17,11 @@
     <string name="str_http_repeat_time">반복 횟수</string>
     <string name="str_http_file_io">File I/O</string>
     <string name="str_http_result">Result</string>
+
+    <string name="iperf_version2">iperf2</string>
+    <string name="iperf_version3">iperf3</string>
+    <string name="iperf_start">Start</string>
+    <string name="iperf_stop">Stop</string>
+    <string name="iperf_advanced">Advanced</string>
+
 </resources>

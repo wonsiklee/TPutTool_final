@@ -35,7 +35,7 @@ public class DeviceStatsInfo {
     @Setter @Getter private int mCallCnt;
 
     /* Direction */
-    @Setter @Getter private DeviceStatsInfoStorageManager.TEST_TYPE mDirection;
+    @Setter @Getter private IDeviceStatsInfoStorageManager.TEST_TYPE mDirection;
 
     public DeviceStatsInfo() {
         this.mCpuCurFrequencyList = new ArrayList<>();

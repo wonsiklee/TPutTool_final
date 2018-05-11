@@ -26,7 +26,7 @@ import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.LGFTPClient;
-import com.android.LGSetupWizard.clients.LGFTPOperationListener;
+import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
 import com.android.LGSetupWizard.data.MediaScanning;
 
 import java.io.File;
@@ -125,7 +125,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mLGFTPFileDownloadProgressDialog.setOnDismissListener(this);
 
         if (this.mLGFtpClient == null) {
-            this.mLGFtpClient = new LGFTPClient(this.mLGFTPOperationListener);
+            this.mLGFtpClient = new LGFTPClient(this.mILGFTPOperationListener);
         }
 
         this.mBtnDLULStartStop = (Button) this.mView.findViewById(R.id.btn_ftp_download);
@@ -229,7 +229,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         Log.d(TAG, "************* debug_printCurrentFileList() ENDS ***************");
     }
 
-    LGFTPOperationListener mLGFTPOperationListener = new LGFTPOperationListener() {
+    ILGFTPOperationListener mILGFTPOperationListener = new ILGFTPOperationListener() {
         @Override
         public void onConnectToServerFinished(ArrayList<LGFTPFile> fileList) {
             Log.d(TAG, "onConnectToServerFinished(ArrayList<FTPFile>)");

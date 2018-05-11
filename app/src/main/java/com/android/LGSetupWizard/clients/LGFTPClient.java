@@ -36,10 +36,10 @@ public class LGFTPClient {
     static final private String TAG = LGFTPClient.class.getSimpleName();
 
     private FTPClient mFTPClient;
-    private LGFTPOperationListener mOperationListener;
+    private ILGFTPOperationListener mOperationListener;
     private boolean mIsForcedAbortion;
 
-    public LGFTPClient(LGFTPOperationListener operationListener) {
+    public LGFTPClient(ILGFTPOperationListener operationListener) {
         this.mFTPClient = new FTPClient();
         this.mOperationListener = operationListener;
         mIsForcedAbortion = false;

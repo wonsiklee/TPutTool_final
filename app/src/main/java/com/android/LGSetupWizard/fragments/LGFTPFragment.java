@@ -352,9 +352,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 case MSG_FILE_DOWNLOAD_STARTED:
                     Log.d(TAG, "MSG_FILE_DOWNLOAD_STARTED");
                     LGFTPFragment.this.mBtnDLULStartStop.setEnabled(false);
-                    int total = mInitialFileCount;
-                    int current = mInitialFileCount - LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileCount() + 1;
-                    Log.d(TAG, "file count : " + mInitialFileCount + ", " + current);
                     LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.updateFileCount(mInitialFileCount, mInitialFileCount - LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileCount() + 1);
                     LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.setDownloadingFileName(LGFTPFragment.this.mDownloadingFileName);
                     LGFTPFragment.this.showFileDownloadProgressBar();

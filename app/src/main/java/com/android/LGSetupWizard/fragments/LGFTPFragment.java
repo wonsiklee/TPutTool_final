@@ -523,7 +523,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     public void run() {
                         try {
                             LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                            LGFTPFragment.this.mLGFtpClient.retrieveFileAndWrite(sSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
+                            LGFTPFragment.this.mLGFtpClient.retrieveFile(sSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

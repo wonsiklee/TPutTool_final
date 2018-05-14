@@ -13,8 +13,6 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.io.CopyStreamEvent;
-import org.apache.commons.net.io.CopyStreamListener;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -197,9 +195,9 @@ public class LGFTPClient {
         }
     };
 
-    public boolean retrieveFileAndWrite(ArrayList<LGFTPFile> targetFileList, boolean shouldWrite) throws Exception {
+    public boolean retrieveFile(ArrayList<LGFTPFile> targetFileList, boolean shouldWrite) throws Exception {
         for (LGFTPFile file: targetFileList) {
-            if (!this.retrieveFileAndWrite(file, shouldWrite)) {
+            if (!this.retrieveFile(file, shouldWrite)) {
                 return false;
             }
             Thread.sleep(1000);
@@ -207,11 +205,9 @@ public class LGFTPClient {
         return true;
     }
 
-    private boolean mIsFileIORequried = true;
-
-    public boolean retrieveFileAndWrite(LGFTPFile targetFile, boolean shouldWrite) throws Exception {
+    public boolean retrieveFile(LGFTPFile targetFile, boolean shouldWrite) throws Exception {
         boolean ret = false;
-        this.mIsFileIORequried = shouldWrite;
+
         Log.d(TAG, "retrieve " + targetFile);
 
         String sRemoteFileName = targetFile.getName();
@@ -236,19 +232,25 @@ public class LGFTPClient {
         OutputStream sOutputStream = null;
         InputStream sInputStream = null;
         try {
-
             Log.d(TAG, "************************************************************");
             Log.d(TAG, "download started bufferSize = " + this.mFTPClient.getBufferSize() + " bytes");
-            sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
+            if (shouldWrite) {
+                sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
+            }
+            sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
 
             Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
             b.putSerializable(KEY_FILE, targetFile);
             msg.setData(b);
 
+            LGFTPClient.this.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            this.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
-            this.mStartTime = System.currentTimeMillis();
+            // 1. initialize control variables.
+            LGFTPClient.this.mStartTime = System.currentTimeMillis();
+            LGFTPClient.this.mDownloadedBytes = 0;
+            LGFTPClient.this.mElapsedTime = 0;
+            LGFTPClient.this.mIsForcedAbortion = false;
 
             // 1. start t-put calculation msg loop
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
@@ -256,35 +258,17 @@ public class LGFTPClient {
             // 2. inform the fragment that file DL has been started.
             LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
 
-            // 3-1. in case we need to write file to sdcard.
-            if (shouldWrite) {
-                this.mFTPClient.setCopyStreamListener(new CopyStreamListener() {
-                    @Override
-                    public void bytesTransferred(CopyStreamEvent event) {
-                        Log.d(TAG, "event : " + event);
-                    }
-
-                    @Override
-                    public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-                        LGFTPClient.this.mDownloadedBytes = totalBytesTransferred;
-                        LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
-                    }
-                });
-
-                ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
-
-            } else { // 3-2. in case we do not need to write file to sdcard.
-                sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
-                byte[] sBytesArray = new byte[4096];
-                int sBytesRead = -1;
-                while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
+            byte[] sBytesArray = new byte[4096];
+            int sBytesRead = -1;
+            while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
+                if (shouldWrite) {
                     sOutputStream.write(sBytesArray, 0, sBytesRead);
-                    LGFTPClient.this.mDownloadedBytes += sBytesRead;
-                    LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
                 }
-
-                ret = this.mFTPClient.completePendingCommand();
+                LGFTPClient.this.mDownloadedBytes += sBytesRead;
+                LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
             }
+
+            ret = this.mFTPClient.completePendingCommand();
 
             Log.d(TAG, "mIsForcedAbortion : " + mIsForcedAbortion);
             if (mIsForcedAbortion) {
@@ -307,7 +291,11 @@ public class LGFTPClient {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
+            LGFTPClient.this.mDownloadedBytes = 0;
+            LGFTPClient.this.mElapsedTime = 0;
             LGFTPClient.this.mTputCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
+            LGFTPClient.this.mOperationListener.onDownloadFinished(ret, sDownloadFile);
+
             if (sOutputStream != null) {
                 try {
                     sOutputStream.close();
@@ -323,69 +311,8 @@ public class LGFTPClient {
                     e.printStackTrace();
                 }
             }
-
-            mOperationListener.onDownloadFinished(ret, sDownloadFile);
         }
         return ret;
-    }
-
-    public void retrieveFileAndDoNotWrite(LGFTPFile targetFile) throws Exception {
-        Log.d(TAG, "retrieveFileAndDoNotWrite() " + targetFile.getName());
-
-        String sRemoteFileName = targetFile.getName();
-        Log.d(TAG, "sRemoteFileName " + sRemoteFileName);
-
-        String sDirPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-
-        File sTargetDir = new File(sDirPath + "/TPutMonitor");
-        if (!sTargetDir.exists()) {
-            Log.d(TAG, sTargetDir.getName() + " does not exist, hence make dir");
-            sTargetDir.mkdir();
-        }
-
-        if (!sTargetDir.canWrite()) {
-            Log.d(TAG, "Cannot write logs to dir");
-            throw new Exception("File cannot be written");
-        }
-
-        File sDownloadFile = new File(sTargetDir + "/" + sRemoteFileName);
-        Log.d(TAG, "downloadFile : " + sDownloadFile);
-
-        OutputStream sOutputStream = null;
-        InputStream sInputStream = null;
-        try {
-            sOutputStream = new BufferedOutputStream(new FileOutputStream(sTargetDir));
-            sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
-            byte[] sBytesArray = new byte[4096];
-            int sBytesRead = -1;
-            while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
-                sOutputStream.write(sBytesArray, 0, sBytesRead);
-            }
-
-            boolean sIsSuccess = this.mFTPClient.completePendingCommand();
-            if (sIsSuccess) {
-                Log.d(TAG,  targetFile.getName() + " has been downloaded successfully.");
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (sOutputStream != null) {
-                    sOutputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (sInputStream != null) {
-                    sInputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public String printWorkingDirectory() throws IOException {

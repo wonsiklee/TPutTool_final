@@ -237,7 +237,9 @@ public class LGFTPClient {
             if (shouldWrite) {
                 sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
             }
+            Log.d(TAG, "a");
             sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
+            Log.d(TAG, "b");
 
             Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
@@ -255,14 +257,18 @@ public class LGFTPClient {
             // 2. start t-put calculation msg loop
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
 
+            Log.d(TAG, "c");
             // 3. inform the fragment that file DL has been started.
-            LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
-
+            //LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
+            LGFTPClient.this.mOperationListener.onDownloadStarted(targetFile);
+            Log.d(TAG, "d");
             byte[] sBytesArray = new byte[20971520]; // 20 MBytes
             int sBytesRead = -1;
             Log.d(TAG, "1111111");
             while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
+                Log.d(TAG, "sBytesRead = " + sBytesRead + " bytes received");
                 if (shouldWrite) {
+                    Log.d(TAG, "bbbbbbbbbbbbbb");
                     sOutputStream.write(sBytesArray, 0, sBytesRead);
                 }
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;

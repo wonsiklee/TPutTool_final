@@ -258,8 +258,9 @@ public class LGFTPClient {
             // 3. inform the fragment that file DL has been started.
             LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
 
-            byte[] sBytesArray = new byte[20971520];
+            byte[] sBytesArray = new byte[20971520]; // 20 MBytes
             int sBytesRead = -1;
+            Log.d(TAG, "1111111");
             while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
                 if (shouldWrite) {
                     sOutputStream.write(sBytesArray, 0, sBytesRead);
@@ -267,7 +268,7 @@ public class LGFTPClient {
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;
                 LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
             }
-
+            Log.d(TAG, "22222222");
             ret = this.mFTPClient.completePendingCommand();
 
             Log.d(TAG, "mIsForcedAbortion : " + mIsForcedAbortion);

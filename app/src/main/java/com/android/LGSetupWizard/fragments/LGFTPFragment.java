@@ -17,7 +17,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -442,7 +441,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                         LGFTPFragment.this.mInitialFileCount = Integer.MIN_VALUE;
                     } else {
-                        Log.d(TAG, "all selected files have have been either downloaded successfully.");
+                        Log.d(TAG, "all selected files have have been downloaded successfully.");
                         LGFTPFragment.this.dismissFileDownloadProgressBar();
                         LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                         LGFTPFragment.this.mInitialFileCount = Integer.MIN_VALUE;
@@ -524,7 +523,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     public void run() {
                         try {
                             LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                            LGFTPFragment.this.mLGFtpClient.retrieveFileOutputStream(sSelectedFileList);
+                            LGFTPFragment.this.mLGFtpClient.retrieveFileAndWrite(sSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

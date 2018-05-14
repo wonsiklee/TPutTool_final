@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
@@ -39,6 +40,8 @@ public class LGFTPClient {
     private ILGFTPOperationListener mOperationListener;
     private boolean mIsForcedAbortion;
 
+    @Getter private String mCurrentWorkingDirectory = "/";
+
     public LGFTPClient(ILGFTPOperationListener operationListener) {
         this.mFTPClient = new FTPClient();
         this.mOperationListener = operationListener;
@@ -59,7 +62,7 @@ public class LGFTPClient {
                 Log.d(TAG, "successfully connected");
                 if (loginToServer(userID, password)) {
                     Log.d(TAG, "Logged in successfully");
-                    fileList = nonThreadicGetFileList();
+                    fileList = nonThreadedGetFileList();
                     // keep alive 2 mins.
                     LGFTPClient.this.mFTPClient.setKeepAlive(true);
                     LGFTPClient.this.mFTPClient.setControlKeepAliveTimeout(120);
@@ -115,7 +118,7 @@ public class LGFTPClient {
         return this.mFTPClient.isConnected();
     }
 
-    private ArrayList<LGFTPFile> nonThreadicGetFileList() {
+    private ArrayList<LGFTPFile> nonThreadedGetFileList() {
         ArrayList<LGFTPFile> retArray = new ArrayList<>();
 
         try {
@@ -128,8 +131,6 @@ public class LGFTPClient {
         return retArray;
     }
 
-    @Getter private String mCurrentWorkingDirectory = "/";
-
     public void changeWorkingDirectory(final String path) {
 
         try {
@@ -137,7 +138,7 @@ public class LGFTPClient {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            mOperationListener.onChangeWorkingDirectoryFinished(nonThreadicGetFileList());
+            mOperationListener.onChangeWorkingDirectoryFinished(nonThreadedGetFileList());
             try {
                 mCurrentWorkingDirectory = mFTPClient.printWorkingDirectory();
             } catch (IOException e) {
@@ -156,6 +157,7 @@ public class LGFTPClient {
     final static private int MSG_STOP_TPUT_CALCULATION_LOOP = 0x02;
 
     final static private String KEY_FILE = "file";
+    final static private String KEY_IS_FILE_IO_IN_USE = "file_io_is_in_use";
 
     private Handler mTputCalculationLoopHandler = new Handler() {
         @Override
@@ -195,9 +197,9 @@ public class LGFTPClient {
         }
     };
 
-    public boolean retrieveFileOutputStream(ArrayList<LGFTPFile> targetFileList) throws Exception {
+    public boolean retrieveFileAndWrite(ArrayList<LGFTPFile> targetFileList, boolean shouldWrite) throws Exception {
         for (LGFTPFile file: targetFileList) {
-            if (!this.retrieveFileOutputStream(file)) {
+            if (!this.retrieveFileAndWrite(file, shouldWrite)) {
                 return false;
             }
             Thread.sleep(1000);
@@ -205,8 +207,11 @@ public class LGFTPClient {
         return true;
     }
 
-    public boolean retrieveFileOutputStream(LGFTPFile targetFile) throws Exception {
+    private boolean mIsFileIORequried = true;
+
+    public boolean retrieveFileAndWrite(LGFTPFile targetFile, boolean shouldWrite) throws Exception {
         boolean ret = false;
+        this.mIsFileIORequried = shouldWrite;
         Log.d(TAG, "retrieve " + targetFile);
 
         String sRemoteFileName = targetFile.getName();
@@ -229,35 +234,58 @@ public class LGFTPClient {
         Log.d(TAG, "downloadFile : " + sDownloadFile);
 
         OutputStream sOutputStream = null;
+        InputStream sInputStream = null;
         try {
-            this.mFTPClient.setCopyStreamListener(new CopyStreamListener() {
-                @Override
-                public void bytesTransferred(CopyStreamEvent event) {
-                    Log.d(TAG, "event : " + event);
-                }
 
-                @Override
-                public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-                    LGFTPClient.this.mDownloadedBytes = totalBytesTransferred;
-                    LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
-                }
-            });
             Log.d(TAG, "************************************************************");
             Log.d(TAG, "download started bufferSize = " + this.mFTPClient.getBufferSize() + " bytes");
             sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
 
-            this.mStartTime = System.currentTimeMillis();
             Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
             b.putSerializable(KEY_FILE, targetFile);
             msg.setData(b);
+
+
+            this.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+            this.mStartTime = System.currentTimeMillis();
+
+            // 1. start t-put calculation msg loop
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
 
-            Log.d(TAG, "1111111");
+            // 2. inform the fragment that file DL has been started.
             LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
-            Log.d(TAG, "2222222");
-            ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
-            Log.d(TAG, "ret = " + ret);
+
+            // 3-1. in case we need to write file to sdcard.
+            if (shouldWrite) {
+                this.mFTPClient.setCopyStreamListener(new CopyStreamListener() {
+                    @Override
+                    public void bytesTransferred(CopyStreamEvent event) {
+                        Log.d(TAG, "event : " + event);
+                    }
+
+                    @Override
+                    public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
+                        LGFTPClient.this.mDownloadedBytes = totalBytesTransferred;
+                        LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
+                    }
+                });
+
+                ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
+
+            } else { // 3-2. in case we do not need to write file to sdcard.
+                sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
+                byte[] sBytesArray = new byte[4096];
+                int sBytesRead = -1;
+                while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
+                    sOutputStream.write(sBytesArray, 0, sBytesRead);
+                    LGFTPClient.this.mDownloadedBytes += sBytesRead;
+                    LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
+                }
+
+                ret = this.mFTPClient.completePendingCommand();
+            }
+
             Log.d(TAG, "mIsForcedAbortion : " + mIsForcedAbortion);
             if (mIsForcedAbortion) {
                 ret = false;
@@ -286,20 +314,48 @@ public class LGFTPClient {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                mOperationListener.onDownloadFinished(ret, sDownloadFile);
             }
+
+            if (sInputStream != null) {
+                try {
+                    sInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            mOperationListener.onDownloadFinished(ret, sDownloadFile);
         }
         return ret;
     }
 
-    public void retrieveFileUsingFileStream(LGFTPFile targetFile) {
-        String sRemoteFile2 = targetFile.getName();
-        File sDownloadFile2 = new File("D:/Downloads/song.mp3");
+    public void retrieveFileAndDoNotWrite(LGFTPFile targetFile) throws Exception {
+        Log.d(TAG, "retrieveFileAndDoNotWrite() " + targetFile.getName());
+
+        String sRemoteFileName = targetFile.getName();
+        Log.d(TAG, "sRemoteFileName " + sRemoteFileName);
+
+        String sDirPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        File sTargetDir = new File(sDirPath + "/TPutMonitor");
+        if (!sTargetDir.exists()) {
+            Log.d(TAG, sTargetDir.getName() + " does not exist, hence make dir");
+            sTargetDir.mkdir();
+        }
+
+        if (!sTargetDir.canWrite()) {
+            Log.d(TAG, "Cannot write logs to dir");
+            throw new Exception("File cannot be written");
+        }
+
+        File sDownloadFile = new File(sTargetDir + "/" + sRemoteFileName);
+        Log.d(TAG, "downloadFile : " + sDownloadFile);
+
         OutputStream sOutputStream = null;
         InputStream sInputStream = null;
         try {
-            sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile2));
-            sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFile2);
+            sOutputStream = new BufferedOutputStream(new FileOutputStream(sTargetDir));
+            sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
             byte[] sBytesArray = new byte[4096];
             int sBytesRead = -1;
             while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
@@ -308,7 +364,7 @@ public class LGFTPClient {
 
             boolean sIsSuccess = this.mFTPClient.completePendingCommand();
             if (sIsSuccess) {
-                Log.d(TAG, "File #2 has been downloaded successfully.");
+                Log.d(TAG,  targetFile.getName() + " has been downloaded successfully.");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -3,13 +3,18 @@ package com.android.LGSetupWizard.clients;
 import android.os.Environment;
 import android.util.Log;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import lombok.experimental.Accessors;
 
@@ -18,8 +23,8 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGOKHTTPClient implements LGHTTPClient {
-    private static String TAG = LGOKHTTPClient.class.getSimpleName();
+public class LGApacheHTTPClient implements LGHTTPClient {
+    private static String TAG = LGApacheHTTPClient.class.getSimpleName();
 
     private LGHTTPDownloadStateChangeListener mStateListener;
     private DownloadRunnable mDownloadRunnable;
@@ -27,7 +32,7 @@ public class LGOKHTTPClient implements LGHTTPClient {
     private String mFileURL;
     private boolean mEnableFileIO;
 
-    public LGOKHTTPClient() {
+    public LGApacheHTTPClient() {
     }
 
     @Override
@@ -119,9 +124,13 @@ public class LGOKHTTPClient implements LGHTTPClient {
                     os = new FileOutputStream(this.fileToBeDownloaded);
                 }
 
-                HttpURLConnection localHttpURLConnection = (HttpURLConnection) new URL(fileUrl).openConnection();
-                mFullSize = getHeaderFieldLong(localHttpURLConnection, "Content-Length", -1L);
-                BufferedInputStream localBufferedInputStream = new BufferedInputStream(localHttpURLConnection.getInputStream(), BUFFER_SIZE);
+                HttpGet httpRequest = new HttpGet(fileUrl);
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response = (HttpResponse)httpclient.execute(httpRequest);
+
+                HttpEntity entity = response.getEntity();
+                mFullSize = entity.getContentLength();
+                BufferedInputStream localBufferedInputStream = new BufferedInputStream(entity.getContent(), BUFFER_SIZE);
 
                 byte[] data = new byte[BUFFER_SIZE];
 
@@ -154,7 +163,6 @@ public class LGOKHTTPClient implements LGHTTPClient {
                         os.close();
                     }
                     localBufferedInputStream.close();
-                    localHttpURLConnection.disconnect();
                 }
             } catch (IOException localException) {
                 Log.d(TAG, "Exception", localException);

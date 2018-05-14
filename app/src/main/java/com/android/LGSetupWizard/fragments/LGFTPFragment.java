@@ -1,5 +1,6 @@
 package com.android.LGSetupWizard.fragments;
 
+import android.animation.Animator;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,10 +17,13 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
@@ -50,6 +54,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private EditText mEditTextPortNum;
     private EditText mEditTextUserID;
     private EditText mEditTextPassword;
+
+
+    private LinearLayout mLinearLayoutLoggedInViewGroup;
+    private Switch mSwitchFileIO;
+
 
     private ListView mFTPFileListView;
 
@@ -128,9 +137,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mLGFtpClient = new LGFTPClient(this.mILGFTPOperationListener);
         }
 
-        this.mBtnDLULStartStop = (Button) this.mView.findViewById(R.id.btn_ftp_download);
-        this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
-
         this.mBtnConnectDisconnect = (Button) this.mView.findViewById(R.id.btn_connect_disconnect);
         if (this.mLGFtpClient.isConnected()) {
             this.mBtnConnectDisconnect.setOnClickListener(this.mClickListenerDisconnect);
@@ -151,11 +157,16 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mFTPFileListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         this.mFTPFileListView.setOnItemClickListener(this);
 
-
         if (this.mFTPFileListVIewAdapter == null) {
             this.mFTPFileListVIewAdapter = new LGFTPFileListViewAdapter(this.getContext());
             this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
         }
+
+        this.mBtnDLULStartStop = (Button) this.mView.findViewById(R.id.btn_ftp_download);
+        this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
+        this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
+        this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
+        this.mUIControlHandler.sendEmptyMessage(MSG_DISCONNECT_FROM_SERVER_FINISHED);
 
         Log.d(TAG, "onResume() completed");
     }
@@ -312,7 +323,30 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     Log.d(TAG, "MSG_CONNECT_TO_SERVER_FINISHED");
                     LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerDisconnect);
                     LGFTPFragment.this.mBtnConnectDisconnect.setText("Log out");
+                    LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                     LGFTPFragment.this.dismissNetworkOperationProgressBar();
+                    LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(0).alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
+                    LGFTPFragment.this.mSwitchFileIO.setEnabled(true);
                     this.sendEmptyMessage(MSG_FILE_SET_CHANGED);
                     break;
 
@@ -320,9 +354,34 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     Log.d(TAG, "MSG_DISCONNECT_FROM_SERVER_FINISHED");
                     LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerConnect);
                     LGFTPFragment.this.mBtnConnectDisconnect.setText("Log in");
+                    LGFTPFragment.this.mBtnDLULStartStop.setEnabled(false);
                     LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(null);
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     LGFTPFragment.this.dismissNetworkOperationProgressBar();
+                    LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
+                            .setListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
+                                }
+
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+
+                                }
+                            });
+
+                    LGFTPFragment.this.mSwitchFileIO.setEnabled(false);
                     break;
 
                 case MSG_CHANGE_WORKING_DIRECTORY_FINISHED:

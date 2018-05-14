@@ -252,13 +252,13 @@ public class LGFTPClient {
             LGFTPClient.this.mElapsedTime = 0;
             LGFTPClient.this.mIsForcedAbortion = false;
 
-            // 1. start t-put calculation msg loop
+            // 2. start t-put calculation msg loop
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
 
-            // 2. inform the fragment that file DL has been started.
+            // 3. inform the fragment that file DL has been started.
             LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
 
-            byte[] sBytesArray = new byte[4096];
+            byte[] sBytesArray = new byte[20971520];
             int sBytesRead = -1;
             while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
                 if (shouldWrite) {

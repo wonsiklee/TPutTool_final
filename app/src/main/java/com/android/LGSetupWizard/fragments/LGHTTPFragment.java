@@ -15,12 +15,14 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
@@ -56,6 +58,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private TextView mTxtViewHTTPResultHistory;
     private CheckBox mCheckBoxEnableFileIO;
     private ProgressBar mProgressBarHttpProgress;
+    private ImageButton mImageButtonClearAddr;
 
     // listeners and HTTP Client
     private LGHTTPClient mLGHTTPClient;
@@ -95,10 +98,18 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private View.OnClickListener mStopTestClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Log.d(TAG, "StopTestClickListener.onClick()");
+            Log.d(TAG, "mStopTestClickListener.onClick()");
             LGHTTPFragment.this.mRepeatCount = 0;
             LGHTTPFragment.this.mMaxCount = 0;
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(END_TEST);
+        }
+    };
+
+    private View.OnClickListener mClearAddrClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, "mClearAddrClickListener.onClick()");
+            LGHTTPFragment.this.mEditTxtFileAddr.setText("");
         }
     };
 
@@ -301,6 +312,9 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         this.mTxtViewHTTPResultHistory = (TextView) this.mView.findViewById(R.id.txtView_http_result_history);
         this.mTxtViewHTTPResultHistory.setMovementMethod(new ScrollingMovementMethod());
         this.mTxtViewHTTPResultHistory.setMaxLines(20);
+
+        this.mImageButtonClearAddr = (ImageButton) this.mView.findViewById(R.id.imageButton_clear_addr);
+        this.mImageButtonClearAddr.setOnClickListener(this.mClearAddrClickListener);
     }
 
     @Override
@@ -310,10 +324,13 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 case R.id.rdoBtn_http_stack_okhttp:
                     Log.d(TAG, "R.id.rdoBtn_http_stack_okhttp checked : " + isChecked);
                     this.mLGHTTPClient = new LGOKHTTPClient();
+                    this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
                     break;
 
                 case R.id.rdoBtn_http_stack_apache:
                     Log.d(TAG, "R.id.rdoBtn_http_stack_apache checked : " + isChecked);
+                    this.mLGHTTPClient = new LGApacheHTTPClient();
+                    this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
                     break;
             }
         }

@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
 
-    private String testAddr = "http://www.lge.co.kr/upload/SW_PDS/SNDRealtekW7_64b_v6273.exe";
+    private String testAddr = "http://tool.xcdn.gdms.lge.com/swdata/MOBILESYNC/GO/P5.3.23.20150119/LGPCSuite/Autorun/LGPCSuite_Setup.exe";
     //private String testAddr = null;
 
     private static final int START_TEST = 0x00;
@@ -71,7 +71,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
     public static class DataPool {
         public long totalSize;
-        public long totalDuration;
+        public float totalDuration;
         public float avgTPut;
     }
 
@@ -118,7 +118,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (mIsInProgress) {
-                mLGHTTPClient.publishAvgTPut();
+                mLGHTTPClient.publishCurrentTPut();
                 this.sendEmptyMessageDelayed(0, 2000);
             }
         }
@@ -152,7 +152,10 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     Log.d(TAG, "HTTP_DL_FINISHED");
                     mRepeatCount++;
                     mIsInProgress = false;
-                    Toast.makeText(LGHTTPFragment.this.getContext(), "TEST Finished : " + DATA_POOL.totalSize + " bytes received \nfor " + DATA_POOL.totalDuration + ",\nTput : " + DATA_POOL.avgTPut + " Mbps", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LGHTTPFragment.this.getContext(),
+                            "TEST Finished : " + DATA_POOL.totalSize + " bytes received \nfor " +
+                                    String.format("%.2f", DATA_POOL.totalDuration) + " sec,\nTput : " +
+                                    String.format("%.2f", DATA_POOL.avgTPut) + " Mbps", Toast.LENGTH_SHORT).show();
                     if (mRepeatCount < mMaxCount) {
                         this.sendEmptyMessageDelayed(HTTP_DL_START, LGHTTPFragment.this.mRepeatInterval);
                     } else {
@@ -196,6 +199,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             Log.d(TAG, "onDownloadFinished()");
             DATA_POOL.totalSize = totalSize;
             DATA_POOL.totalDuration = totalDuration;
+            DATA_POOL.totalDuration /= 1000;
             DATA_POOL.avgTPut = (totalSize * 8.0f / 1024 / 1024 / (totalDuration / 1000.0f));
 
             getActivity().runOnUiThread(new Runnable() {

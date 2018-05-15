@@ -49,8 +49,8 @@ public class LGApacheHTTPClient implements LGHTTPClient {
         this.mIsOkToGo = false;
     }
 
-    public void publishAvgTPut() {
-        this.mDownloadRunnable.publishAvgTPut();
+    public void publishCurrentTPut() {
+        this.mDownloadRunnable.publishCurrentTPut();
     }
 
     public void setOnStateChangedListener(LGHTTPDownloadStateChangeListener listener) {
@@ -61,9 +61,10 @@ public class LGApacheHTTPClient implements LGHTTPClient {
         private static final int BUFFER_SIZE = 2 * 1024 * 1024;
 
         private long mStartTime;
-        private long mDuration;
         private long mCurrentTime;
+        private long mSavedTime;
         private long mTotalSize;
+        private long mSavedSize;
         private long mFullSize;
         private File directory;
         private File fileToBeDownloaded;
@@ -77,16 +78,19 @@ public class LGApacheHTTPClient implements LGHTTPClient {
             Log.d(TAG, "run() EXIT");
         }
 
-        public void publishAvgTPut() {
+        public void publishCurrentTPut() {
             if (mStateListener != null) {
-                mStateListener.onTPutPublished(getAvgTPut(), getProgress());
+                mStateListener.onTPutPublished(getCurrentTPut(), getProgress());
             }
         }
 
-        public float getAvgTPut() {
+        public float getCurrentTPut() {
             mCurrentTime = System.currentTimeMillis();
-            mDuration = mCurrentTime - mStartTime;
-            float avgTput = (mTotalSize * 8.0f / 1000 / 1000) / (mDuration / 1000.0f);
+            long sDuration = mCurrentTime - mSavedTime;
+            mSavedTime = mCurrentTime;
+            long sSize = mTotalSize - mSavedSize;
+            mSavedSize = mTotalSize;
+            float avgTput = (sSize * 8.0f / 1000 / 1000) / (sDuration / 1000.0f);
             Log.d(TAG, "avgTput : " + avgTput + " Mbps");
             return avgTput;
         }
@@ -153,7 +157,7 @@ public class LGApacheHTTPClient implements LGHTTPClient {
                     Log.e(TAG, "IOException occurred : " + e.getMessage());
                 } finally {
                     if (mStateListener != null) {
-                        mStateListener.onDownloadFinished(mTotalSize, mDuration);
+                        mStateListener.onDownloadFinished(mTotalSize, mCurrentTime - mStartTime);
                     }
                     Log.d(TAG, "executeReceiveLoop() EXIT");
                     mTotalSize = 0;

@@ -1,183 +1,251 @@
 package com.android.LGSetupWizard.clients;
 
 import android.content.Context;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.LGSetupWizard.R;
-import com.android.LGSetupWizard.data.LGFTPFile;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.io.CopyStreamEvent;
-import org.apache.commons.net.io.CopyStreamListener;
-
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.SocketException;
-import java.nio.Buffer;
-import java.util.ArrayList;
 
-import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
  * Created by hyukbin.ko on 2018-05-03.
  */
 
+//TODO need Permissive mode ! because of System app.
+//TODO need fix encording output issue
+@Accessors(prefix = "m")
 public class LGIperfClient {
     static final private String TAG = LGIperfClient.class.getSimpleName();
 
-    private IperfRunnable mIperfRunnable;
+    //private LGIperfRunnable mIperfRunnable;
+    private LGIperfTask mIperfTask;
     private Context mContext;
 
     private static final String IPERF_NAME = "iperf";
     private static final String IPERF3_NAME = "iperf3";
 
+    public static final int MODE_IPERF = 0;
+    public static final int MODE_IPERF3 = 1;
+
+    @Setter public int mIperfVersion;
+
+    private LGIperfClient.OnStateChangeListener mListener;
+    public void setOnStateChangeListener (LGIperfClient.OnStateChangeListener listener){
+        mListener = listener;
+    }
+
     public LGIperfClient(Context context){
         mContext = context;
-        mIperfRunnable = new IperfRunnable();
+        //mIperfRunnable = new LGIperfRunnable();
+        mIperfTask = new LGIperfTask();
     }
-    public void loadIperfFile(){
-        if(!hasFile(IPERF_NAME)){
-            createIperfFile(IPERF_NAME);
+    public boolean loadIperfFile(){
+        if (checkAndCreateIperfFile("iperf") && checkAndCreateIperfFile("iperf3")){
+            Log.d(TAG,"loadIperfFile - success!");
+            return true;
         }
-        //TODO iperf3
+        Log.d(TAG,"loadIperfFile - fail!");
+        return false;
     }
-    private boolean hasFile(String filename){
-        FileInputStream fis ;
-        try {
-            fis = mContext.openFileInput(filename);
-            fis.close();
-        }catch (FileNotFoundException e){
-            Log.d(TAG, " hasFile : not found "+filename);
+
+    private boolean checkAndCreateIperfFile(String iperfName){
+        if(!IPERF3_NAME.equals(iperfName) && !IPERF_NAME.equals(iperfName)){
+            Log.e(TAG, "checkAndCrateIperfFile : invalid iperfName="+iperfName);
             return false;
-        }catch (IOException e){
-            e.printStackTrace();
         }
 
-        Log.d(TAG, " hasFile : found "+filename);
+        File file = new File(mContext.getFilesDir().getPath()+"/"+iperfName);
+
+        if( !(file.exists() && file.canExecute())){
+            InputStream sOpenRawResource = IPERF_NAME.equals(iperfName)?
+                    mContext.getResources().openRawResource(R.raw.iperf):mContext.getResources().openRawResource(R.raw.iperf3);
+
+            try {
+                byte[] sBuffer = new byte[sOpenRawResource.available()];
+                sOpenRawResource.read(sBuffer);
+                sOpenRawResource.close();
+                FileOutputStream sOpenFileOutput = mContext.openFileOutput(iperfName, Context.MODE_PRIVATE);
+                sOpenFileOutput.write(sBuffer);
+                sOpenFileOutput.close();
+                mContext.getFileStreamPath(iperfName).setExecutable(true);
+
+            }catch (Exception e){
+                Log.d(TAG,"loadIperfFile ("+iperfName+") Fail:"+e.toString());
+                return false;
+            }
+        }
+        Log.d(TAG,"loadIperfFile ("+iperfName+") success!");
         return true;
     }
 
-    private void createIperfFile(String filename){
-        InputStream is = null ;
-        byte[] buffer;
-        switch (filename) {
-            case IPERF_NAME :
-                is = mContext.getResources().openRawResource(R.raw.iperf);
-                break;
-        }
-
-        try {
-            if (is == null || is.available() <= 0) {
-                Log.d(TAG, "createIperfFile : can't got resource  -" + filename);
-                return;
-            }
-            int size = is.available();
-            buffer = new byte [size];
-            is.read(buffer);
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(TAG, "createIperfFile : can't read resource  -" + filename);
-            return;
-        }
-
-
-        FileOutputStream fos = null;
-        try {
-            fos = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
-            fos.write(buffer);
-            fos.close();
-            Runtime.getRuntime().exec("chmod 777 "+mContext.getFilesDir()+"/"+filename).waitFor();
-        } catch (FileNotFoundException e) {
-            Log.d(TAG,"createIperfFile : can't create file -"+filename);
-            return;
-        } catch (IOException e) {
-            Log.d(TAG,"createIperfFile : can't close file -"+filename);
-            return;
-        } catch (InterruptedException e) {
-            Log.d(TAG,"createIperfFile : can't chmod file -"+filename);
-            return;
-        }
-
-        Log.d(TAG,"createIperfFile : success -"+filename);
-
-    }
-
     public void start(){
-        mIperfRunnable.run();
+
     }
 
+    public void start(String option){
+        mIperfTask = new LGIperfTask();
+        StringBuilder sCmdBuilder = new StringBuilder(
+                (mIperfVersion == MODE_IPERF)?
+                        mContext.getFilesDir().getPath()+"/"+IPERF_NAME:
+                 mContext.getFilesDir().getPath()+"/"+IPERF3_NAME).append(" ");
+        sCmdBuilder.append(option);
+        //mIperfRunnable.run(sCmdBuilder.toString().split(" "));*/
+
+        mIperfTask.execute(new String[]{sCmdBuilder.toString()});
+    }
     public void stop(){
-        mIperfRunnable.abort();
+        //mIperfRunnable.stop();
+        if(mIperfTask != null)
+            mIperfTask.stop();
+
+        mIperfTask = null;
     }
 
-    class IperfRunnable implements Runnable  {
-        boolean mFlag = false;
-        Process process;
 
-        public void abort(){
-            /*TODO check destroy  */
-            //process.destroy();
-            //android.os.Process.killProcess(int pid);
-            mFlag = false;
+    class LGIperfTask extends AsyncTask {
+        String ITAG = "LGIperfTask";
+        Process iProcess;
+        private Integer runIperf(String... arg){
+            if(arg == null || arg[0] == null){
+                return Integer.valueOf(99);
+            }
+            try {
+                iProcess = new ProcessBuilder(new String[0]).command(arg[0].split(" ")).redirectErrorStream(true).start();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iProcess.getInputStream()));
+                int sRead = 0;
+                char[] sBuffer = new char[4096];
+                /*
+                while (bufferedReader.readLine() != null) {
+                    publishProgress(new String[]{bufferedReader.readLine() + "\n"});
+                }*/
+                while ((sRead = bufferedReader.read(sBuffer)) > 0){
+                        final String sResult = new StringBuffer().append(sBuffer, 0, sRead).toString();
+                        publishProgress( new String[]{sResult});
+                }
+            } catch (IOException e) {
+                Log.e(ITAG, "runIperf-exception="+ e.toString() );
+                iProcess.destroy();
+                iProcess = null;
+            }
+
+            return Integer.valueOf(0);
+        }
+
+        public final void stop() {
+            cancel(false);
+            if (iProcess != null) {
+                iProcess.destroy();
+                iProcess = null;
+            }
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            return runIperf((String[])objects);
+        }
+
+        @Override
+        protected final /* synthetic */ void onCancelled(Object obj) {
+            Log.d(ITAG,"onCancelled" );
+
+            mListener.onStopped();
+        }
+        @Override
+        protected final /* synthetic */ void onPostExecute(Object obj) {
+            Integer num = (Integer) obj;
+            if (num != null) {
+                Log.d(ITAG, "onPostExecute - "+ new StringBuilder("onPostExecute got ").append(num.toString()).toString());
+                if (num.intValue() == 88) {
+
+                }
+            }
+
+            mListener.onStopped();
+        }
+
+        protected final /* synthetic */ void onProgressUpdate(Object[] objArr) {
+            String[] strArr = (String[]) objArr;
+            if (strArr != null && strArr[0] != null) {
+                Log.d(ITAG, "onProgressUpdate-"+strArr[0]+"<end>");
+                mListener.onGettingMeesage(strArr[0]);
+            }
+        }
+
+
+    }
+
+    /*
+    class LGIperfRunnable implements Runnable  {
+        String ITAG = "LGIperfRunnable";
+        String iOption = null;
+        Process iProcess;
+        String iCmd[];
+
+        public void stop(){
+            iOption = null;
+            iCmd = null;
+            iProcess.destroy();
+
         }
         @Override
         public void run() {
-            mFlag = true;
             try {
-                Log.d(TAG, "=============== START IperfRunnable run =====================");
-                // Executes the command.
-                String[] cmd = {mContext.getFilesDir()+"/"+IPERF_NAME, "--h"};
-                Log.d(TAG,"run  - " +cmd.toString());
-                process = Runtime.getRuntime().exec(cmd);
-
+                Log.d(ITAG, "=============== START IperfRunnable run =====================");
+                iProcess = new ProcessBuilder().command(iCmd).redirectErrorStream(true).start();
 
                 // Reads stdout.
                 // NOTE: You can write to stdin of the command using
                 //       process.getOutputStream().
                 BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream()));
+                        new InputStreamReader(iProcess.getInputStream()));
 
-                BufferedReader reader_e = new BufferedReader(
-                        new InputStreamReader(process.getErrorStream()));
 
-                int read =0;
-                int read_e =0;
+                int sRead =0;
 
                 char[] buffer = new char[4096];
-                char[] buffer2 = new char[4096];
-                while (mFlag && /*TODO process check  &&*/ (read = reader.read(buffer)) > 0 || (read_e = reader_e.read(buffer2)) > 0 ) {
-                    StringBuffer output = new StringBuffer();
 
-                    if(read > 0)
-                        output.append(buffer, 0, read);
-                    else if(read_e > 0)
-                        output.append(buffer2, 0, read_e);
+                while ( (sRead = reader.read(buffer)) > 0 ) {
+                    final String sResult = new StringBuffer().append(buffer, 0, sRead).toString();
+                    new Runnable(){
 
-                    Log.d(TAG,output.toString());
+                        @Override
+                        public void run() {
+                            if(mListener != null ) mListener.onGettingMeesage(sResult);
+                        }
+                    }.run();
+
+                    Log.d(ITAG,sResult);
                 }
                 // Waits for the command to finish.
-                process.waitFor();
-                Log.d(TAG, "=============== STOP IperfRunnable run =====================");
+                reader.close();
+                Log.d(ITAG, "=============== STOP IperfRunnable run =====================");
             } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Log.d(ITAG, "run IOException =" + e.toString());
+            } finally {
+                iCmd = null;
             }
+            LGIperfRunnable.this.stop();
+            if(mListener != null ) mListener.onStopped();
         }
+
+        public void run(String[] cmd){
+            iCmd = cmd;
+            LGIperfRunnable.this.run();
+        }
+    }*/
+
+    public interface OnStateChangeListener{
+        void onGettingMeesage(String message);
+        void onStarted();
+        void onStopped();
     }
 }

@@ -36,14 +36,14 @@ public class LGFTPClient {
 
     private FTPClient mFTPClient;
     private ILGFTPOperationListener mOperationListener;
-    private boolean mIsForcedAbortion;
+    private boolean mIsForcedAbort;
 
     @Getter private String mCurrentWorkingDirectory = "/";
 
     public LGFTPClient(ILGFTPOperationListener operationListener) {
         this.mFTPClient = new FTPClient();
         this.mOperationListener = operationListener;
-        mIsForcedAbortion = false;
+        mIsForcedAbort = false;
     }
 
     //
@@ -237,9 +237,8 @@ public class LGFTPClient {
             if (shouldWrite) {
                 sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
             }
-            Log.d(TAG, "a");
+
             sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
-            Log.d(TAG, "b");
 
             Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
@@ -252,23 +251,20 @@ public class LGFTPClient {
             LGFTPClient.this.mStartTime = System.currentTimeMillis();
             LGFTPClient.this.mDownloadedBytes = 0;
             LGFTPClient.this.mElapsedTime = 0;
-            LGFTPClient.this.mIsForcedAbortion = false;
+            LGFTPClient.this.mIsForcedAbort = false;
 
             // 2. start t-put calculation msg loop
             LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
 
-            Log.d(TAG, "c");
             // 3. inform the fragment that file DL has been started.
             //LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
             LGFTPClient.this.mOperationListener.onDownloadStarted(targetFile);
-            Log.d(TAG, "d");
+
             byte[] sBytesArray = new byte[20971520]; // 20 MBytes
             int sBytesRead = -1;
-            Log.d(TAG, "1111111");
+            Log.d(TAG, "shouldWrite : " + shouldWrite);
             while ((sBytesRead = sInputStream.read(sBytesArray)) != -1) {
-                Log.d(TAG, "sBytesRead = " + sBytesRead + " bytes received");
                 if (shouldWrite) {
-                    Log.d(TAG, "bbbbbbbbbbbbbb");
                     sOutputStream.write(sBytesArray, 0, sBytesRead);
                 }
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;
@@ -277,8 +273,8 @@ public class LGFTPClient {
             Log.d(TAG, "22222222");
             ret = this.mFTPClient.completePendingCommand();
 
-            Log.d(TAG, "mIsForcedAbortion : " + mIsForcedAbortion);
-            if (mIsForcedAbortion) {
+            Log.d(TAG, "mIsForcedAbort : " + mIsForcedAbort);
+            if (mIsForcedAbort) {
                 ret = false;
             }
             if (ret) {
@@ -286,7 +282,7 @@ public class LGFTPClient {
             } else {
                 Log.d(TAG, "Download failed");
             }
-            this.mIsForcedAbortion = false;
+            this.mIsForcedAbort = false;
             Log.d(TAG, "************************************************************");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -329,7 +325,7 @@ public class LGFTPClient {
     public boolean stopDownload() {
         try {
             Log.d(TAG, "calling abort()");
-            this.mIsForcedAbortion = true;
+            this.mIsForcedAbort = true;
             return this.mFTPClient.abort();
         } catch (IOException e) {
             e.printStackTrace();

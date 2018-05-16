@@ -1,11 +1,14 @@
 package com.android.LGSetupWizard.fragments;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
+import android.net.ConnectivityManagerEx;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +36,9 @@ import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
 import com.android.LGSetupWizard.data.MediaScanning;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -124,9 +130,40 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }.start();
     }
 
+    private static boolean DEBUG = true;
+
     @Override
     public void onResume() {
         super.onResume();
+
+        if (DEBUG) {
+            ConnectivityManager jj = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            @SuppressLint("ServiceCast") ConnectivityManager jj2 = (ConnectivityManagerEx) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            Log.d(TAG + " shsh", jj.getClass().getSimpleName());
+            Log.d(TAG + " shsh", jj2.getClass().getSimpleName());
+            Log.d(TAG + " shsh", (jj instanceof ConnectivityManagerEx) ? "jj is connectivityManagerEx" : "jj is not connectivityManagerEx");
+            Log.d(TAG + " shsh", (jj2 instanceof ConnectivityManager) ? "jj2 is connectivityManager" : "jj is not ConnectivityManager");
+
+            try {
+                Field field = jj.getClass().getSuperclass().getDeclaredField("mService");
+                Log.d(TAG + " shsh", field.getType().getCanonicalName());
+                Method m = field.getDeclaringClass().getDeclaredMethod("startTethering", new Class[]{});
+                m.invoke(field);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+            } catch (NoSuchMethodException e) {
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+                e.printStackTrace();
+            }
+        }
 
         this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
         this.mLGFTPFileDownloadProgressDialog = new LGFTPFileDownloadProgressDialog(this.getContext());

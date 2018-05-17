@@ -24,5 +24,23 @@
     <string name="iperf_start">Start</string>
     <string name="iperf_stop">Stop</string>
     <string name="iperf_advanced">Advanced</string>
+    <string name="iperf_menu_back">Back</string>
+    <string name="iperf_menu_add">Add</string>
+    <string name="iperf_menu_delete">Delete</string>
+    <string name="iperf_menu_select">Select</string>
+    <string name="iperf_menu_version_2">V2</string>
+    <string name="iperf_menu_version_3">V3</string>
+    <string name="iperf_menu_server">Sever</string>
+    <string name="iperf_menu_client">Client</string>
+    <string name="iperf_menu_host">Host</string>
+    <string name="iperf_menu_reverse">Reverse(-R)</string>
+    <string name="iperf_menu_tcp">TCP</string>
+    <string name="iperf_menu_udp">UDP</string>
+    <string name="iperf_menu_rate">Rate(-b)</string>
+    <string name="iperf_menu_duration">Duration(-t)</string>
+    <string name="iperf_menu_interval">Interval(-i)</string>
+    <string name="iperf_menu_stream">Stream(-P)</string>
+    <string name="iperf_menu_port">Port(-p)</string>
+    <string name="iperf_menu_other">Others</string>
 
 </resources>

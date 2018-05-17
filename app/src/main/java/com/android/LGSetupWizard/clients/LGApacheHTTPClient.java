@@ -58,7 +58,6 @@ public class LGApacheHTTPClient implements LGHTTPClient {
     }
 
     public class DownloadRunnable implements Runnable {
-        private static final int BUFFER_SIZE = 2 * 1024 * 1024;
 
         private long mStartTime;
         private long mCurrentTime;

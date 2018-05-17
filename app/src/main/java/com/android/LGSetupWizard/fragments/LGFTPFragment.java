@@ -15,6 +15,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -177,6 +179,19 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mEditTextUserID = (EditText) this.mView.findViewById(R.id.editText_user_id);
         this.mEditTextPassword = (EditText) this.mView.findViewById(R.id.editText_password);
         this.mEditTextRepeatCount = this.mView.findViewById(R.id.txtView_ftp_download_repeat_count);
+        this.mEditTextRepeatCount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() == 0)
+                    mEditTextRepeatCount.setText("1");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
 
         if (!this.isNetworkAvailable()) {
             this.mBtnConnectDisconnect.setEnabled(false);

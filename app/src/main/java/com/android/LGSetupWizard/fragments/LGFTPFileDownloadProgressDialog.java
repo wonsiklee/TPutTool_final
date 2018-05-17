@@ -26,9 +26,6 @@ public class LGFTPFileDownloadProgressDialog extends Dialog implements View.OnCl
     private TextView mTxtViewDownloadingFileName;
     private TextView mTxtViewDownloadingFileCount;
 
-    /*@Setter @Getter    private int mTotalFileCount;
-    @Setter @Getter    private int mCurrentFileCount;*/
-
     public LGFTPFileDownloadProgressDialog(Context context) {
         super(context);
         requestWindowFeature(Window.FEATURE_NO_TITLE);

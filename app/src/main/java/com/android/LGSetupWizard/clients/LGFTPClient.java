@@ -53,6 +53,7 @@ public class LGFTPClient {
         try {
             this.mFTPClient.connect(serverAddress, portNum);
             int reply = mFTPClient.getReplyCode();
+            Log.d(TAG, "server connect reply : " + reply);
             if (!FTPReply.isPositiveCompletion(reply)) {
                 mFTPClient.disconnect();
                 Log.d(TAG, "connection failed, FTPReply code : " + reply);
@@ -60,7 +61,7 @@ public class LGFTPClient {
                 Log.d(TAG, "successfully connected");
                 if (loginToServer(userID, password)) {
                     Log.d(TAG, "Logged in successfully");
-                    fileList = nonThreadedGetFileList();
+                    fileList = getFileList();
                     // keep alive 2 mins.
                     LGFTPClient.this.mFTPClient.setKeepAlive(true);
                     LGFTPClient.this.mFTPClient.setControlKeepAliveTimeout(120);
@@ -116,7 +117,7 @@ public class LGFTPClient {
         return this.mFTPClient.isConnected();
     }
 
-    private ArrayList<LGFTPFile> nonThreadedGetFileList() {
+    private ArrayList<LGFTPFile> getFileList() {
         ArrayList<LGFTPFile> retArray = new ArrayList<>();
 
         try {
@@ -136,7 +137,7 @@ public class LGFTPClient {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            mOperationListener.onChangeWorkingDirectoryFinished(nonThreadedGetFileList());
+            mOperationListener.onChangeWorkingDirectoryFinished(getFileList());
             try {
                 mCurrentWorkingDirectory = mFTPClient.printWorkingDirectory();
             } catch (IOException e) {
@@ -290,6 +291,7 @@ public class LGFTPClient {
         } catch (FTPConnectionClosedException e) {
             e.printStackTrace();
             Log.e(TAG, "FTPConnectionClosedException : " + e.getMessage());
+            Log.e(TAG, "CODE : " + this.mFTPClient.getReplyCode() + ", " + this.mFTPClient.getReplyString());
         } catch (IOException e) {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());

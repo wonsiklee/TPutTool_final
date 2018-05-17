@@ -131,37 +131,28 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }.start();
     }
 
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
 
     @Override
     public void onResume() {
         super.onResume();
 
         if (DEBUG) {
-            ConnectivityManager jj = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            @SuppressLint("ServiceCast") ConnectivityManager jj2 = (ConnectivityManagerEx) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            Log.d(TAG + " shsh", jj.getClass().getSimpleName());
-            Log.d(TAG + " shsh", jj2.getClass().getSimpleName());
-            Log.d(TAG + " shsh", (jj instanceof ConnectivityManagerEx) ? "jj is connectivityManagerEx" : "jj is not connectivityManagerEx");
-            Log.d(TAG + " shsh", (jj2 instanceof ConnectivityManager) ? "jj2 is connectivityManager" : "jj is not ConnectivityManager");
+            ConnectivityManager sConnectivityManager = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
             try {
-                Field field = jj.getClass().getSuperclass().getDeclaredField("mService");
-                Log.d(TAG + " shsh", field.getType().getCanonicalName());
-                Method m = field.getDeclaringClass().getDeclaredMethod("startTethering", new Class[]{});
-                m.invoke(field);
+                Field field = sConnectivityManager.getClass().getDeclaredField("mService");
+                Method m = field.getDeclaringClass().getDeclaredMethod("stopTethering", new Class[]{int.class});
+                Method[] ddd = field.getDeclaringClass().getMethods();
+
+                m.invoke(sConnectivityManager, 0);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
-                Log.d(TAG + "shsh", e.getLocalizedMessage());
             } catch (NoSuchMethodException e) {
-                Log.d(TAG + "shsh", e.getLocalizedMessage());
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
-                Log.d(TAG + "shsh", e.getLocalizedMessage());
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
-                Log.d(TAG + "shsh", e.getLocalizedMessage());
                 e.printStackTrace();
             }
         }
@@ -204,7 +195,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
         this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
-        this.mUIControlHandler.sendEmptyMessage(MSG_DISCONNECT_FROM_SERVER_FINISHED);
+        this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
         Log.d(TAG, "onResume() completed");
     }
@@ -235,6 +226,55 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
     }
     /* network operation progress bar show/hide [END] */
+
+    private void showDLBtnLayout() {
+        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(0).alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+    }
+
+    private void hideDLBtnLayout() {
+        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+    }
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -350,6 +390,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static int MSG_FILE_DOWNLOAD_UPDATE_DIALOG_INFO = 0x08;
     final static int MSG_SELECTED_FILES_CHANGED = 0x09;
     final static int MSG_CLEAR_SELECTED_FILES_CHANGED = 0x10;
+    final static int MSG_REFRESH_ALL_UI = 0x11;
 
 
     // UI Control handler
@@ -364,27 +405,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mBtnConnectDisconnect.setText("Log out");
                     LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                     LGFTPFragment.this.dismissNetworkOperationProgressBar();
-                    LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(0).alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    });
+                    LGFTPFragment.this.showDLBtnLayout();
                     LGFTPFragment.this.mSwitchFileIO.setEnabled(true);
                     this.sendEmptyMessage(MSG_FILE_SET_CHANGED);
                     break;
@@ -397,28 +418,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(null);
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     LGFTPFragment.this.dismissNetworkOperationProgressBar();
-                    LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
-                            .setListener(new Animator.AnimatorListener() {
-                                @Override
-                                public void onAnimationStart(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
-                                }
-
-                                @Override
-                                public void onAnimationCancel(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animator animation) {
-
-                                }
-                            });
+                    LGFTPFragment.this.hideDLBtnLayout();
 
                     LGFTPFragment.this.mSwitchFileIO.setEnabled(false);
                     break;
@@ -431,20 +431,26 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
                 case MSG_FILE_SET_CHANGED:
                     Log.d(TAG, "MSG_FILE_SET_CHANGED");
-                    // 1 : sort first
-                    LGFTPFile[] sortedArray = new LGFTPFile[LGFTPFragment.this.mFileList.size()];
-                    sortedArray = LGFTPFragment.this.mFileList.toArray(sortedArray);
-                    Arrays.sort(sortedArray);
 
-                    // 2 : assign the sorted list to the adapter
-                    LGFTPFragment.this.mFileList = new ArrayList<>(Arrays.asList(sortedArray));
-                    LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(LGFTPFragment.this.mFileList);
+                    if (LGFTPFragment.this.mFileList != null) {
+                        // 1 : sort first
+                        LGFTPFile[] sortedArray = new LGFTPFile[LGFTPFragment.this.mFileList.size()];
+                        sortedArray = LGFTPFragment.this.mFileList.toArray(sortedArray);
+                        Arrays.sort(sortedArray);
+
+                        // 2 : assign the sorted list to the adapter
+                        LGFTPFragment.this.mFileList = new ArrayList<>(Arrays.asList(sortedArray));
+                        LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(LGFTPFragment.this.mFileList);
+                    } else {
+                        Log.d(TAG, "mFileList is null, clearing out currently showing file list.");
+                    }
 
                     // 3 : clear selected file index
                     LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
 
                     // 4 : refresh
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+
                     break;
 
                 case MSG_FILE_DOWNLOAD_STARTED:
@@ -505,7 +511,42 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     break;
+                case MSG_REFRESH_ALL_UI:
+                    Log.d(TAG, "MSG_REFRESH_ALL_UI");
+                    if (LGFTPFragment.this.mLGFtpClient.isConnected()) {
 
+                    } else {
+                        LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerConnect);
+                        LGFTPFragment.this.mBtnConnectDisconnect.setText("Log in");
+                        LGFTPFragment.this.mBtnDLULStartStop.setEnabled(false);
+                        LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(null);
+                        LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+                        LGFTPFragment.this.dismissNetworkOperationProgressBar();
+                        LGFTPFragment.this.mSwitchFileIO.setEnabled(false);
+                        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
+                                .setListener(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animation) {
+
+                                    }
+                                });
+                    }
+                    break;
                 default:
                     break;
             }

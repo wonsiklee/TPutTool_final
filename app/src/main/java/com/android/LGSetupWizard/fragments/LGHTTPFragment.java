@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -66,6 +67,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private int mMaxCount;
     private int mRepeatInterval = 5000;
     private Handler mTargetHandler;
+    private InputMethodManager mInputMethodManager;
 
     private static DataPool DATA_POOL = new DataPool();
 
@@ -92,6 +94,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
             Log.d(TAG, "Repeat count : " + mMaxCount);
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(START_TEST);
+
+            LGHTTPFragment.this.hideKeyboard();
         }
     };
 
@@ -271,6 +275,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             this.mLGHTTPClient = new LGOKHTTPClient();
             this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
             this.mTargetHandler = this.mHttpTestControlHandler;
+
+            mInputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         }
         return mView;
     }
@@ -319,6 +325,12 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
         this.mImageButtonClearAddr = (ImageButton) this.mView.findViewById(R.id.imageButton_clear_addr);
         this.mImageButtonClearAddr.setOnClickListener(this.mClearAddrClickListener);
+    }
+
+    private void hideKeyboard()
+    {
+        mInputMethodManager.hideSoftInputFromWindow(mEditTxtFileAddr.getWindowToken(), 0);
+        mInputMethodManager.hideSoftInputFromWindow(mEditTxtRepeatCount.getWindowToken(), 0);
     }
 
     @Override

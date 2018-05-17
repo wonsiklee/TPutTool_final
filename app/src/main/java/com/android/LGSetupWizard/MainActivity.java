@@ -111,13 +111,11 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        Log.d(TAG, "onPageScrolled()");
         // do nothing
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Log.d(TAG, "onPageScrollStateChanger()");
         // do nothing
     }
 

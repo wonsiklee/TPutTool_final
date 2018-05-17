@@ -1,14 +1,11 @@
 package com.android.LGSetupWizard.fragments;
 
 import android.animation.Animator;
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
-import android.net.ConnectivityManagerEx;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -80,7 +77,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private String mDownloadingFileName;
     private long mDownloadingFileSize;
     private boolean mDownloadResult;
-    private int mRepeatCount;
 
     private int mInitialFileCount;
 
@@ -601,8 +597,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }.start();
         }
     };
-
-
 
     // dl start listener
     private View.OnClickListener mClickListenerStart = new View.OnClickListener() {

@@ -123,14 +123,17 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         sHolder.mIsSelected.setVisibility(View.INVISIBLE);
 
         FTPFile ff = this.mFileList.get(position);
-        if (FTPFile.DIRECTORY_TYPE == ff.getType()) {
-            sHolder.mIcon.setImageDrawable(this.mContext.getDrawable(R.drawable.ic_folder_close));
-        } else {
-            sHolder.mIcon.setImageDrawable(this.mContext.getDrawable(R.drawable.ic_file));
-        }
 
         sHolder.mFileName.setText(ff.getName());
-        sHolder.mFileSize.setText((ff.getSize() / 1024/ 1024) + " MB");
+        if (FTPFile.DIRECTORY_TYPE == ff.getType()) {
+            sHolder.mIcon.setImageDrawable(this.mContext.getDrawable(R.drawable.ic_folder_close));
+            sHolder.mFileSize.setVisibility(View.INVISIBLE);
+        } else {
+            sHolder.mFileSize.setVisibility(View.VISIBLE);
+            sHolder.mIcon.setImageDrawable(this.mContext.getDrawable(R.drawable.ic_file));
+            sHolder.mFileSize.setText((ff.getSize() / 1024/ 1024) + " MB");
+        }
+
         if (this.isFileSelectedAt(position)) {
             convertView.setBackgroundColor(R.color.selected_color);
         } else {

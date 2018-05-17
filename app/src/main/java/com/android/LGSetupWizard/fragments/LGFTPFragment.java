@@ -622,9 +622,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         ArrayList<Integer> sTmpSelectedFilePositionList = (ArrayList<Integer>) mFTPFileListVIewAdapter.getSelectedFilePositionList().clone();
                         try {
                             for (int i = 0; i != sRepeatCount; ++i) {
+                                LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
                                 LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
-                                LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
                                 Thread.sleep(1000);
                             }

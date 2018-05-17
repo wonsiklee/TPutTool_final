@@ -1,11 +1,14 @@
 package com.android.LGSetupWizard.fragments;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
+import android.net.ConnectivityManagerEx;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +36,9 @@ import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
 import com.android.LGSetupWizard.data.MediaScanning;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -53,7 +59,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private EditText mEditTextPortNum;
     private EditText mEditTextUserID;
     private EditText mEditTextPassword;
-
+    private EditText mEditTextRepeatCount;
 
     private LinearLayout mLinearLayoutLoggedInViewGroup;
     private Switch mSwitchFileIO;
@@ -72,6 +78,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private String mDownloadingFileName;
     private long mDownloadingFileSize;
     private boolean mDownloadResult;
+    private int mRepeatCount;
 
     private int mInitialFileCount;
 
@@ -124,9 +131,40 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }.start();
     }
 
+    private static boolean DEBUG = true;
+
     @Override
     public void onResume() {
         super.onResume();
+
+        if (DEBUG) {
+            ConnectivityManager jj = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            @SuppressLint("ServiceCast") ConnectivityManager jj2 = (ConnectivityManagerEx) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            Log.d(TAG + " shsh", jj.getClass().getSimpleName());
+            Log.d(TAG + " shsh", jj2.getClass().getSimpleName());
+            Log.d(TAG + " shsh", (jj instanceof ConnectivityManagerEx) ? "jj is connectivityManagerEx" : "jj is not connectivityManagerEx");
+            Log.d(TAG + " shsh", (jj2 instanceof ConnectivityManager) ? "jj2 is connectivityManager" : "jj is not ConnectivityManager");
+
+            try {
+                Field field = jj.getClass().getSuperclass().getDeclaredField("mService");
+                Log.d(TAG + " shsh", field.getType().getCanonicalName());
+                Method m = field.getDeclaringClass().getDeclaredMethod("startTethering", new Class[]{});
+                m.invoke(field);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+            } catch (NoSuchMethodException e) {
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                Log.d(TAG + "shsh", e.getLocalizedMessage());
+                e.printStackTrace();
+            }
+        }
 
         this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
         this.mLGFTPFileDownloadProgressDialog = new LGFTPFileDownloadProgressDialog(this.getContext());
@@ -147,6 +185,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mEditTextPortNum = (EditText) this.mView.findViewById(R.id.editText_port_num);
         this.mEditTextUserID = (EditText) this.mView.findViewById(R.id.editText_user_id);
         this.mEditTextPassword = (EditText) this.mView.findViewById(R.id.editText_password);
+        this.mEditTextRepeatCount = this.mView.findViewById(R.id.txtView_ftp_download_repeat_count);
 
         if (!this.isNetworkAvailable()) {
             this.mBtnConnectDisconnect.setEnabled(false);
@@ -172,6 +211,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     /* file download progress dialog show/hide [START] */
     private void showFileDownloadProgressBar() {
+        this.mLGFTPFileDownloadProgressDialog.updateProgressValue(0, 0, 0);
         this.mLGFTPFileDownloadProgressDialog.show();
     }
 
@@ -513,17 +553,25 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Override
         public void onClick(View v) {
             Log.d(TAG, "mClickListenerStart.onClick()");
+            final int sRepeatCount = Integer.valueOf(mEditTextRepeatCount.getText().toString());
             final ArrayList<LGFTPFile> sSelectedFileList = LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileList();
             Log.d(TAG, "Selected file count : " + sSelectedFileList.size());
-            mInitialFileCount = sSelectedFileList.size();
+            LGFTPFragment.this.mInitialFileCount = sSelectedFileList.size();
 
             if (sSelectedFileList.size() > 0) {
                 new Thread() {
                     @Override
                     public void run() {
+                        ArrayList<LGFTPFile> sTmpSelectedFileList = (ArrayList<LGFTPFile>) sSelectedFileList.clone();
+                        ArrayList<Integer> sTmpSelectedFilePositionList = (ArrayList<Integer>) mFTPFileListVIewAdapter.getSelectedFilePositionList().clone();
                         try {
-                            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                            LGFTPFragment.this.mLGFtpClient.retrieveFile(sSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
+                            for (int i = 0; i != sRepeatCount; ++i) {
+                                LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
+                                LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
+                                LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
+                                Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
+                                Thread.sleep(1000);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

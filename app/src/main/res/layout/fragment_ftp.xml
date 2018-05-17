@@ -123,12 +123,29 @@
         android:animateLayoutChanges="true"
         android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="반복 "/>
+        <EditText
+            android:id="@+id/txtView_ftp_download_repeat_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:minLines="1"
+            android:inputType="numberDecimal"
+            android:text="1" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="회"/>
         <Switch
             android:id="@+id/switch_file_IO_enabler"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="File I/O"
+            android:text="Write to storage"
             android:textOff="File I/O"
             android:textOn="File I/O" />
 

@@ -5,6 +5,7 @@ package com.android.LGSetupWizard.clients;
  */
 
 public interface LGHTTPClient {
+    int BUFFER_SIZE = 2 * 1024 * 1024;
     void startHTTPDownload(String fileAddr, boolean enableFileIO);
     void stopDownload();
     void publishCurrentTPut();

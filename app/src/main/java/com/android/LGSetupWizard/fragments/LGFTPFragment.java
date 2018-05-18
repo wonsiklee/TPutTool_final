@@ -12,8 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,7 +21,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -36,8 +36,6 @@ import com.android.LGSetupWizard.data.MediaScanning;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -52,17 +50,16 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     private View mView;
 
-    private Button mBtnDLULStartStop;
     private Button mBtnConnectDisconnect;
     private EditText mEditTextServerAddress;
     private EditText mEditTextPortNum;
     private EditText mEditTextUserID;
     private EditText mEditTextPassword;
-    private EditText mEditTextRepeatCount;
 
     private LinearLayout mLinearLayoutLoggedInViewGroup;
     private Switch mSwitchFileIO;
-
+    private Spinner mSpinnerRepeatCount;
+    private Button mBtnDLULStartStop;
 
     private ListView mFTPFileListView;
 
@@ -135,26 +132,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     public void onResume() {
         super.onResume();
 
-        if (DEBUG) {
-            ConnectivityManager sConnectivityManager = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            try {
-                Field field = sConnectivityManager.getClass().getDeclaredField("mService");
-                Method m = field.getDeclaringClass().getDeclaredMethod("stopTethering", new Class[]{int.class});
-                Method[] ddd = field.getDeclaringClass().getMethods();
-
-                m.invoke(sConnectivityManager, 0);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-
         this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
         this.mLGFTPFileDownloadProgressDialog = new LGFTPFileDownloadProgressDialog(this.getContext());
         this.mLGFTPFileDownloadProgressDialog.setOnDismissListener(this);
@@ -174,20 +151,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mEditTextPortNum = (EditText) this.mView.findViewById(R.id.editText_port_num);
         this.mEditTextUserID = (EditText) this.mView.findViewById(R.id.editText_user_id);
         this.mEditTextPassword = (EditText) this.mView.findViewById(R.id.editText_password);
-        this.mEditTextRepeatCount = this.mView.findViewById(R.id.txtView_ftp_download_repeat_count);
-        this.mEditTextRepeatCount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() == 0)
-                    mEditTextRepeatCount.setText("1");
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
 
         if (!this.isNetworkAvailable()) {
             this.mBtnConnectDisconnect.setEnabled(false);
@@ -202,10 +165,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
         }
 
+        this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
         this.mBtnDLULStartStop = (Button) this.mView.findViewById(R.id.btn_ftp_download);
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
-        this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
+        this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
+
+
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
         Log.d(TAG, "onResume() completed");
@@ -243,6 +209,15 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             @Override
             public void onAnimationStart(Animator animation) {
                 LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
+                LGFTPFragment.this.mSpinnerRepeatCount.setDropDownWidth(LGFTPFragment.this.mSpinnerRepeatCount.getWidth());
+                try {
+                    Field popup = Spinner.class.getDeclaredField("mPopup");
+                    popup.setAccessible(true);
+                    ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(mSpinnerRepeatCount);
+                    popupWindow.setHeight(LGFTPFragment.this.mSpinnerRepeatCount.getHeight() * 16);
+                } catch (NoClassDefFoundError | ClassCastException | NoSuchFieldException | IllegalAccessException e) {
+                    Log.e(TAG, "" + e.getMessage());
+                }
             }
 
             @Override
@@ -603,7 +578,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Override
         public void onClick(View v) {
             Log.d(TAG, "mClickListenerStart.onClick()");
-            final int sRepeatCount = Integer.valueOf(mEditTextRepeatCount.getText().toString());
+            final int sRepeatCount = Integer.valueOf(mSpinnerRepeatCount.getSelectedItem().toString());
             final ArrayList<LGFTPFile> sSelectedFileList = LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileList();
             Log.d(TAG, "Selected file count : " + sSelectedFileList.size());
             LGFTPFragment.this.mInitialFileCount = sSelectedFileList.size();

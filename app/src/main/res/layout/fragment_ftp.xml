@@ -127,14 +127,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="반복 "/>
-        <EditText
-            android:id="@+id/txtView_ftp_download_repeat_count"
+        <Spinner
+            android:id="@+id/spinner_ftp_download_repeat_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:minLines="1"
-            android:inputType="numberDecimal"
-            android:text="1" />
+            android:gravity="end"
+            android:textAlignment="viewEnd"
+            android:entries="@array/repeat_count"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -145,7 +144,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Write to storage"
+            android:text="File I/O"
             android:textOff="File I/O"
             android:textOn="File I/O" />
 

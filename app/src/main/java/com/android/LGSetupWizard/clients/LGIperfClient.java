@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.data.LGIperfCommand;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 
 /**
  * Created by hyukbin.ko on 2018-05-03.
@@ -30,11 +32,6 @@ public class LGIperfClient {
     private LGIperfTask mIperfTask;
     private Context mContext;
 
-    private static final String IPERF_NAME = "iperf";
-    private static final String IPERF3_NAME = "iperf3";
-
-    public static final int MODE_IPERF = 0;
-    public static final int MODE_IPERF3 = 1;
 
     @Setter public int mIperfVersion;
 
@@ -58,7 +55,7 @@ public class LGIperfClient {
     }
 
     private boolean checkAndCreateIperfFile(String iperfName){
-        if(!IPERF3_NAME.equals(iperfName) && !IPERF_NAME.equals(iperfName)){
+        if(!LGIperfConstants.IPERF3_NAME.equals(iperfName) && !LGIperfConstants.IPERF_NAME.equals(iperfName)){
             Log.e(TAG, "checkAndCrateIperfFile : invalid iperfName="+iperfName);
             return false;
         }
@@ -66,7 +63,7 @@ public class LGIperfClient {
         File file = new File(mContext.getFilesDir().getPath()+"/"+iperfName);
 
         if( !(file.exists() && file.canExecute())){
-            InputStream sOpenRawResource = IPERF_NAME.equals(iperfName)?
+            InputStream sOpenRawResource = LGIperfConstants.IPERF_NAME.equals(iperfName)?
                     mContext.getResources().openRawResource(R.raw.iperf):mContext.getResources().openRawResource(R.raw.iperf3);
 
             try {
@@ -94,9 +91,9 @@ public class LGIperfClient {
     public void start(String option){
         mIperfTask = new LGIperfTask();
         StringBuilder sCmdBuilder = new StringBuilder(
-                (mIperfVersion == MODE_IPERF)?
-                        mContext.getFilesDir().getPath()+"/"+IPERF_NAME:
-                 mContext.getFilesDir().getPath()+"/"+IPERF3_NAME).append(" ");
+                (mIperfVersion == LGIperfConstants.IPERF_VERSION2)?
+                        mContext.getFilesDir().getPath()+"/"+LGIperfConstants.IPERF_NAME:
+                 mContext.getFilesDir().getPath()+"/"+LGIperfConstants.IPERF3_NAME).append(" ");
         sCmdBuilder.append(option);
         //mIperfRunnable.run(sCmdBuilder.toString().split(" "));*/
 

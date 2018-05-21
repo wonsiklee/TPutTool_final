@@ -123,6 +123,13 @@
         android:animateLayoutChanges="true"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/imgBtn_history"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+
+            android:background="@drawable/test_logs" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
@@ -27,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.android.LGSetupWizard.adapters.TPutMonitorTestResultDBAdapter;
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
@@ -57,6 +59,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private EditText mEditTextPassword;
 
     private LinearLayout mLinearLayoutLoggedInViewGroup;
+    private ImageButton mImgBtnTestHistory;
     private Switch mSwitchFileIO;
     private Spinner mSpinnerRepeatCount;
     private Button mBtnDLULStartStop;
@@ -166,6 +169,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
 
         this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
+        this.mImgBtnTestHistory = (this.mView.findViewById(R.id.imgBtn_history));
+        this.mImgBtnTestHistory.setOnClickListener(this.mClickListenerShowHistory);
         this.mBtnDLULStartStop = (Button) this.mView.findViewById(R.id.btn_ftp_download);
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
@@ -591,6 +596,21 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
         }
     };
+
+    // history img btn click listener
+    private View.OnClickListener mClickListenerShowHistory = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "onClick() show history");
+            // TODO : DB list show.
+
+            // test code for DB creation, insertion, delegation
+            TPutMonitorTestResultDBAdapter.open(LGFTPFragment.this.getContext());
+
+            TPutMonitorTestResultDBAdapter.close();
+        }
+    };
+
 
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {

@@ -43,4 +43,24 @@
     <string name="iperf_menu_port">Port(-p)</string>
     <string name="iperf_menu_other">Others</string>
 
+    <!--Dialog -->
+    <string name="dialog_set_button">Set</string>
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="dialog_del_button">Delete</string>
+
+    <string name="dialog_duration_title">Parameter for -t</string>
+    <string name="dialog_duration_description">Specify a duration(in seconds) for the measurement</string>
+    <string name="dialog_interval_title">Parameter for -i</string>
+    <string name="dialog_interval_description">Specify an interval(in seconds) for reports</string>
+    <string name="dialog_streams_title">Parameter for -P</string>
+    <string name="dialog_streams_description">Specify the number of parallel streams</string>
+    <string name="dialog_port_title">Parameter for -p</string>
+    <string name="dialog_port_description">Server to listen on / Client connect to</string>
+
+
+    <string name="dialog_host_title">Parameter for -c </string>
+    <string name="dialog_host_description">Specify a server\'s hostname or IP address</string>
+    <string name="dialog_other_title">Advanced Parameter </string>
+    <string name="dialog_other_description">Advanced Parameter such as -R -O 3,etc </string>
+
 </resources>

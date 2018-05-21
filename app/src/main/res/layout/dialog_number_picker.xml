@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+    <TextView
+        android:id="@+id/tv_title_numbePicker_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text ="title"/>
+    <TextView
+        android:id="@+id/tv_description_numberPicker_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text ="description"/>
+
+    <NumberPicker
+        android:id="@+id/numberPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btn_cancel_numberPicker_dialog"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_cancel_button" />
+
+        <Button
+            android:id="@+id/btn_del_numberPicker_dialog"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_del_button" />
+        <Button
+            android:id="@+id/btn_set_numberPicker_dialog"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_set_button" />
+
+    </LinearLayout>
+</LinearLayout>

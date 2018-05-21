@@ -84,11 +84,11 @@
                 android:textAllCaps="false" />
 
             <Button
-                android:id="@+id/btn_iperf_menu_reverse"
+                android:id="@+id/btn_iperf_menu_port"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/iperf_menu_reverse"
+                android:text="@string/iperf_menu_port"
                 android:textAllCaps="false" />
             <!--                -->
         </LinearLayout>
@@ -107,7 +107,7 @@
                 android:textOn="@string/iperf_menu_udp" />
 
             <Button
-                android:id="@+id/switch_iperf_menu_rate"
+                android:id="@+id/btn_iperf_menu_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -153,17 +153,22 @@
         </LinearLayout>
     </LinearLayout>
 
-
+    <ListView
+        android:id="@+id/listView_iperf_comnnad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iperf_top_menubar"
+        android:layout_above="@+id/iperf_bottom_menubar"/>
+    <!--
     <ScrollView
         android:id="@+id/scrollView_iperf_menu"
         android:layout_below="@+id/iperf_top_menubar"
         android:layout_above="@+id/iperf_bottom_menubar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ListView
-            android:id="@+id/listView_iperf_comnnad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+
+
     </ScrollView>
+    -->
 
 </RelativeLayout>

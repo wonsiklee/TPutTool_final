@@ -174,6 +174,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
+
         Log.d(TAG, "onResume() completed");
     }
 
@@ -221,19 +222,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
 
             @Override
-            public void onAnimationEnd(Animator animation) {
-
-            }
+            public void onAnimationEnd(Animator animation) { }
 
             @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
+            public void onAnimationCancel(Animator animation) { }
 
             @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
+            public void onAnimationRepeat(Animator animation) { }
         });
     }
 
@@ -241,9 +236,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
                 .setListener(new Animator.AnimatorListener() {
                     @Override
-                    public void onAnimationStart(Animator animation) {
-
-                    }
+                    public void onAnimationStart(Animator animation) { }
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -251,14 +244,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     }
 
                     @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
+                    public void onAnimationCancel(Animator animation) { }
 
                     @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
+                    public void onAnimationRepeat(Animator animation) { }
                 });
     }
 
@@ -442,7 +431,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 case MSG_FILE_DOWNLOAD_STARTED:
                     Log.d(TAG, "MSG_FILE_DOWNLOAD_STARTED");
                     LGFTPFragment.this.mBtnDLULStartStop.setEnabled(false);
+                    Log.d(TAG, "mInitialFildCount  = " + mInitialFileCount);
+                    Log.d(TAG, "selectedFileCount = " + (LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileCount()));
+                    Log.d(TAG, "the result = " + (mInitialFileCount - LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileCount() + 1));
                     LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.updateFileCount(mInitialFileCount, mInitialFileCount - LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileCount() + 1);
+                    Log.d(TAG, "mDownloadingFileName : " + LGFTPFragment.this.mDownloadingFileName);
                     LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.setDownloadingFileName(LGFTPFragment.this.mDownloadingFileName);
                     LGFTPFragment.this.showFileDownloadProgressBar();
                     LGFTPFragment.this.mDownloadResult = false;
@@ -476,7 +469,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         Log.d(TAG, "all selected files have have been downloaded successfully.");
                         LGFTPFragment.this.dismissFileDownloadProgressBar();
                         LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
-                        LGFTPFragment.this.mInitialFileCount = Integer.MIN_VALUE;
                     }
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     break;
@@ -512,9 +504,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
                                 .setListener(new Animator.AnimatorListener() {
                                     @Override
-                                    public void onAnimationStart(Animator animation) {
-
-                                    }
+                                    public void onAnimationStart(Animator animation) { }
 
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
@@ -522,14 +512,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                                     }
 
                                     @Override
-                                    public void onAnimationCancel(Animator animation) {
-
-                                    }
+                                    public void onAnimationCancel(Animator animation) { }
 
                                     @Override
-                                    public void onAnimationRepeat(Animator animation) {
-
-                                    }
+                                    public void onAnimationRepeat(Animator animation) { }
                                 });
                     }
                     break;

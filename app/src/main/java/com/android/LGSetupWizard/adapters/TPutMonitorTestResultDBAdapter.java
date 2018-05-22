@@ -4,12 +4,11 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import lombok.Getter;
+import android.util.Log;
 
 public class TPutMonitorTestResultDBAdapter {
     private static final String TAG = TPutMonitorTestResultDBAdapter.class.getSimpleName();
-    private static final String DB_NAME = "tput_monitor_db_name";
+    private static final String DB_NAME = "tput_test_log";
     private static final String DB_TABLE_NAME = "result_table";
     private static final String KEY_DATE_TIME = "date_time";
     private static final String KEY_ROW_ID = "_id";
@@ -54,12 +53,18 @@ public class TPutMonitorTestResultDBAdapter {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-
+            Log.d(TAG, "onCreate() ");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            Log.d(TAG, "onUpgrade() " + oldVersion + " to " + newVersion);
+        }
 
+        @Override
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            //super.onDowngrade(db, oldVersion, newVersion);
+            Log.d(TAG, "onDowngrade() " + oldVersion + " to " + newVersion);
         }
     }
 }

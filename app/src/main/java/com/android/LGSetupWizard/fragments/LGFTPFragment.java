@@ -611,7 +611,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
     };
 
-
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         Log.d(TAG, "onKey() called + " + keyCode);

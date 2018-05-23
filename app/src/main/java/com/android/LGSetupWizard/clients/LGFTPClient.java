@@ -43,8 +43,8 @@ public class LGFTPClient {
     @Getter private String mCurrentWorkingDirectory = "/";
 
     public LGFTPClient(ILGFTPOperationListener operationListener) {
-        //this.mFTPClient = new FTPClient();
-        this.mFTPClient = new FTPSClient();
+        this.mFTPClient = new FTPClient();
+        //this.mFTPClient = new FTPSClient();
         this.mFTPClient.setControlEncoding("euc-kr");
 
         this.mOperationListener = operationListener;

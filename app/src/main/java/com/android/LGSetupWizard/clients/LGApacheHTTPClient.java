@@ -89,12 +89,14 @@ public class LGApacheHTTPClient implements LGHTTPClient {
             mSavedTime = mCurrentTime;
             long sSize = mTotalSize - mSavedSize;
             mSavedSize = mTotalSize;
+            if (sDuration == 0) return 0;
             float avgTput = (sSize * 8.0f / 1000 / 1000) / (sDuration / 1000.0f);
             Log.d(TAG, "avgTput : " + avgTput + " Mbps");
             return avgTput;
         }
 
         public int getProgress() {
+            if (mFullSize == 0) return 0;
             int sProgress = (int) ((mTotalSize * 100 / mFullSize));
             Log.d(TAG, "sProgress : " + sProgress + " %");
             return sProgress;
@@ -156,6 +158,7 @@ public class LGApacheHTTPClient implements LGHTTPClient {
                     Log.e(TAG, "IOException occurred : " + e.getMessage());
                 } finally {
                     if (mStateListener != null) {
+                        mCurrentTime = System.currentTimeMillis();
                         mStateListener.onDownloadFinished(mTotalSize, mCurrentTime - mStartTime);
                     }
                     Log.d(TAG, "executeReceiveLoop() EXIT");

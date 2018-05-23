@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 public class TestResultLogDBManager {
     private static final String TAG = TestResultLogDBManager.class.getSimpleName();
@@ -87,26 +88,24 @@ public class TestResultLogDBManager {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.insert(TABLE_NAME, null, cv);
-
             db.close();
 
             db = this.getReadableDatabase();
-
             Cursor c = db.query(TABLE_NAME, new String[] {KEY_ROW_ID, KEY_DATE_TIME}, null, null, null, null, null);
 
             if (c != null && c.getCount() > 0) {
                 c.moveToFirst();
-            }
-
-            Log.d(TAG, "record count = " + c.getCount());
-            Log.d(TAG, "cursor position = " + c.getPosition());
-            do  {
+                Log.d(TAG, "record count = " + c.getCount());
                 Log.d(TAG, "cursor position = " + c.getPosition());
-                int index = c.getInt(c.getColumnIndex(KEY_ROW_ID));
-                String dateTime = c.getString(c.getColumnIndex(KEY_DATE_TIME));
-                Log.d(TAG, "index = " + index + ", dateTime = " + dateTime);
-            } while (c.moveToNext());
-
+                do  {
+                    Log.d(TAG, "cursor position = " + c.getPosition());
+                    int index = c.getInt(c.getColumnIndex(KEY_ROW_ID));
+                    String dateTime = c.getString(c.getColumnIndex(KEY_DATE_TIME));
+                    Log.d(TAG, "index = " + index + ", dateTime = " + dateTime);
+                } while (c.moveToNext());
+            } else {
+                Toast.makeText(mContext, "no data to show", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

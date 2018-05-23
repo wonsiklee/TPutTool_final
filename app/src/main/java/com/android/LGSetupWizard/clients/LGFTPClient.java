@@ -8,11 +8,11 @@ import android.util.Log;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
 
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -26,6 +26,8 @@ import java.util.ArrayList;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
+
+import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 /**
  * Created by wonsik.lee on 2018-01-01.
@@ -41,13 +43,17 @@ public class LGFTPClient {
     @Getter private String mCurrentWorkingDirectory = "/";
 
     public LGFTPClient(ILGFTPOperationListener operationListener) {
-        this.mFTPClient = new FTPClient();
+        //this.mFTPClient = new FTPClient();
+        this.mFTPClient = new FTPSClient();
+        this.mFTPClient.setControlEncoding("euc-kr");
+
         this.mOperationListener = operationListener;
-        mIsForcedAbort = false;
+        this.mIsForcedAbort = false;
     }
 
     //
     public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password) {
+        boolean sResult = false;
         ArrayList<LGFTPFile> fileList = null;
         Log.d(TAG, "connectToServer() " + serverAddress);
         try {
@@ -59,12 +65,17 @@ public class LGFTPClient {
                 Log.d(TAG, "connection failed, FTPReply code : " + reply);
             } else {
                 Log.d(TAG, "successfully connected");
+                sResult = true;
+                LGFTPClient.this.mFTPClient.setFileType(BINARY_FILE_TYPE);
+                // keep alive 2 mins.
+                LGFTPClient.this.mFTPClient.setKeepAlive(true);
+                LGFTPClient.this.mFTPClient.setControlKeepAliveTimeout(120);
+                LGFTPClient.this.mFTPClient.setSoTimeout(1000);
+
                 if (loginToServer(userID, password)) {
                     Log.d(TAG, "Logged in successfully");
                     fileList = getFileList();
-                    // keep alive 2 mins.
-                    LGFTPClient.this.mFTPClient.setKeepAlive(true);
-                    LGFTPClient.this.mFTPClient.setControlKeepAliveTimeout(120);
+
                     // buffer size 25 Mbytes,
                     LGFTPClient.this.mFTPClient.setBufferSize(26214400);
                 }
@@ -76,7 +87,7 @@ public class LGFTPClient {
             e.printStackTrace();
             Log.e(TAG, "connection error: " + e.getMessage());
         } finally {
-            mOperationListener.onConnectToServerFinished(fileList);
+            this.mOperationListener.onConnectToServerFinished(sResult, fileList);
         }
     }
 
@@ -238,6 +249,7 @@ public class LGFTPClient {
                 sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
             }
 
+            /*LGFTPClient.this.mFTPClient.enterLocalPassiveMode();*/
             sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
 
             Message msg = LGFTPClient.this.mTPutCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
@@ -245,7 +257,7 @@ public class LGFTPClient {
             b.putSerializable(KEY_FILE, targetFile);
             msg.setData(b);
 
-            LGFTPClient.this.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+            LGFTPClient.this.mFTPClient.setFileType(BINARY_FILE_TYPE);
 
             // 1. initialize control variables.
             LGFTPClient.this.mStartTime = System.currentTimeMillis();

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public interface ILGFTPOperationListener {
     // server connection
-    void onConnectToServerFinished(@Nullable ArrayList<LGFTPFile> fileNames);
+    void onConnectToServerFinished(boolean result, @Nullable ArrayList<LGFTPFile> fileNames);
     void onDisconnectToServerFinished();
 
     // download

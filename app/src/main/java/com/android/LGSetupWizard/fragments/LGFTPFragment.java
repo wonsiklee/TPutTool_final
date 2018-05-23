@@ -1,6 +1,8 @@
 package com.android.LGSetupWizard.fragments;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -83,6 +85,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static private String KEY_DOWNLOAD_FILE_NAME = "file_name";
     final static private String KEY_DOWNLOAD_RESULT = "file_size";
     final static private String KEY_AVG_TPUT = "avg_tput";
+    final static private String KEY_LOGIN_RESULT = "login_result";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -302,17 +305,21 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     ILGFTPOperationListener mILGFTPOperationListener = new ILGFTPOperationListener() {
         @Override
-        public void onConnectToServerFinished(ArrayList<LGFTPFile> fileList) {
-            Log.d(TAG, "onConnectToServerFinished(ArrayList<FTPFile>)");
-
-            if (fileList == null) {
-                Log.d(TAG, "fileList is null, this could mean login fail or server connection fail.");
-            } else {
-                LGFTPFragment.this.mFileList = fileList;
-                Log.d(TAG, "fileList length : " + mFileList.size());
+        public void onConnectToServerFinished(boolean result, ArrayList<LGFTPFile> fileList) {
+            Log.d(TAG, "onConnectToServerFinished(boolean, ArrayList<FTPFile>) : " + result);
+            Message msg = mUIControlHandler.obtainMessage(MSG_CONNECT_TO_SERVER_FINISHED);
+            Bundle b = new Bundle();
+            b.putBoolean(KEY_LOGIN_RESULT, result);
+            msg.setData(b);
+            if (result) {
+                if (fileList == null) {
+                    Log.d(TAG, "no File list retrieved.");
+                } else {
+                    LGFTPFragment.this.mFileList = fileList;
+                    Log.d(TAG, "fileList length : " + mFileList.size());
+                }
             }
-
-            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_CONNECT_TO_SERVER_FINISHED);
+            LGFTPFragment.this.mUIControlHandler.sendMessage(msg);
         }
 
         @Override
@@ -376,20 +383,40 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
 
     // UI Control handler
+    @SuppressLint("HandlerLeak")
     private Handler mUIControlHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_CONNECT_TO_SERVER_FINISHED:
-                    Log.d(TAG, "MSG_CONNECT_TO_SERVER_FINISHED");
-                    LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerDisconnect);
-                    LGFTPFragment.this.mBtnConnectDisconnect.setText("Log out");
-                    LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
-                    LGFTPFragment.this.dismissNetworkOperationProgressBar();
-                    LGFTPFragment.this.showDLBtnLayout();
-                    LGFTPFragment.this.mSwitchFileIO.setEnabled(true);
-                    this.sendEmptyMessage(MSG_FILE_SET_CHANGED);
+                case MSG_CONNECT_TO_SERVER_FINISHED: {
+                        Log.d(TAG, "MSG_CONNECT_TO_SERVER_FINISHED");
+                        Bundle b = msg.getData();
+                        boolean sResult = b.getBoolean(KEY_LOGIN_RESULT);
+                        LGFTPFragment.this.dismissNetworkOperationProgressBar();
+                        if (sResult) {
+                            LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerDisconnect);
+                            LGFTPFragment.this.mBtnConnectDisconnect.setText("Log out");
+                            LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
+                            LGFTPFragment.this.showDLBtnLayout();
+                            LGFTPFragment.this.mSwitchFileIO.setEnabled(true);
+                            this.sendEmptyMessage(MSG_FILE_SET_CHANGED);
+                        } else {
+                            AlertDialog.Builder alertDiBuilder = new AlertDialog.Builder(LGFTPFragment.this.getContext());
+                            alertDiBuilder
+                                    .setIcon(R.drawable.alert_icon)
+                                    .setTitle("문제 발생!!!")
+                                    .setMessage("Login 실패!!!")
+                                    .setCancelable(false)
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
+                        }
+                    }
+
                     break;
 
                 case MSG_DISCONNECT_FROM_SERVER_FINISHED:
@@ -454,35 +481,37 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.dismissFileDownloadProgressBar();
                     break;
 
-                case MSG_FILE_DOWNLOAD_FINISHED:
-                    Log.d(TAG, "MSG_FILE_DOWNLOAD_FINISHED");
-                    Bundle b = msg.getData();
-                    LGFTPFragment.this.mDownloadResult = b.getBoolean(KEY_DOWNLOAD_RESULT);
-                    String sDownloadFileName = b.getString(KEY_DOWNLOAD_FILE_NAME);
+                case MSG_FILE_DOWNLOAD_FINISHED: {
+                        Log.d(TAG, "MSG_FILE_DOWNLOAD_FINISHED");
+                        Bundle b = msg.getData();
+                        LGFTPFragment.this.mDownloadResult = b.getBoolean(KEY_DOWNLOAD_RESULT);
+                        String sDownloadFileName = b.getString(KEY_DOWNLOAD_FILE_NAME);
 
-                    if (mDownloadResult) {
-                        Toast.makeText(LGFTPFragment.this.getContext(),
-                                "FileName : " + sDownloadFileName + "\nDownload completed !!!\nAvgTPut : " + b.getFloat(KEY_AVG_TPUT) + " Mbps",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(LGFTPFragment.this.getContext(),
-                                "FileName : " + sDownloadFileName + "\nDownload " + " FAILED!!!",Toast.LENGTH_LONG).show();
+                        if (mDownloadResult) {
+                            Toast.makeText(LGFTPFragment.this.getContext(),
+                                    "FileName : " + sDownloadFileName + "\nDownload completed !!!\nAvgTPut : " + b.getFloat(KEY_AVG_TPUT) + " Mbps",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(LGFTPFragment.this.getContext(),
+                                    "FileName : " + sDownloadFileName + "\nDownload " + " FAILED!!!",Toast.LENGTH_LONG).show();
+                        }
+
+                        if (LGFTPFragment.this.mDownloadResult && !LGFTPFragment.this.mFTPFileListVIewAdapter.isSelectedFileListEmpty()) {
+                            Log.d(TAG, "download finished, but still got " + mFTPFileListVIewAdapter.getSelectedFileCount() + " files left");
+                            this.sendEmptyMessage(MSG_FILE_DOWNLOAD_UPDATE_DIALOG_INFO);
+                        } else if (!LGFTPFragment.this.mDownloadResult) {
+                            Log.d(TAG, "download result : " + mDownloadResult);
+                            LGFTPFragment.this.dismissFileDownloadProgressBar();
+                            LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
+                            LGFTPFragment.this.mInitialFileCount = Integer.MIN_VALUE;
+                        } else {
+                            Log.d(TAG, "all selected files have have been downloaded successfully.");
+                            LGFTPFragment.this.dismissFileDownloadProgressBar();
+                            LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
+                        }
+                        LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     }
 
-                    if (LGFTPFragment.this.mDownloadResult && !LGFTPFragment.this.mFTPFileListVIewAdapter.isSelectedFileListEmpty()) {
-                        Log.d(TAG, "download finished, but still got " + mFTPFileListVIewAdapter.getSelectedFileCount() + " files left");
-                        this.sendEmptyMessage(MSG_FILE_DOWNLOAD_UPDATE_DIALOG_INFO);
-                    } else if (!LGFTPFragment.this.mDownloadResult) {
-                        Log.d(TAG, "download result : " + mDownloadResult);
-                        LGFTPFragment.this.dismissFileDownloadProgressBar();
-                        LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
-                        LGFTPFragment.this.mInitialFileCount = Integer.MIN_VALUE;
-                    } else {
-                        Log.d(TAG, "all selected files have have been downloaded successfully.");
-                        LGFTPFragment.this.dismissFileDownloadProgressBar();
-                        LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
-                    }
-                    LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     break;
 
                 case MSG_FILE_DOWNLOAD_UPDATE_DIALOG_INFO:

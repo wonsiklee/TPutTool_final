@@ -28,7 +28,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.LGSetupWizard.adapters.TPutMonitorTestResultDBAdapter;
+import com.android.LGSetupWizard.database.TestResultLogDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
@@ -605,9 +605,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             // TODO : DB list show.
 
             // test code for DB creation, insertion, delegation
-            TPutMonitorTestResultDBAdapter.open(LGFTPFragment.this.getContext());
-
-            TPutMonitorTestResultDBAdapter.close();
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).testQry();
         }
     };
 

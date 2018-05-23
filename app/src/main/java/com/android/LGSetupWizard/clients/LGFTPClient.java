@@ -156,9 +156,8 @@ public class LGFTPClient {
     final static private int MSG_STOP_TPUT_CALCULATION_LOOP = 0x02;
 
     final static private String KEY_FILE = "file";
-    final static private String KEY_IS_FILE_IO_IN_USE = "file_io_is_in_use";
 
-    private Handler mTputCalculationLoopHandler = new Handler() {
+    private Handler mTPutCalculationLoopHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -241,7 +240,7 @@ public class LGFTPClient {
 
             sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
 
-            Message msg = LGFTPClient.this.mTputCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
+            Message msg = LGFTPClient.this.mTPutCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
             b.putSerializable(KEY_FILE, targetFile);
             msg.setData(b);
@@ -255,7 +254,7 @@ public class LGFTPClient {
             LGFTPClient.this.mIsForcedAbort = false;
 
             // 2. start t-put calculation msg loop
-            LGFTPClient.this.mTputCalculationLoopHandler.sendMessage(msg);
+            LGFTPClient.this.mTPutCalculationLoopHandler.sendMessage(msg);
 
             // 3. inform the fragment that file DL has been started.
             //LGFTPClient.this.mOperationListener.onDownloadStarted((LGFTPFile) msg.getData().getSerializable(KEY_FILE));
@@ -271,7 +270,6 @@ public class LGFTPClient {
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;
                 LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTime;
             }
-            Log.d(TAG, "22222222");
             ret = this.mFTPClient.completePendingCommand();
 
             Log.d(TAG, "mIsForcedAbort : " + mIsForcedAbort);
@@ -296,10 +294,11 @@ public class LGFTPClient {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
+            // initialize variables.
+            LGFTPClient.this.mOperationListener.onDownloadFinished(ret, sDownloadFile, ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000));
             LGFTPClient.this.mDownloadedBytes = 0;
             LGFTPClient.this.mElapsedTime = 0;
-            LGFTPClient.this.mTputCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
-            LGFTPClient.this.mOperationListener.onDownloadFinished(ret, sDownloadFile);
+            LGFTPClient.this.mAvgTPut = 0;
 
             if (sOutputStream != null) {
                 try {
@@ -316,6 +315,9 @@ public class LGFTPClient {
                     e.printStackTrace();
                 }
             }
+
+            // invoke callback.
+            LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
         }
         return ret;
     }

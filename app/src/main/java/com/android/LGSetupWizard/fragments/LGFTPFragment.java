@@ -82,6 +82,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     final static private String KEY_DOWNLOAD_FILE_NAME = "file_name";
     final static private String KEY_DOWNLOAD_RESULT = "file_size";
+    final static private String KEY_AVG_TPUT = "avg_tput";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -341,7 +342,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
 
         @Override
-        public void onDownloadFinished(boolean result, File file) {
+        public void onDownloadFinished(boolean result, File file, float avgTPut) {
             Log.d(TAG, "onDownloadFinished() " + result + ", " + file.toString());
             if (result) {
                 new MediaScanning(LGFTPFragment.this.getContext(), file);
@@ -354,6 +355,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             Bundle b = new Bundle();
             b.putBoolean(KEY_DOWNLOAD_RESULT, result);
             b.putString(KEY_DOWNLOAD_FILE_NAME, file.getName());
+            b.putFloat(KEY_AVG_TPUT, avgTPut);
             msg.setData(b);
 
             LGFTPFragment.this.mUIControlHandler.sendMessage(msg);
@@ -458,9 +460,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mDownloadResult = b.getBoolean(KEY_DOWNLOAD_RESULT);
                     String sDownloadFileName = b.getString(KEY_DOWNLOAD_FILE_NAME);
 
-                    Toast.makeText(LGFTPFragment.this.getContext(),
-                            "FileName : " + sDownloadFileName + "\nDownload " + ((mDownloadResult) ? " completed" : " FAILED!!!"),
-                            Toast.LENGTH_LONG).show();
+                    if (mDownloadResult) {
+                        Toast.makeText(LGFTPFragment.this.getContext(),
+                                "FileName : " + sDownloadFileName + "\nDownload completed !!!\nAvgTPut : " + b.getFloat(KEY_AVG_TPUT) + " Mbps",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(LGFTPFragment.this.getContext(),
+                                "FileName : " + sDownloadFileName + "\nDownload " + " FAILED!!!",Toast.LENGTH_LONG).show();
+                    }
 
                     if (LGFTPFragment.this.mDownloadResult && !LGFTPFragment.this.mFTPFileListVIewAdapter.isSelectedFileListEmpty()) {
                         Log.d(TAG, "download finished, but still got " + mFTPFileListVIewAdapter.getSelectedFileCount() + " files left");

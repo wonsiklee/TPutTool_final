@@ -37,16 +37,10 @@
             android:textAllCaps="false"
             android:text="@string/iperf_menu_select"/>
     </LinearLayout>
-    <FrameLayout
-        android:id="@+id/padding_bottom"
-        android:background="@color/colorPrimary"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-    </FrameLayout>
+
     <LinearLayout
         android:id="@+id/iperf_bottom_menubar"
-        android:layout_above="@+id/padding_bottom"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -159,16 +153,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/iperf_top_menubar"
         android:layout_above="@+id/iperf_bottom_menubar"/>
-    <!--
-    <ScrollView
-        android:id="@+id/scrollView_iperf_menu"
-        android:layout_below="@+id/iperf_top_menubar"
-        android:layout_above="@+id/iperf_bottom_menubar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-    </ScrollView>
-    -->
 
 </RelativeLayout>

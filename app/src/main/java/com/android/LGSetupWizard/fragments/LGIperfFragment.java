@@ -113,6 +113,12 @@ public class LGIperfFragment extends Fragment {
 
     private void initUIControls() {
 
+        FrameLayout padding_bottom = (FrameLayout) mView.findViewById(R.id.iperf_padding_bottom);
+        if(hasSoftMenu()){
+            padding_bottom.getLayoutParams().height = getSoftMenuHeight();
+            padding_bottom.requestLayout();
+        }
+
         mainLayoutView = (View)mView.findViewById(R.id.iperf_main);
 
 
@@ -146,13 +152,7 @@ public class LGIperfFragment extends Fragment {
 
 
         menuLayoutView = (View)mView.findViewById(R.id.iperf_menu);
-        FrameLayout padding_bottom = (FrameLayout) menuLayoutView.findViewById(R.id.padding_bottom);
-        //padding_bottom.getLayoutParams().height = getNavigationBarHeight(mContext);
-        //padding_bottom.requestLayout();
-        if(hasSoftMenu()){
-            padding_bottom.getLayoutParams().height = getSoftMenuHeight();
-            padding_bottom.requestLayout();
-        }
+
 
         btn_iperf_menu_back = (Button)menuLayoutView.findViewById(R.id.btn_iperf_menu_back);
         btn_iperf_menu_back.setOnClickListener(new View.OnClickListener() {

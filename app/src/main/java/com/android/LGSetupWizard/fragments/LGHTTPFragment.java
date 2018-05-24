@@ -54,6 +54,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private EditText mEditTxtFileAddr;
     private RadioButton mRdoBtnOkHttp;
     private RadioButton mRdoBtnApache;
+    private Button mBtnSaveResult;
     private EditText mEditTxtRepeatCount;
     private Button mBtnStartDl;
     private TextView mTxtViewHTTPResult;
@@ -98,6 +99,13 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(START_TEST);
 
             LGHTTPFragment.this.hideKeyboard();
+        }
+    };
+
+    private View.OnClickListener mSaveResultClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, "mSaveResultClickListener.onClick()");
         }
     };
 
@@ -329,6 +337,9 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
         this.mBtnStartDl = (Button) this.mView.findViewById(R.id.btn_start_http_dl_test);
         this.mBtnStartDl.setOnClickListener(this.mStartTestClickListener);
+
+        this.mBtnSaveResult = (Button) this.mView.findViewById(R.id.btn_save_result);
+        this.mBtnSaveResult.setOnClickListener(this.mSaveResultClickListener);
 
         this.mProgressBarHttpProgress = (ProgressBar) this.mView.findViewById(R.id.progressBar_http_progress);
         this.mProgressBarHttpProgress.setMax(100);

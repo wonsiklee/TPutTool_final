@@ -358,6 +358,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 Log.d(TAG, "after selected file removal list size = " + LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().size());
             }
 
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).insert(TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO, avgTPut, file.getName());
+TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
             Message msg = LGFTPFragment.this.mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();
             b.putBoolean(KEY_DOWNLOAD_RESULT, result);
@@ -641,7 +643,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             // TODO : DB list show.
 
             // test code for DB creation, insertion, delegation
-            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).testQry();
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
         }
     };
 

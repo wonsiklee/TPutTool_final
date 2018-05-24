@@ -328,6 +328,7 @@ public class LGFTPClient {
                 }
             }
 
+            Log.d(TAG, "sending MSG_STOP_TPUT_CALCULATION_LOOP");
             // invoke callback.
             LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
         }

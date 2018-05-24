@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:gravity="center"
-                    android:paddingRight="20dp"
+                    android:paddingRight="10dp"
                     android:text="@string/str_http_okhttp" />
 
                 <RadioButton
@@ -87,7 +87,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:paddingRight="10dp"
                     android:text="@string/str_http_apache" />
+
+                <Button
+                    android:id="@+id/btn_save_result"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/str_save_result" />
 
             </RadioGroup>
         </LinearLayout>

@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.LGSetupWizard.R;
-import com.android.LGSetupWizard.data.LGIperfCommand;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,7 +45,7 @@ public class LGIperfClient {
         mIperfTask = new LGIperfTask();
     }
     public boolean loadIperfFile(){
-        if (checkAndCreateIperfFile("iperf") && checkAndCreateIperfFile("iperf3")){
+        if (checkAndCreateIperfFile(LGIperfConstants.IPERF_NAME) && checkAndCreateIperfFile(LGIperfConstants.IPERF3_NAME)){
             Log.d(TAG,"loadIperfFile - success!");
             return true;
         }
@@ -95,12 +94,10 @@ public class LGIperfClient {
                         mContext.getFilesDir().getPath()+"/"+LGIperfConstants.IPERF_NAME:
                  mContext.getFilesDir().getPath()+"/"+LGIperfConstants.IPERF3_NAME).append(" ");
         sCmdBuilder.append(option);
-        //mIperfRunnable.run(sCmdBuilder.toString().split(" "));*/
 
         mIperfTask.execute(new String[]{sCmdBuilder.toString()});
     }
     public void stop(){
-        //mIperfRunnable.stop();
         if(mIperfTask != null)
             mIperfTask.stop();
 
@@ -120,10 +117,6 @@ public class LGIperfClient {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iProcess.getInputStream()));
                 int sRead = 0;
                 char[] sBuffer = new char[4096];
-                /*
-                while (bufferedReader.readLine() != null) {
-                    publishProgress(new String[]{bufferedReader.readLine() + "\n"});
-                }*/
                 while ((sRead = bufferedReader.read(sBuffer)) > 0){
                         final String sResult = new StringBuffer().append(sBuffer, 0, sRead).toString();
                         publishProgress( new String[]{sResult});
@@ -179,66 +172,6 @@ public class LGIperfClient {
 
 
     }
-
-    /*
-    class LGIperfRunnable implements Runnable  {
-        String ITAG = "LGIperfRunnable";
-        String iOption = null;
-        Process iProcess;
-        String iCmd[];
-
-        public void stop(){
-            iOption = null;
-            iCmd = null;
-            iProcess.destroy();
-
-        }
-        @Override
-        public void run() {
-            try {
-                Log.d(ITAG, "=============== START IperfRunnable run =====================");
-                iProcess = new ProcessBuilder().command(iCmd).redirectErrorStream(true).start();
-
-                // Reads stdout.
-                // NOTE: You can write to stdin of the command using
-                //       process.getOutputStream().
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(iProcess.getInputStream()));
-
-
-                int sRead =0;
-
-                char[] buffer = new char[4096];
-
-                while ( (sRead = reader.read(buffer)) > 0 ) {
-                    final String sResult = new StringBuffer().append(buffer, 0, sRead).toString();
-                    new Runnable(){
-
-                        @Override
-                        public void run() {
-                            if(mListener != null ) mListener.onGettingMeesage(sResult);
-                        }
-                    }.run();
-
-                    Log.d(ITAG,sResult);
-                }
-                // Waits for the command to finish.
-                reader.close();
-                Log.d(ITAG, "=============== STOP IperfRunnable run =====================");
-            } catch (IOException e) {
-                Log.d(ITAG, "run IOException =" + e.toString());
-            } finally {
-                iCmd = null;
-            }
-            LGIperfRunnable.this.stop();
-            if(mListener != null ) mListener.onStopped();
-        }
-
-        public void run(String[] cmd){
-            iCmd = cmd;
-            LGIperfRunnable.this.run();
-        }
-    }*/
 
     public interface OnStateChangeListener{
         void onGettingMeesage(String message);

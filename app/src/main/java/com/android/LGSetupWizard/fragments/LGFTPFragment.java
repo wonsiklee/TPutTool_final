@@ -29,7 +29,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -41,6 +40,7 @@ import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
 import com.android.LGSetupWizard.data.MediaScanning;
+import com.android.LGSetupWizard.database.TestResultLogPopupWindow;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -75,9 +75,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
     private ProgressDialog mNetworkOperationProgressDialog;
-
-    private View mPopupViewTestResultContentView;
-    private PopupWindow mPopupWindowTestResult;
+    private TestResultLogPopupWindow mTestResultLogPopupWindow;
 
     private LGFTPFileListViewAdapter mFTPFileListVIewAdapter;
     private LGFTPClient mLGFtpClient;
@@ -187,20 +185,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
         this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        (((WindowManager) LGFTPFragment.this.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()).getMetrics(metrics);
-        this.mPopupViewTestResultContentView = LGFTPFragment.this.getLayoutInflater().inflate(R.layout.popup_view_test_result, null);
-        this.mPopupWindowTestResult = new PopupWindow(mPopupViewTestResultContentView, (int)(metrics.widthPixels * 0.8f), (int)(metrics.heightPixels * 0.8f), true);
-        this.mPopupViewTestResultContentView.findViewById(R.id.btn_dismiss_result).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mPopupWindowTestResult.dismiss();
-            }
-        });
+        this.mTestResultLogPopupWindow = new TestResultLogPopupWindow(this.getContext());
 
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
-
 
         Log.d(TAG, "onResume() completed");
     }
@@ -585,7 +572,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 case MSG_SHOW_RESULT_POPUP_WINDOW:
                     Log.d(TAG, "MSG_SHOW_RESULT_POPUP_WINDOW");
                     // TODO : need to fetch all the related data (where test category is about (FTP))from DB, and project it to the data.
-                    mPopupWindowTestResult.showAtLocation(mPopupViewTestResultContentView, Gravity.CENTER, 0, 0);
+                    mTestResultLogPopupWindow.show(LGFTPFragment.this.getView(), mSwitchFileIO.isChecked() ? TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultLogDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO);
                     break;
 
                 default:

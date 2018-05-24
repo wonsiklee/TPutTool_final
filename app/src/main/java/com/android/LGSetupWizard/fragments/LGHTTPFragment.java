@@ -27,6 +27,7 @@ import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
+import com.android.LGSetupWizard.database.TestResultLogDBManager;
 
 import lombok.experimental.Accessors;
 
@@ -70,6 +71,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private InputMethodManager mInputMethodManager;
 
     private static DataPool DATA_POOL = new DataPool();
+    private boolean mEnableFileIO;
 
     public static class DataPool {
         public long totalSize;
@@ -146,10 +148,10 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 case HTTP_DL_START:
                     Log.d(TAG, "HTTP_DL_START - Remaining count : " + mRepeatCount);
                     String fileAddr = LGHTTPFragment.this.mEditTxtFileAddr.getText().toString();
-                    boolean enableFileIO = LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked();
-                    mLGHTTPClient.startHTTPDownload(fileAddr, enableFileIO);
+                    LGHTTPFragment.this.mEnableFileIO = LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked();
+                    mLGHTTPClient.startHTTPDownload(fileAddr, LGHTTPFragment.this.mEnableFileIO);
                     mIsInProgress = true;
-                    mGrepAvgTPutHandler.sendEmptyMessageDelayed(0, 1000);
+                    mGrepAvgTPutHandler.sendEmptyMessageDelayed(0, 2000);
                     break;
 
                 case HTTP_DL_FINISHED:
@@ -219,6 +221,22 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(HTTP_DL_FINISHED);
             LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(100);
+            TestResultLogDBManager.TestCategory sCategory;
+            if (LGHTTPFragment.this.mLGHTTPClient instanceof LGOKHTTPClient) {
+                if (LGHTTPFragment.this.mEnableFileIO) {
+                    sCategory = TestResultLogDBManager.TestCategory.HTTP_OK_WITH_FILE_IO;
+                } else {
+                    sCategory = TestResultLogDBManager.TestCategory.HTTP_OK_WITHOUT_FILE_IO;
+                }
+            } else {
+                if (LGHTTPFragment.this.mEnableFileIO) {
+                    sCategory = TestResultLogDBManager.TestCategory.HTTP_APACHE_WITH_FILE_IO;
+                } else {
+                    sCategory = TestResultLogDBManager.TestCategory.HTTP_APACHE_WITHOUT_FILE_IO;
+                }
+            }
+            TestResultLogDBManager.getInstance(LGHTTPFragment.this.getContext()).insert(sCategory, DATA_POOL.avgTPut, "Test no." + (mRepeatCount + 1));
+            TestResultLogDBManager.getInstance(LGHTTPFragment.this.getContext()).debug_testQry_DB();
         }
 
         @Override

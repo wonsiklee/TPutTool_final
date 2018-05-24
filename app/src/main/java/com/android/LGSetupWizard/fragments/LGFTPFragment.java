@@ -14,11 +14,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -71,6 +75,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
     private ProgressDialog mNetworkOperationProgressDialog;
+
+    private View mPopupViewTestResultContentView;
+    private PopupWindow mPopupWindowTestResult;
 
     private LGFTPFileListViewAdapter mFTPFileListVIewAdapter;
     private LGFTPClient mLGFtpClient;
@@ -180,6 +187,17 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
         this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
 
+        DisplayMetrics metrics = new DisplayMetrics();
+        (((WindowManager) LGFTPFragment.this.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()).getMetrics(metrics);
+        this.mPopupViewTestResultContentView = LGFTPFragment.this.getLayoutInflater().inflate(R.layout.popup_view_test_result, null);
+        this.mPopupWindowTestResult = new PopupWindow(mPopupViewTestResultContentView, (int)(metrics.widthPixels * 0.8f), (int)(metrics.heightPixels * 0.8f), true);
+        this.mPopupViewTestResultContentView.findViewById(R.id.btn_dismiss_result).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                mPopupWindowTestResult.dismiss();
+            }
+        });
 
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
@@ -359,7 +377,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
 
             TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).insert(TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO, avgTPut, file.getName());
-TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+
             Message msg = LGFTPFragment.this.mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();
             b.putBoolean(KEY_DOWNLOAD_RESULT, result);
@@ -382,6 +401,7 @@ TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQr
     final static int MSG_SELECTED_FILES_CHANGED = 0x09;
     final static int MSG_CLEAR_SELECTED_FILES_CHANGED = 0x10;
     final static int MSG_REFRESH_ALL_UI = 0x11;
+    final static int MSG_SHOW_RESULT_POPUP_WINDOW = 0x12;
 
 
     // UI Control handler
@@ -562,6 +582,12 @@ TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQr
                                 });
                     }
                     break;
+                case MSG_SHOW_RESULT_POPUP_WINDOW:
+                    Log.d(TAG, "MSG_SHOW_RESULT_POPUP_WINDOW");
+                    // TODO : need to fetch all the related data (where test category is about (FTP))from DB, and project it to the data.
+                    mPopupWindowTestResult.showAtLocation(mPopupViewTestResultContentView, Gravity.CENTER, 0, 0);
+                    break;
+
                 default:
                     break;
             }
@@ -635,6 +661,7 @@ TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQr
         }
     };
 
+
     // history img btn click listener
     private View.OnClickListener mClickListenerShowHistory = new View.OnClickListener() {
         @Override
@@ -644,6 +671,8 @@ TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQr
 
             // test code for DB creation, insertion, delegation
             TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+
+            mUIControlHandler.sendEmptyMessage(MSG_SHOW_RESULT_POPUP_WINDOW);
         }
     };
 

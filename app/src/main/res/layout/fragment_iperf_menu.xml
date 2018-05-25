@@ -5,35 +5,26 @@
     <LinearLayout
         android:id="@+id/iperf_top_menubar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center">
         <Button
             android:id="@+id/btn_iperf_menu_back"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAllCaps="false"
+            style="@style/IperfMenuStyle"
             android:text="@string/iperf_menu_back"/>
 
         <Button
             android:id="@+id/btn_iperf_menu_add"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAllCaps="false"
+            style="@style/IperfMenuStyle"
             android:text="@string/iperf_menu_add"/>
 
         <Button
             android:id="@+id/btn_iperf_menu_delete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/IperfMenuStyle"
             android:textAllCaps="false"
             android:text="@string/iperf_menu_delete"/>
         <Button
             android:id="@+id/btn_iperf_menu_select"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/IperfMenuStyle"
             android:textAllCaps="false"
             android:text="@string/iperf_menu_select"/>
     </LinearLayout>
@@ -43,107 +34,85 @@
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
-            <ToggleButton
+            <Switch
                 android:id="@+id/switch_iperf_menu_version"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAllCaps="false"
+                style="@style/IperfSwitchStyle"
                 android:textOff="@string/iperf_menu_version_2"
                 android:textOn="@string/iperf_menu_version_3" />
 
-            <ToggleButton
+            <Switch
                 android:id="@+id/switch_iperf_menu_server_client"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAllCaps="false"
+                style="@style/IperfSwitchStyle"
                 android:textOff="@string/iperf_menu_server"
                 android:textOn="@string/iperf_menu_client" />
 
             <Button
                 android:id="@+id/btn_iperf_menu_host"
-                android:baselineAligned="false"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/iperf_menu_host"
-                android:textAllCaps="false" />
+                style="@style/IperfMenuStyle"
+                android:text="@string/iperf_menu_host" />
 
             <Button
                 android:id="@+id/btn_iperf_menu_port"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/IperfMenuStyle"
                 android:text="@string/iperf_menu_port"
-                android:textAllCaps="false" />
+                />
             <!--                -->
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
-            <ToggleButton
+            <Switch
                 android:id="@+id/swtich_iperf_menu_tcp_udp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAllCaps="false"
+                style="@style/IperfSwitchStyle"
                 android:textOff="@string/iperf_menu_tcp"
                 android:textOn="@string/iperf_menu_udp" />
 
             <Button
                 android:id="@+id/btn_iperf_menu_rate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/IperfMenuStyle"
                 android:text="@string/iperf_menu_rate"
-                android:textAllCaps="false" />
+                />
 
             <Button
                 android:id="@+id/btn_iperf_menu_duration"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/IperfMenuStyle"
                 android:text="@string/iperf_menu_duration"
-                android:textAllCaps="false" />
+                 />
 
             <Button
                 android:id="@+id/btn_iperf_menu_interval"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/IperfMenuStyle"
                 android:text="@string/iperf_menu_interval"
-                android:textAllCaps="false" />
+                />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/btn_iperf_menu_steams"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/IperfMenuStyle"
                 android:text="@string/iperf_menu_stream"
-                android:textAllCaps="false" />
+                />
 
             <Button
                 android:id="@+id/btn_iperf_menu_others"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
+                style="@style/IperfMenuStyle"
                 android:text="@string/iperf_menu_other"
-                android:textAllCaps="false" />
+                />
         </LinearLayout>
     </LinearLayout>
 
@@ -152,6 +121,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/iperf_top_menubar"
-        android:layout_above="@+id/iperf_bottom_menubar"/>
+        android:layout_above="@+id/iperf_bottom_menubar"
+        android:divider="@color/iperf_listview_devider"
+        android:dividerHeight="@dimen/iperf_listview_divider_height"/>
 
 </RelativeLayout>

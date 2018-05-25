@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -59,7 +60,7 @@ public class LGIperfFragment extends Fragment {
     //UI component
     private View mainLayoutView;
     private ToggleButton toggleBtn_iperf_start_n_stop;
-    private ToggleButton switch_iperf_version;
+    private Switch switch_iperf_version;
     private TextView tv_iperf_output;
     private EditText editText_iperf_option;
     private ScrollView scrollView_output;
@@ -78,12 +79,11 @@ public class LGIperfFragment extends Fragment {
     private LGIperfCommand mSelectedIperfCommand;
 
     //Menu
-    private ToggleButton switch_iperf_menu_version;
-    private ToggleButton switch_iperf_menu_server_client;
+    private Switch switch_iperf_menu_version;
+    private Switch switch_iperf_menu_server_client;
     private Button btn_iperf_menu_host;
-    //private ToggleButton toggleBtn_iperf_menu_reverse;
     private Button btn_iperf_menu_port;
-    private ToggleButton swtich_iperf_menu_tcp_udp;
+    private Switch swtich_iperf_menu_tcp_udp;
     private Button btn_iperf_menu_duration;
     private Button btn_iperf_menu_interval;
     private Button btn_iperf_menu_steams;
@@ -98,6 +98,8 @@ public class LGIperfFragment extends Fragment {
         mContext = getContext();
         if (mView == null) {
             mView = inflater.inflate(R.layout.fragment_iperf, container, false);
+            mView.setBackgroundResource(R.color.iperf_background);
+
             initUIControls();
 
             mLGIperfClient = new LGIperfClient(getContext());
@@ -137,7 +139,7 @@ public class LGIperfFragment extends Fragment {
 
         tv_iperf_output = (TextView) mainLayoutView.findViewById(R.id.tv_iperf_output);
         editText_iperf_option = (EditText)mainLayoutView.findViewById(R.id.editText_iperf_option);
-        switch_iperf_version = (ToggleButton)mainLayoutView.findViewById(R.id.switch_iperf_version);
+        switch_iperf_version = (Switch) mainLayoutView.findViewById(R.id.switch_iperf_version);
         switch_iperf_version.setOnCheckedChangeListener(mIperfVersionCheckChangeListener);
 
         btn_iperf_advanced = (Button)mainLayoutView.findViewById(R.id.btn_iperf_advanced);
@@ -202,14 +204,16 @@ public class LGIperfFragment extends Fragment {
                         switch_iperf_version.setOnCheckedChangeListener(null);
                         switch_iperf_version.setChecked(true);
                         switch_iperf_version.setOnCheckedChangeListener(mIperfVersionCheckChangeListener);
-                        editText_iperf_option.setText(selectedCommand.substring(LGIperfConstants.IPERF3_NAME.length()+1));
+                        if(selectedCommand.length() > LGIperfConstants.IPERF3_NAME.length() )
+                            editText_iperf_option.setText(selectedCommand.substring(LGIperfConstants.IPERF3_NAME.length()+1));
                     }
                     else if ( selectedCommand.startsWith(LGIperfConstants.IPERF_NAME)){
                         Log.e(TAG,"started  !! "+LGIperfConstants.IPERF_NAME);
                         switch_iperf_version.setOnCheckedChangeListener(null);
                         switch_iperf_version.setChecked(false);
                         switch_iperf_version.setOnCheckedChangeListener(mIperfVersionCheckChangeListener);
-                        editText_iperf_option.setText(selectedCommand.substring(LGIperfConstants.IPERF_NAME.length()+1));
+                        if(selectedCommand.length() > LGIperfConstants.IPERF_NAME.length() )
+                            editText_iperf_option.setText(selectedCommand.substring(LGIperfConstants.IPERF_NAME.length()+1));
                     }
                     else{
                         Log.e(TAG,"error!! uncorrect command");
@@ -238,8 +242,8 @@ public class LGIperfFragment extends Fragment {
         });
 
 
-        switch_iperf_menu_version = (ToggleButton)menuLayoutView.findViewById(R.id.switch_iperf_menu_version);
-        switch_iperf_menu_server_client = (ToggleButton)menuLayoutView.findViewById(R.id.switch_iperf_menu_server_client);
+        switch_iperf_menu_version = (Switch)menuLayoutView.findViewById(R.id.switch_iperf_menu_version);
+        switch_iperf_menu_server_client = (Switch)menuLayoutView.findViewById(R.id.switch_iperf_menu_server_client);
         btn_iperf_menu_host = (Button)menuLayoutView.findViewById(R.id.btn_iperf_menu_host);
         btn_iperf_menu_host.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -307,7 +311,7 @@ public class LGIperfFragment extends Fragment {
 
 
 
-        swtich_iperf_menu_tcp_udp = (ToggleButton)menuLayoutView.findViewById(R.id.swtich_iperf_menu_tcp_udp);
+        swtich_iperf_menu_tcp_udp = (Switch)menuLayoutView.findViewById(R.id.swtich_iperf_menu_tcp_udp);
         btn_iperf_menu_duration = (Button)menuLayoutView.findViewById(R.id.btn_iperf_menu_duration);
         btn_iperf_menu_duration.setOnClickListener(new View.OnClickListener() {
             @Override

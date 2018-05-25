@@ -37,9 +37,11 @@ public class LGIperfCommand {
         String subString;
         if (command.startsWith(LGIperfConstants.IPERF3_NAME)) {
             mVersion = LGIperfConstants.IPERF_VERSION3;
+            if(command.equals(LGIperfConstants.IPERF3_NAME))return;
             subString  = command.substring(LGIperfConstants.IPERF3_NAME.length()+1);
-        }else if(command.startsWith("iperf")) {
+        }else if(command.startsWith(LGIperfConstants.IPERF_NAME)) {
             mVersion = LGIperfConstants.IPERF_VERSION2;
+            if(command.equals(LGIperfConstants.IPERF_NAME))return;
             subString  = command.substring(LGIperfConstants.IPERF_NAME.length()+1);
         }else {
             isValid = false;

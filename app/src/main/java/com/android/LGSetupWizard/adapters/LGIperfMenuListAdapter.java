@@ -93,7 +93,7 @@ public class LGIperfMenuListAdapter extends BaseAdapter{
             convertView.setBackgroundColor(mContext.getColor(R.color.selected_color));
         }
         else {
-            convertView.setBackgroundColor(Color.WHITE);
+            convertView.setBackgroundColor(Color.TRANSPARENT);
         }
 
         sHolder.textview_iperf_menu_item.setText(mCommandList.get(position));

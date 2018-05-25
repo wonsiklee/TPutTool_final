@@ -14,11 +14,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +40,7 @@ import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
 import com.android.LGSetupWizard.data.MediaScanning;
+import com.android.LGSetupWizard.database.TestResultLogPopupWindow;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -71,6 +75,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
     private ProgressDialog mNetworkOperationProgressDialog;
+    private TestResultLogPopupWindow mTestResultLogPopupWindow;
 
     private LGFTPFileListViewAdapter mFTPFileListVIewAdapter;
     private LGFTPClient mLGFtpClient;
@@ -180,9 +185,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
         this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
 
+        this.mTestResultLogPopupWindow = new TestResultLogPopupWindow(this.getContext());
 
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
-
 
         Log.d(TAG, "onResume() completed");
     }
@@ -358,6 +363,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 Log.d(TAG, "after selected file removal list size = " + LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().size());
             }
 
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).insert(TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO, avgTPut, file.getName());
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+
             Message msg = LGFTPFragment.this.mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();
             b.putBoolean(KEY_DOWNLOAD_RESULT, result);
@@ -380,6 +388,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static int MSG_SELECTED_FILES_CHANGED = 0x09;
     final static int MSG_CLEAR_SELECTED_FILES_CHANGED = 0x10;
     final static int MSG_REFRESH_ALL_UI = 0x11;
+    final static int MSG_SHOW_RESULT_POPUP_WINDOW = 0x12;
 
 
     // UI Control handler
@@ -560,6 +569,12 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                                 });
                     }
                     break;
+                case MSG_SHOW_RESULT_POPUP_WINDOW:
+                    Log.d(TAG, "MSG_SHOW_RESULT_POPUP_WINDOW");
+                    // TODO : need to fetch all the related data (where test category is about (FTP))from DB, and project it to the data.
+                    mTestResultLogPopupWindow.show(LGFTPFragment.this.getView(), mSwitchFileIO.isChecked() ? TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultLogDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO);
+                    break;
+
                 default:
                     break;
             }
@@ -633,6 +648,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
     };
 
+
     // history img btn click listener
     private View.OnClickListener mClickListenerShowHistory = new View.OnClickListener() {
         @Override
@@ -641,7 +657,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             // TODO : DB list show.
 
             // test code for DB creation, insertion, delegation
-            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).testQry();
+            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+
+            mUIControlHandler.sendEmptyMessage(MSG_SHOW_RESULT_POPUP_WINDOW);
         }
     };
 

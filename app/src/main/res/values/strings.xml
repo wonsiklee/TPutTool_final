@@ -18,6 +18,7 @@
     <string name="str_http_file_io">File I/O</string>
     <string name="str_http_result">Result</string>
     <string name="str_http_result_history">History</string>
+    <string name="str_save_result">결과 저장</string>
 
     <string name="iperf_version2">iperf2</string>
     <string name="iperf_version3">iperf3</string>

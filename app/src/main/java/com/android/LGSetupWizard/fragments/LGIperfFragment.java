@@ -163,7 +163,7 @@ public class LGIperfFragment extends Fragment {
         btn_iperf_menu_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,"clicked back btn");
+                Log.d(TAG,"clicked back_border_line btn");
                 switchLayout(LAYOUT_MODE_MAIN);
             }
         });

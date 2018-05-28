@@ -108,7 +108,7 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         if (convertView == null) {
             sHolder = new ViewHolder();
 
-            LayoutInflater li = (LayoutInflater.from(this.mContext));
+            LayoutInflater li = LayoutInflater.from(this.mContext);
             convertView = li.inflate(R.layout.file_list_view_item, null);
             sHolder.mIcon = (ImageView) convertView.findViewById(R.id.imageView_file_icon);
             sHolder.mFileName = (TextView) convertView.findViewById(R.id.txtView_file_name);

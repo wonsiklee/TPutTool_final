@@ -9,13 +9,17 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.LGSetupWizard.data.TestResultDTO;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
-public class TestResultLogDBManager {
-    private static final String TAG = TestResultLogDBManager.class.getSimpleName();
+public class TestResultDBManager {
+    private static final String TAG = TestResultDBManager.class.getSimpleName();
 
-    private static TestResultLogDBManager mInstance;
+    private static TestResultDBManager mInstance;
 
     private Context mContext;
     private TPutMonitorTestResultDBHelper mTPutMonitorTestResultDBHelper;
@@ -26,28 +30,32 @@ public class TestResultLogDBManager {
                                HTTP_OK_WITH_FILE_IO, HTTP_OK_WITHOUT_FILE_IO, // okhttp
                                HTTP_APACHE_WITH_FILE_IO, HTTP_APACHE_WITHOUT_FILE_IO } // apache http
 
-    public static TestResultLogDBManager getInstance(Context context) {
+    public static TestResultDBManager getInstance(Context context) {
         Log.d(TAG, "getInstance()");
         if (mInstance == null) {
             Log.d(TAG, "mInstance is null");
-            mInstance = new TestResultLogDBManager(context);
+            mInstance = new TestResultDBManager(context);
         }
         return mInstance;
     }
 
-    private TestResultLogDBManager(Context context) {
-        Log.d(TAG, "TestResultLogDBManager constructor");
+    private TestResultDBManager(Context context) {
+        Log.d(TAG, "TestResultDBManager constructor");
         this.mContext = context;
         this.mTPutMonitorTestResultDBHelper = new TPutMonitorTestResultDBHelper(mContext);
     }
 
     public void debug_testQry_DB() {
-        Log.d(TAG, "TestResultLogDBManager testQry()");
+        Log.d(TAG, "TestResultDBManager testQry()");
         this.mTPutMonitorTestResultDBHelper.debug_testQry();
     }
 
     public void insert(TestCategory category, float testResult, @Nullable String description) {
         this.mTPutMonitorTestResultDBHelper.insert(category, testResult, description);
+    }
+
+    public ArrayList<TestResultDTO> fetch(TestCategory category) {
+        return this.mTPutMonitorTestResultDBHelper.fetch(category);
     }
 
     private class TPutMonitorTestResultDBHelper extends SQLiteOpenHelper {
@@ -105,6 +113,33 @@ public class TestResultLogDBManager {
             SQLiteDatabase db = this.getWritableDatabase();
             db.insert(TABLE_NAME, null, cv);
             db.close();
+        }
+
+        private ArrayList<TestResultDTO> fetch(TestCategory category) {
+            ArrayList<TestResultDTO> sResultList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.query(TABLE_NAME,
+                    new String[] {KEY_ROW_ID, KEY_DATE_TIME, KEY_TEST_CATEGORY, KEY_TEST_RESULT, KEY_DESCRIPTION},
+                    null, null, null, null, null);
+            if (c != null && c.getCount() > 0) {
+                c.moveToFirst();
+                do  {
+                    try {
+                        sResultList.add(new TestResultDTO(c.getInt(c.getColumnIndex(KEY_ROW_ID)),
+                                mDateFormatter.parse(c.getString(c.getColumnIndex(KEY_DATE_TIME))),
+                                c.getString(c.getColumnIndex(KEY_TEST_CATEGORY)),
+                                c.getFloat(c.getColumnIndex(KEY_TEST_RESULT)),
+                                c.getString(c.getColumnIndex(KEY_DESCRIPTION))));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
+                    }
+                } while (c.moveToNext());
+            } else {
+                Toast.makeText(mContext, "no data to show", Toast.LENGTH_SHORT).show();
+            }
+            db.close();
+            return sResultList;
         }
 
         private void debug_testQry() {

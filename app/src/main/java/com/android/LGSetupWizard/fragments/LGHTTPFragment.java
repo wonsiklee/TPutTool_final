@@ -27,7 +27,7 @@ import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
-import com.android.LGSetupWizard.database.TestResultLogDBManager;
+import com.android.LGSetupWizard.database.TestResultDBManager;
 
 import lombok.experimental.Accessors;
 
@@ -229,22 +229,22 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(HTTP_DL_FINISHED);
             LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(100);
-            TestResultLogDBManager.TestCategory sCategory;
+            TestResultDBManager.TestCategory sCategory;
             if (LGHTTPFragment.this.mLGHTTPClient instanceof LGOKHTTPClient) {
                 if (LGHTTPFragment.this.mEnableFileIO) {
-                    sCategory = TestResultLogDBManager.TestCategory.HTTP_OK_WITH_FILE_IO;
+                    sCategory = TestResultDBManager.TestCategory.HTTP_OK_WITH_FILE_IO;
                 } else {
-                    sCategory = TestResultLogDBManager.TestCategory.HTTP_OK_WITHOUT_FILE_IO;
+                    sCategory = TestResultDBManager.TestCategory.HTTP_OK_WITHOUT_FILE_IO;
                 }
             } else {
                 if (LGHTTPFragment.this.mEnableFileIO) {
-                    sCategory = TestResultLogDBManager.TestCategory.HTTP_APACHE_WITH_FILE_IO;
+                    sCategory = TestResultDBManager.TestCategory.HTTP_APACHE_WITH_FILE_IO;
                 } else {
-                    sCategory = TestResultLogDBManager.TestCategory.HTTP_APACHE_WITHOUT_FILE_IO;
+                    sCategory = TestResultDBManager.TestCategory.HTTP_APACHE_WITHOUT_FILE_IO;
                 }
             }
-            TestResultLogDBManager.getInstance(LGHTTPFragment.this.getContext()).insert(sCategory, DATA_POOL.avgTPut, "Test no." + (mRepeatCount + 1));
-            TestResultLogDBManager.getInstance(LGHTTPFragment.this.getContext()).debug_testQry_DB();
+            TestResultDBManager.getInstance(LGHTTPFragment.this.getContext()).insert(sCategory, DATA_POOL.avgTPut, "Test no." + (mRepeatCount + 1));
+            TestResultDBManager.getInstance(LGHTTPFragment.this.getContext()).debug_testQry_DB();
         }
 
         @Override

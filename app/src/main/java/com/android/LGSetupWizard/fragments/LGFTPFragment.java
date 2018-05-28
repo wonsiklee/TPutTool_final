@@ -14,14 +14,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,14 +30,14 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.LGSetupWizard.database.TestResultLogDBManager;
+import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
 import com.android.LGSetupWizard.data.MediaScanning;
-import com.android.LGSetupWizard.database.TestResultLogPopupWindow;
+import com.android.LGSetupWizard.database.TestResultPopupWindow;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -75,7 +72,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
     private ProgressDialog mNetworkOperationProgressDialog;
-    private TestResultLogPopupWindow mTestResultLogPopupWindow;
+    private TestResultPopupWindow mTestResultPopupWindow;
 
     private LGFTPFileListViewAdapter mFTPFileListVIewAdapter;
     private LGFTPClient mLGFtpClient;
@@ -185,7 +182,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
         this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
 
-        this.mTestResultLogPopupWindow = new TestResultLogPopupWindow(this.getContext());
+        this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
 
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
@@ -363,8 +360,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 Log.d(TAG, "after selected file removal list size = " + LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().size());
             }
 
-            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).insert(TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO, avgTPut, file.getName());
-            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).insert(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO, avgTPut, file.getName());
+            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
 
             Message msg = LGFTPFragment.this.mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();
@@ -572,7 +569,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 case MSG_SHOW_RESULT_POPUP_WINDOW:
                     Log.d(TAG, "MSG_SHOW_RESULT_POPUP_WINDOW");
                     // TODO : need to fetch all the related data (where test category is about (FTP))from DB, and project it to the data.
-                    mTestResultLogPopupWindow.show(LGFTPFragment.this.getView(), mSwitchFileIO.isChecked() ? TestResultLogDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultLogDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO);
+                    mTestResultPopupWindow.show(LGFTPFragment.this.getView(), mSwitchFileIO.isChecked() ? TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO);
                     break;
 
                 default:
@@ -657,7 +654,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             // TODO : DB list show.
 
             // test code for DB creation, insertion, delegation
-            TestResultLogDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
 
             mUIControlHandler.sendEmptyMessage(MSG_SHOW_RESULT_POPUP_WINDOW);
         }

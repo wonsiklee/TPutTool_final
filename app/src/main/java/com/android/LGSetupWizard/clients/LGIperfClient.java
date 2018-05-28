@@ -21,13 +21,10 @@ import lombok.experimental.Accessors;
  * Created by hyukbin.ko on 2018-05-03.
  */
 
-//TODO need Permissive mode ! because of System app.
-//TODO need fix encording output issue
 @Accessors(prefix = "m")
 public class LGIperfClient {
     static final private String TAG = LGIperfClient.class.getSimpleName();
 
-    //private LGIperfRunnable mIperfRunnable;
     private LGIperfTask mIperfTask;
     private Context mContext;
 
@@ -41,7 +38,6 @@ public class LGIperfClient {
 
     public LGIperfClient(Context context){
         mContext = context;
-        //mIperfRunnable = new LGIperfRunnable();
         mIperfTask = new LGIperfTask();
     }
     public boolean loadIperfFile(){
@@ -83,19 +79,14 @@ public class LGIperfClient {
         return true;
     }
 
-    public void start(){
-
-    }
-
     public void start(String option){
         mIperfTask = new LGIperfTask();
-        StringBuilder sCmdBuilder = new StringBuilder(
-                (mIperfVersion == LGIperfConstants.IPERF_VERSION2)?
-                        mContext.getFilesDir().getPath()+"/"+LGIperfConstants.IPERF_NAME:
-                 mContext.getFilesDir().getPath()+"/"+LGIperfConstants.IPERF3_NAME).append(" ");
-        sCmdBuilder.append(option);
 
-        mIperfTask.execute(new String[]{sCmdBuilder.toString()});
+
+        mIperfTask.execute(new String[]{
+                new StringBuilder((mIperfVersion == LGIperfConstants.IPERF_VERSION2)? LGIperfConstants.IPERF_NAME : LGIperfConstants.IPERF3_NAME)
+                        .append(" ").append(option).toString()
+        });
     }
     public void stop(){
         if(mIperfTask != null)
@@ -113,18 +104,20 @@ public class LGIperfClient {
                 return Integer.valueOf(99);
             }
             try {
-                iProcess = new ProcessBuilder(new String[0]).command(arg[0].split(" ")).redirectErrorStream(true).start();
+                ProcessBuilder iPB = new ProcessBuilder(new String[0]).command(arg[0].split(" "));
+                iPB.directory(new File(mContext.getFilesDir().getPath()));
+                iPB.redirectErrorStream(true);
+
+                iProcess = iPB.start();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iProcess.getInputStream()));
                 int sRead = 0;
                 char[] sBuffer = new char[4096];
                 while ((sRead = bufferedReader.read(sBuffer)) > 0){
-                        final String sResult = new StringBuffer().append(sBuffer, 0, sRead).toString();
-                        publishProgress( new String[]{sResult});
+                    final String sResult = new StringBuffer().append(sBuffer, 0, sRead).toString();
+                    publishProgress( new String[]{sResult});
                 }
             } catch (IOException e) {
                 Log.e(ITAG, "runIperf-exception="+ e.toString() );
-                iProcess.destroy();
-                iProcess = null;
             }
 
             return Integer.valueOf(0);
@@ -162,15 +155,13 @@ public class LGIperfClient {
             mListener.onStopped();
         }
 
-        protected final /* synthetic */ void onProgressUpdate(Object[] objArr) {
+        protected final void onProgressUpdate(Object[] objArr) {
             String[] strArr = (String[]) objArr;
             if (strArr != null && strArr[0] != null) {
                 Log.d(ITAG, "onProgressUpdate-"+strArr[0]+"<end>");
                 mListener.onGettingMeesage(strArr[0]);
             }
         }
-
-
     }
 
     public interface OnStateChangeListener{

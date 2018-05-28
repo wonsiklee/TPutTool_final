@@ -7,6 +7,7 @@
     <color name="not_selected_color">#ffffff</color>
 
     <color name="iperf_background">#333333</color>
+    <color name="iperf_popup_headerline">#333333</color>
     <color name="iperf_text">#ffffff</color>
     <color name="iperf_listview_devider">#ffffff</color>
     <color name="iperf_switch_text_color">#ffffff</color>

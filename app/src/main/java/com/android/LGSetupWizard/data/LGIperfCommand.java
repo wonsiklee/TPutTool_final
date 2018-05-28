@@ -16,16 +16,15 @@ import lombok.experimental.Accessors;
 @Accessors(prefix="m")
 public class LGIperfCommand {
     @Getter @Setter private int mVersion;
-    @Getter @Setter private int mMode = -1;
+    @Getter @Setter private int mMode = LGIperfConstants.IPERF_NOT_SET;
     @Getter @Setter private String mHost;
-    @Getter @Setter private int mPort;
-    @Getter @Setter private boolean mReverMode = false;
+    @Getter @Setter private int mPort = LGIperfConstants.IPERF_NOT_SET;
     @Getter @Setter private boolean mUDPmode = false;
-    @Getter @Setter private int mRate = -1;
-    @Getter @Setter private int mRateUnit = -1;
-    @Getter @Setter private int mDuration = -1;
-    @Getter @Setter private int mInterval = -1;
-    @Getter @Setter private int mStream =-1 ;
+    @Getter @Setter private int mRate = LGIperfConstants.IPERF_NOT_SET;
+    @Getter @Setter private int mRateUnit = LGIperfConstants.IPERF_NOT_SET;
+    @Getter @Setter private int mDuration = LGIperfConstants.IPERF_NOT_SET;
+    @Getter @Setter private int mInterval = LGIperfConstants.IPERF_NOT_SET;
+    @Getter @Setter private int mStream = LGIperfConstants.IPERF_NOT_SET ;
     @Getter @Setter private String mOtherOptions="";
 
     @Getter private boolean isValid = true;
@@ -70,9 +69,6 @@ public class LGIperfCommand {
                 case "-s" : mMode = LGIperfConstants.IPERF_MODE_SERVER;
                     break;
 
-                case "-R" : mReverMode = true;
-                    break;
-
                 case "-u" : mUDPmode = true ;
                     break;
 
@@ -87,18 +83,20 @@ public class LGIperfCommand {
                         isValid = false;
                         return;
                     }
-                    if(commandOptions[i].contains("K") || commandOptions[i].contains("k")){
+                    String temp = commandOptions[i];
+                    if(temp.contains("K") || temp.contains("k")){
                         mRateUnit = LGIperfConstants.IPERF_RATEUNIT_KBPS;
-                        commandOptions[i].replace("K","");
-                        commandOptions[i].replace("k","");
-                    }else if (commandOptions[i].contains("M") || commandOptions[i].contains("m") ){
+                        temp = temp.replace("K","");
+                        temp = temp.replace("k","");
+                    }else if (temp.contains("M") || temp.contains("m") ){
                         mRateUnit = LGIperfConstants.IPERF_RATEUNIT_MBPS;
-                        commandOptions[i].replace("M","");
-                        commandOptions[i].replace("m","");
+                        temp = temp.replace("M","");
+                        temp = temp.replace("m","");
                     }else{
                         mRateUnit = LGIperfConstants.IPERF_RATEUNIT_BPS;
                     }
-                    mRate = Integer.valueOf(commandOptions[i]);
+
+                    mRate = Integer.valueOf(temp);
                     break;
 
                 case "-t":
@@ -154,15 +152,15 @@ public class LGIperfCommand {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append( (mVersion==LGIperfConstants.IPERF_VERSION2)?LGIperfConstants.IPERF_NAME: LGIperfConstants.IPERF3_NAME )
                 .append( (mMode == LGIperfConstants.IPERF_MODE_CLIENT)? " -c":"")
-                .append( (mMode == LGIperfConstants.IPERF_MODE_CLIENT && mHost!=null)? " "+mHost:"")
                 .append( (mMode == LGIperfConstants.IPERF_MODE_SERVER)? " -s":"")
-                .append( (mReverMode)? " -r":"")
+                .append( (mMode == LGIperfConstants.IPERF_MODE_CLIENT && mHost!=null)? " "+mHost:"")
                 .append( (mUDPmode)? " -u":"")
-                .append( (mRate!=-1 && mRateUnit!=-1)? " -b "+mRate+ LGIperfConstants.toStringRateUnit(mRate):"")
-                .append( (mDuration!=-1)? " -t "+mDuration:"")
-                .append( (mInterval!=-1)? " -i "+mInterval:"")
-                .append( (mPort!=-1)? " -p "+mPort:"")
-                .append( (mStream!=-1)? " -P "+mStream:"")
+                .append( (mUDPmode && mRate!=LGIperfConstants.IPERF_NOT_SET && mRateUnit!=LGIperfConstants.IPERF_NOT_SET)?
+                        " -b "+mRate+ LGIperfConstants.toStringRateUnit(mRateUnit):"")
+                .append( (mPort!=LGIperfConstants.IPERF_NOT_SET)? " -p "+mPort:"")
+                .append( (mInterval!=LGIperfConstants.IPERF_NOT_SET)? " -i "+mInterval:"")
+                .append( (mDuration!=LGIperfConstants.IPERF_NOT_SET)? " -t "+mDuration:"")
+                .append( (mStream!=LGIperfConstants.IPERF_NOT_SET)? " -P "+mStream:"")
                 .append( (mOtherOptions!=null)? " "+ mOtherOptions:"");
         return stringBuilder.toString();
     }

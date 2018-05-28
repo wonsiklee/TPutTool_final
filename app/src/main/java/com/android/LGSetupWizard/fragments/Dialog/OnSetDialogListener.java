@@ -6,6 +6,7 @@ package com.android.LGSetupWizard.fragments.Dialog;
 
 public interface OnSetDialogListener {
     void onSelect(Object selectedValue);
+    void onSelect(Object selectedValue, int selectedPosition);
     void onCancel();
     void onDelete();
 }

@@ -31,10 +31,12 @@ import com.android.LGSetupWizard.clients.LGIperfClient;
 import com.android.LGSetupWizard.clients.LGIperfConstants;
 import com.android.LGSetupWizard.data.LGIperfCommand;
 import com.android.LGSetupWizard.fragments.Dialog.EditTextDialog;
+import com.android.LGSetupWizard.fragments.Dialog.EditTextUnitDialog;
 import com.android.LGSetupWizard.fragments.Dialog.NumberPickerDialog;
 import com.android.LGSetupWizard.fragments.Dialog.OnSetDialogListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.experimental.Accessors;
@@ -86,8 +88,10 @@ public class LGIperfFragment extends Fragment {
     private Switch swtich_iperf_menu_tcp_udp;
     private Button btn_iperf_menu_duration;
     private Button btn_iperf_menu_interval;
+    private Button btn_iperf_menu_rate;
     private Button btn_iperf_menu_steams;
     private Button btn_iperf_menu_others;
+
 
 
 
@@ -111,7 +115,6 @@ public class LGIperfFragment extends Fragment {
 
         return mView;
     }
-
 
     private void initUIControls() {
 
@@ -261,6 +264,12 @@ public class LGIperfFragment extends Fragment {
                     }
 
                     @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+
+                    }
+
+
+                    @Override
                     public void onCancel() {
 
                     }
@@ -283,7 +292,7 @@ public class LGIperfFragment extends Fragment {
                 EditTextDialog dialog = new EditTextDialog(getContext(),
                         getResources().getString(R.string.dialog_port_title),
                         getResources().getString(R.string.dialog_port_description),
-                        ""+mSelectedIperfCommand.getPort());
+                        ""+(mSelectedIperfCommand.getPort()!=LGIperfConstants.IPERF_NOT_SET? mSelectedIperfCommand.getPort() : 0));
                 dialog.setInputType(InputType.TYPE_CLASS_NUMBER);
                 dialog.setOnSetDialogListener(new OnSetDialogListener() {
                     @Override
@@ -292,6 +301,12 @@ public class LGIperfFragment extends Fragment {
                         mIperfMenuListAdapter.modifyCommand(mSelectedIperfCommand.toString());
                         mIperfMenuListAdapter.notifyDataSetChanged();
                     }
+
+                    @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+
+                    }
+
 
                     @Override
                     public void onCancel() {
@@ -331,6 +346,12 @@ public class LGIperfFragment extends Fragment {
                     }
 
                     @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+
+                    }
+
+
+                    @Override
                     public void onCancel() {
                     }
 
@@ -364,6 +385,13 @@ public class LGIperfFragment extends Fragment {
                     }
 
                     @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+
+
+                    }
+
+
+                    @Override
                     public void onCancel() {
                     }
 
@@ -378,6 +406,50 @@ public class LGIperfFragment extends Fragment {
             }
         });
 
+        btn_iperf_menu_rate = (Button)menuLayoutView.findViewById(R.id.btn_iperf_menu_rate);
+        btn_iperf_menu_rate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                EditTextUnitDialog dialog = new EditTextUnitDialog(getContext(),
+                        getResources().getString(R.string.dialog_rate_title),
+                        getResources().getString(R.string.dialog_rate_description),
+                        ""+(mSelectedIperfCommand.getRate()!=LGIperfConstants.IPERF_NOT_SET? mSelectedIperfCommand.getRate() : 0),
+                        mSelectedIperfCommand.getRateUnit()!=LGIperfConstants.IPERF_NOT_SET? mSelectedIperfCommand.getRateUnit() : 0,
+                        Arrays.asList(getResources().getStringArray(R.array.rate_unit))
+                );
+                dialog.setInputType(InputType.TYPE_CLASS_NUMBER);
+                dialog.setOnSetDialogListener(new OnSetDialogListener() {
+                    @Override
+                    public void onSelect(Object selectedValue) {
+
+                    }
+
+                    @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+                        mSelectedIperfCommand.setRate(Integer.valueOf((String)selectedValue));
+                        mSelectedIperfCommand.setRateUnit(selectedPosition);
+                        Log.d(TAG,"mSelectedIperfCommand = "+mSelectedIperfCommand.toString());
+                        mIperfMenuListAdapter.modifyCommand(mSelectedIperfCommand.toString());
+                        mIperfMenuListAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onDelete() {
+                        mSelectedIperfCommand.setRate(-1);
+                        mSelectedIperfCommand.setRateUnit(-1);
+                        mIperfMenuListAdapter.modifyCommand(mSelectedIperfCommand.toString());
+                        mIperfMenuListAdapter.notifyDataSetChanged();
+                    }
+                });
+                dialog.show();
+            }
+        });
 
         btn_iperf_menu_steams = (Button)menuLayoutView.findViewById(R.id.btn_iperf_menu_steams);
         btn_iperf_menu_steams.setOnClickListener(new View.OnClickListener() {
@@ -395,6 +467,11 @@ public class LGIperfFragment extends Fragment {
                         mSelectedIperfCommand.setStream((int)selectedValue);
                         mIperfMenuListAdapter.modifyCommand(mSelectedIperfCommand.toString());
                         mIperfMenuListAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+
                     }
 
                     @Override
@@ -431,6 +508,11 @@ public class LGIperfFragment extends Fragment {
                     }
 
                     @Override
+                    public void onSelect(Object selectedValue, int selectedPosition) {
+
+                    }
+
+                    @Override
                     public void onCancel() {
 
                     }
@@ -450,6 +532,7 @@ public class LGIperfFragment extends Fragment {
 
 
     private void drawMenu(){
+
         switch_iperf_menu_version.setOnCheckedChangeListener(null);
         switch_iperf_menu_version.setChecked(mSelectedIperfCommand.getVersion() == LGIperfConstants.IPERF_VERSION3);
         switch_iperf_menu_version.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -475,11 +558,13 @@ public class LGIperfFragment extends Fragment {
                 }else {
                     mSelectedIperfCommand.setMode(LGIperfConstants.IPERF_MODE_SERVER);
                 }
+                btn_iperf_menu_host.setEnabled(isChecked);
                 mIperfMenuListAdapter.modifyCommand(mSelectedIperfCommand.toString());
                 mIperfMenuListAdapter.notifyDataSetChanged();
 
             }
         });
+        btn_iperf_menu_host.setEnabled(switch_iperf_menu_server_client.isChecked());
 
         swtich_iperf_menu_tcp_udp.setOnCheckedChangeListener(null);
         swtich_iperf_menu_tcp_udp.setChecked(mSelectedIperfCommand.isUDPmode());
@@ -487,12 +572,12 @@ public class LGIperfFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSelectedIperfCommand.setUDPmode(isChecked);
+                btn_iperf_menu_rate.setEnabled(isChecked);
                 mIperfMenuListAdapter.modifyCommand(mSelectedIperfCommand.toString());
                 mIperfMenuListAdapter.notifyDataSetChanged();
-
             }
         });
-
+        btn_iperf_menu_rate.setEnabled(swtich_iperf_menu_tcp_udp.isChecked());
     }
 
     private void switchLayout(int mode){

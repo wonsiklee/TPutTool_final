@@ -57,7 +57,8 @@
     <string name="dialog_streams_description">Specify the number of parallel streams</string>
     <string name="dialog_port_title">Parameter for -p</string>
     <string name="dialog_port_description">Server to listen on / Client connect to</string>
-
+    <string name="dialog_rate_title">Parameter for -b</string>
+    <string name="dialog_rate_description">for UDP, bandwidth to send at in bits/sec</string>
 
     <string name="dialog_host_title">Parameter for -c </string>
     <string name="dialog_host_description">Specify a server\'s hostname or IP address</string>

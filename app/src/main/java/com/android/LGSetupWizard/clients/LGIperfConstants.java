@@ -12,7 +12,7 @@ public class LGIperfConstants {
     public static final int IPERF_VERSION2 = 0;
     public static final int IPERF_VERSION3 = 1;
 
-    public static final int IPERF_INVLAID_SET = -1;
+    public static final int IPERF_NOT_SET = -1;
 
     public static final int IPERF_MODE_SERVER = 0;
     public static final int IPERF_MODE_CLIENT = 1;

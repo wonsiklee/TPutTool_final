@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -55,7 +56,7 @@ public class TestResultDBManager {
         this.mTPutMonitorTestResultDBHelper.insert(category, testResult, description);
     }
 
-    public ArrayList<TestResultDTO> fetch(TestCategory category) {
+    public ArrayList<TestResultDTO> fetch(@NonNull TestCategory category) {
         return this.mTPutMonitorTestResultDBHelper.fetch(category);
     }
 
@@ -116,12 +117,68 @@ public class TestResultDBManager {
             db.close();
         }
 
+        private String[] formWhereValueArray(TestCategory category) {
+            ArrayList<String> tmp = new ArrayList<>();
+            String catString = category.toString();
+            if (catString.contains("FTP")) {
+                tmp.add(TestCategory.FTP_DL_WITH_FILE_IO.toString());
+                tmp.add(TestCategory.FTP_DL_WITHOUT_FILE_IO.toString());
+            } else if (catString.contains("iPerf")) {
+                tmp.add(TestCategory.iPerf.toString());
+            } else if (catString.contains("HTTP_OK")) {
+                tmp.add(TestCategory.HTTP_OK_WITH_FILE_IO.toString());
+                tmp.add(TestCategory.HTTP_OK_WITHOUT_FILE_IO.toString());
+            } else if (catString.contains("HTTP_APACHE")) {
+                tmp.add(TestCategory.HTTP_APACHE_WITH_FILE_IO.toString());
+                tmp.add(TestCategory.HTTP_APACHE_WITHOUT_FILE_IO.toString());
+            } else if (catString.contains("ALL")) {
+                tmp.add(TestCategory.FTP_DL_WITH_FILE_IO.toString());
+                tmp.add(TestCategory.FTP_DL_WITHOUT_FILE_IO.toString());
+                tmp.add(TestCategory.iPerf.toString());
+                tmp.add(TestCategory.HTTP_OK_WITH_FILE_IO.toString());
+                tmp.add(TestCategory.HTTP_OK_WITHOUT_FILE_IO.toString());
+                tmp.add(TestCategory.HTTP_APACHE_WITH_FILE_IO.toString());
+                tmp.add(TestCategory.HTTP_APACHE_WITHOUT_FILE_IO.toString());
+                tmp.add(TestCategory.ALL_TYPE.toString());
+            }
+            return tmp.toArray(new String[tmp.size()]);
+        }
+
+        private String formWhereClause(TestCategory category) {
+            String catString = category.toString();
+            StringBuilder sb = new StringBuilder();
+
+            if (catString.contains("FTP")) {
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ");
+            } else if (catString.contains("iPerf")) {
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ");
+            } else if (catString.contains("HTTP_OK")) {
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ");
+            } else if (catString.contains("HTTP_APACHE")) {
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ");
+            } else if (catString.contains("ALL")) {
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ").append(" OR ");
+                sb.append(KEY_TEST_CATEGORY).append(" = ? ");
+            }
+            return sb.toString();
+        }
+
         private ArrayList<TestResultDTO> fetch(TestCategory category) {
             ArrayList<TestResultDTO> sResultList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
+
             Cursor c = db.query(TABLE_NAME,
                     new String[] {KEY_ROW_ID, KEY_DATE_TIME, KEY_TEST_CATEGORY, KEY_TEST_RESULT, KEY_DESCRIPTION},
-                    null, null, null, null, null);
+                    formWhereClause(category), formWhereValueArray(category), null, null, null);
             if (c != null && c.getCount() > 0) {
                 c.moveToFirst();
                 do  {

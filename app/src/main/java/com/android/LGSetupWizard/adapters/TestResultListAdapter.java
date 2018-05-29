@@ -6,17 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.data.TestResultDTO;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-import android.util.Log;
 
 public class TestResultListAdapter extends BaseAdapter {
 
@@ -29,13 +25,10 @@ public class TestResultListAdapter extends BaseAdapter {
     public TestResultListAdapter(Context context) {
         this.mContext = context;
         this.initTestResultLogList();
-        /*this.mTestResultLogList = TestResultDBManager.getInstance(this.mContext).fetch(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO);
-        this.mTestResultLogList.add(0, DUMMY_TEST_RESULT);*/
     }
 
     @Override
     public int getCount() {
-        Log.d(TAG, "getCount() called ");
         return this.mTestResultLogList.size();
     }
 
@@ -51,7 +44,6 @@ public class TestResultListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d(TAG, "getView() " + position);
         ViewHolder sHolder = null;
 
         if (convertView == null) {
@@ -74,11 +66,10 @@ public class TestResultListAdapter extends BaseAdapter {
             sHolder.mTxtViewFileIO.setBackgroundColor(Color.LTGRAY);
             sHolder.mTxtViewValue.setBackgroundColor(Color.LTGRAY);
         } else {
-            sHolder.mTxtViewIdx.setText(String.valueOf(this.mTestResultLogList.get(position).mIndex));
+            sHolder.mTxtViewIdx.setText(String.valueOf(position));
             sHolder.mTxtViewDate.setText(this.mTestResultLogList.get(position).mTestedTime.toString());
             String fileIO;
             String testCategory = this.mTestResultLogList.get(position).mTestedCategory.toString();
-            Log.d(TAG, "testCategory : " + testCategory);
             if (testCategory.contains("WITHOUT")) {
                 fileIO = "X";
             } else if (testCategory.contains("WITH")) {
@@ -95,7 +86,7 @@ public class TestResultListAdapter extends BaseAdapter {
 
     public void updateDataSet(TestResultDBManager.TestCategory category) {
         this.initTestResultLogList();
-        this.mTestResultLogList = TestResultDBManager.getInstance(this.mContext).fetch(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO);
+        this.mTestResultLogList = TestResultDBManager.getInstance(this.mContext).fetch(category);
         this.mTestResultLogList.add(0, DUMMY_TEST_RESULT);
 
         this.notifyDataSetChanged();
@@ -108,7 +99,6 @@ public class TestResultListAdapter extends BaseAdapter {
     }
 
     private class ViewHolder {
-        public LinearLayout mLinearLayoutItemWrapper;
         public TextView mTxtViewIdx;
         public TextView mTxtViewDate;
         public TextView mTxtViewFileIO;

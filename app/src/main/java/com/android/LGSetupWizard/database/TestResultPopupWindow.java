@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.util.Log;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.TestResultListAdapter;
@@ -49,15 +48,13 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
                 if (position == 0) {
                     return true;
                 } else {
-                    Log.d(TAG, "onItemLongClick() ==> position = " + position);
                     new AlertDialog.Builder(mContext)
-                            .setIcon(R.drawable.ic_f)
                             .setTitle("Description")
                             .setMessage(mTestResultListAdapter.getItem(position).mTestDescription)
                             .setNeutralButton("확인", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    dismiss();
+                                    dialog.cancel();
                                 }
                             }).show();
                     return false;
@@ -77,13 +74,10 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
     }
 
     public void show(View parentView, TestResultDBManager.TestCategory category) {
-        Log.d(TAG, "show() " + category);
         this.mTestResultListAdapter.updateDataSet(category);
-        //this.showAsDropDown(parentView);
+
         this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
         this.showAtLocation(parentView, Gravity.CENTER, (int) parentView.getX(), (int) parentView.getY());
-
-        // TODO : need to fetch category data from the DB.
     }
 
     @Override

@@ -216,8 +216,40 @@ public class LGFTPClient {
         return true;
     }
 
+    /*
+          Connect and login to the server.
+          Enter local passive mode for data connection.
+          Set file type to be transferred to binary.
+          Construct path of the remote file to be downloaded.
+          Create a new OutputStream for writing the file to disk.
+
+          If using the first method (retrieveFile):
+            Pass the remote file path and the OutputStream as arguments of the method retrieveFile().
+            Close the OutputStream.
+            Check return value of retrieveFile() to verify success.
+
+          If using the second method (retrieveFileStream):
+            Retrieve an InputStream returned by the method retrieveFileStream().
+            Repeatedly a byte array from the InputStream and write these bytes into the OutputStream, until the InputStream is empty.
+            Call completePendingCommand() method to complete transaction.
+            Close the opened OutputStream the InputStream.
+            Check return value of completePendingCommand() to verify success.
+
+          Logout and disconnect from the server.
+
+          http://www.codejava.net/java-se/networking/ftp/java-ftp-file-download-tutorial-and-example
+    * */
     public boolean retrieveFile(LGFTPFile targetFile, boolean shouldWrite) throws Exception {
         boolean ret = false;
+
+        Log.d(TAG, "setUseEPSVwithIPv4(");
+        this.mFTPClient.setUseEPSVwithIPv4(true);
+
+        Log.d(TAG, "enterLocalPassiveMode()");
+        this.mFTPClient.enterLocalPassiveMode();
+
+        Log.d(TAG, "setFileType(BINARY_FILE_TYPE)");
+        this.mFTPClient.setFileType(BINARY_FILE_TYPE);
 
         Log.d(TAG, "retrieve " + targetFile);
 
@@ -249,15 +281,12 @@ public class LGFTPClient {
                 sOutputStream = new BufferedOutputStream(new FileOutputStream(sDownloadFile));
             }
 
-            /*LGFTPClient.this.mFTPClient.enterLocalPassiveMode();*/
             sInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
 
             Message msg = LGFTPClient.this.mTPutCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
             b.putSerializable(KEY_FILE, targetFile);
             msg.setData(b);
-
-            LGFTPClient.this.mFTPClient.setFileType(BINARY_FILE_TYPE);
 
             // 1. initialize control variables.
             LGFTPClient.this.mStartTime = System.currentTimeMillis();
@@ -306,8 +335,10 @@ public class LGFTPClient {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
-            // initialize variables.
+            // 4. invoke callback
             LGFTPClient.this.mOperationListener.onDownloadFinished(ret, sDownloadFile, ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000));
+
+            // 5. initialize variables.
             LGFTPClient.this.mDownloadedBytes = 0;
             LGFTPClient.this.mElapsedTime = 0;
             LGFTPClient.this.mAvgTPut = 0;
@@ -329,7 +360,6 @@ public class LGFTPClient {
             }
 
             Log.d(TAG, "sending MSG_STOP_TPUT_CALCULATION_LOOP");
-            // invoke callback.
             LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
         }
         return ret;

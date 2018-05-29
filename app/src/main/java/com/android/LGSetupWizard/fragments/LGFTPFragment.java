@@ -177,7 +177,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
         this.mImgBtnTestHistory = (this.mView.findViewById(R.id.imgBtn_history));
         this.mImgBtnTestHistory.setOnClickListener(this.mClickListenerShowHistory);
-        this.mBtnDLULStartStop = (Button) this.mView.findViewById(R.id.btn_ftp_download);
+        this.mBtnDLULStartStop = this.mView.findViewById(R.id.btn_ftp_download);
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
         this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);

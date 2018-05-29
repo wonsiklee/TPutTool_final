@@ -27,11 +27,11 @@
                 android:focusableInTouchMode="true" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="85dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:text="@string/str_http_file_addr" />
 
             <EditText
@@ -39,7 +39,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="0dp"
                 android:inputType="textUri"
                 android:text="@string/str_http_default_file_addr" />
 
@@ -60,11 +59,11 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="85dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:text="@string/str_http_http_stack" />
 
             <RadioGroup
@@ -75,8 +74,9 @@
 
                 <RadioButton
                     android:id="@+id/rdoBtn_http_stack_okhttp"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:checked="true"
                     android:gravity="center"
                     android:paddingRight="10dp"
@@ -84,8 +84,9 @@
 
                 <RadioButton
                     android:id="@+id/rdoBtn_http_stack_apache"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:paddingRight="10dp"
                     android:text="@string/str_http_apache" />
@@ -107,17 +108,17 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="85dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:gravity="center"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
                 android:text="@string/str_http_repeat_time" />
 
             <EditText
                 android:id="@+id/editTxt_repeat_count"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:gravity="center"
                 android:inputType="number"
                 android:text="2" />
@@ -127,6 +128,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="10dp"
                 android:checked="true"
                 android:text="@string/str_http_file_io" />
 

@@ -26,24 +26,22 @@
         android:textAlignment="center"
         android:text="Time"
         android:maxLines="1"
-        android:minLines="1"/>
+        android:minLines="1" />
 
     <TextView
         android:id="@+id/txtView_test_category"
-        android:layout_width="0dp"
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
         android:background="@drawable/back_border_line"
         android:textAlignment="center"
-        android:text="Cat."
+        android:text="File I/O"
         android:maxLines="1"
         android:minLines="1"/>
 
     <TextView
         android:id="@+id/txtView_test_result_value"
-        android:layout_width="0dp"
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
         android:background="@drawable/back_border_line"
         android:textAlignment="center"
         android:text="Mbps"

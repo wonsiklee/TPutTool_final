@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -78,8 +79,10 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
     public void show(View parentView, TestResultDBManager.TestCategory category) {
         Log.d(TAG, "show() " + category);
         this.mTestResultListAdapter.updateDataSet(category);
-        this.showAsDropDown(parentView);
-        //this.mTestResultListAdapter.notifyDataSetChanged();
+        //this.showAsDropDown(parentView);
+        this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
+        this.showAtLocation(parentView, Gravity.CENTER, (int) parentView.getX(), (int) parentView.getY());
+
         // TODO : need to fetch category data from the DB.
     }
 

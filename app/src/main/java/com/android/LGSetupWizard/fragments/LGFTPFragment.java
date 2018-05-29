@@ -355,13 +355,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             Log.d(TAG, "onDownloadFinished() " + result + ", " + file.toString());
             if (result) {
                 new MediaScanning(LGFTPFragment.this.getContext(), file);
-                Log.d(TAG, "before selected file removal list size = " + LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().size());
                 LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().remove(0);
-                Log.d(TAG, "after selected file removal list size = " + LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().size());
             }
 
-            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).insert(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO, avgTPut, file.getName());
-            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).insert(mSwitchFileIO.isChecked()? TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO, avgTPut, file.getName());
 
             Message msg = LGFTPFragment.this.mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();

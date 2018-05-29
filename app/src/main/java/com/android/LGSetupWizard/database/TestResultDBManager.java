@@ -28,7 +28,8 @@ public class TestResultDBManager {
     public enum TestCategory { FTP_DL_WITH_FILE_IO, FTP_DL_WITHOUT_FILE_IO, // FTP
                                iPerf, // iPerf
                                HTTP_OK_WITH_FILE_IO, HTTP_OK_WITHOUT_FILE_IO, // okhttp
-                               HTTP_APACHE_WITH_FILE_IO, HTTP_APACHE_WITHOUT_FILE_IO } // apache http
+                               HTTP_APACHE_WITH_FILE_IO, HTTP_APACHE_WITHOUT_FILE_IO,
+                               ALL_TYPE } // apache http
 
     public static TestResultDBManager getInstance(Context context) {
         Log.d(TAG, "getInstance()");
@@ -47,7 +48,7 @@ public class TestResultDBManager {
 
     public void debug_testQry_DB() {
         Log.d(TAG, "TestResultDBManager testQry()");
-        this.mTPutMonitorTestResultDBHelper.debug_testQry();
+        //this.mTPutMonitorTestResultDBHelper.debug_testQry();
     }
 
     public void insert(TestCategory category, float testResult, @Nullable String description) {

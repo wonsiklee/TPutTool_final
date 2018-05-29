@@ -654,7 +654,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             // TODO : DB list show.
 
             // test code for DB creation, insertion, delegation
-            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
+            //TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).debug_testQry_DB();
 
             mUIControlHandler.sendEmptyMessage(MSG_SHOW_RESULT_POPUP_WINDOW);
         }

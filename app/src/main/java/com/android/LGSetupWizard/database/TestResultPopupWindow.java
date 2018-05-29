@@ -41,7 +41,7 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
 
         this.mTestResultListAdapter = new TestResultListAdapter(this.mContext);
         this.mListViewTestResults = this.mPopupViewTestResultContentView.findViewById(R.id.listView_test_result);
-        this.mListViewTestResults.setAdapter(new TestResultListAdapter(this.mContext));
+        this.mListViewTestResults.setAdapter(this.mTestResultListAdapter);
         this.mListViewTestResults.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -77,7 +77,9 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
 
     public void show(View parentView, TestResultDBManager.TestCategory category) {
         Log.d(TAG, "show() " + category);
-        super.showAsDropDown(parentView);
+        this.mTestResultListAdapter.updateDataSet(category);
+        this.showAsDropDown(parentView);
+        //this.mTestResultListAdapter.notifyDataSetChanged();
         // TODO : need to fetch category data from the DB.
     }
 

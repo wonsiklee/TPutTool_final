@@ -28,6 +28,7 @@ import com.android.LGSetupWizard.clients.LGHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
 import com.android.LGSetupWizard.database.TestResultDBManager;
+import com.android.LGSetupWizard.database.TestResultPopupWindow;
 
 import lombok.experimental.Accessors;
 
@@ -54,7 +55,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private EditText mEditTxtFileAddr;
     private RadioButton mRdoBtnOkHttp;
     private RadioButton mRdoBtnApache;
-    private Button mBtnSaveResult;
+    private ImageButton mImageButtonShowResult;
     private EditText mEditTxtRepeatCount;
     private Button mBtnStartDl;
     private TextView mTxtViewHTTPResult;
@@ -73,6 +74,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
     private static DataPool DATA_POOL = new DataPool();
     private boolean mEnableFileIO;
+
+    private TestResultPopupWindow mTestResultPopupWindow;
 
     public static class DataPool {
         public long totalSize;
@@ -102,10 +105,25 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         }
     };
 
-    private View.OnClickListener mSaveResultClickListener = new View.OnClickListener() {
+    private View.OnClickListener mShowResultClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Log.d(TAG, "mSaveResultClickListener.onClick()");
+            TestResultDBManager.TestCategory sCategory;
+            if (LGHTTPFragment.this.mLGHTTPClient instanceof LGOKHTTPClient) {
+                if (LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked()) {
+                    sCategory = TestResultDBManager.TestCategory.HTTP_OK_WITH_FILE_IO;
+                } else {
+                    sCategory = TestResultDBManager.TestCategory.HTTP_OK_WITHOUT_FILE_IO;
+                }
+            } else {
+                if (LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked()) {
+                    sCategory = TestResultDBManager.TestCategory.HTTP_APACHE_WITH_FILE_IO;
+                } else {
+                    sCategory = TestResultDBManager.TestCategory.HTTP_APACHE_WITHOUT_FILE_IO;
+                }
+            }
+            mTestResultPopupWindow.show(LGHTTPFragment.this.getView(), sCategory);
         }
     };
 
@@ -288,6 +306,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         Log.d(TAG, "onResume()");
         super.onResume();
         this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
+        this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
     }
 
     @Nullable
@@ -338,8 +357,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         this.mBtnStartDl = (Button) this.mView.findViewById(R.id.btn_start_http_dl_test);
         this.mBtnStartDl.setOnClickListener(this.mStartTestClickListener);
 
-        this.mBtnSaveResult = (Button) this.mView.findViewById(R.id.btn_save_result);
-        this.mBtnSaveResult.setOnClickListener(this.mSaveResultClickListener);
+        this.mImageButtonShowResult = (ImageButton) this.mView.findViewById(R.id.imgBtn_save_result);
+        this.mImageButtonShowResult.setOnClickListener(this.mShowResultClickListener);
 
         this.mProgressBarHttpProgress = (ProgressBar) this.mView.findViewById(R.id.progressBar_http_progress);
         this.mProgressBarHttpProgress.setMax(100);

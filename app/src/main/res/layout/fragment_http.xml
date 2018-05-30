@@ -78,7 +78,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:checked="true"
-                    android:gravity="center"
                     android:paddingRight="10dp"
                     android:text="@string/str_http_okhttp" />
 
@@ -87,14 +86,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
                     android:paddingRight="10dp"
                     android:text="@string/str_http_apache" />
 
                 <ImageButton
                     android:id="@+id/imgBtn_save_result"
-                    android:layout_width="40dp"
+                    android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_marginEnd="5dp"
                     android:layout_gravity="center"
 
                     android:background="@drawable/test_logs" />

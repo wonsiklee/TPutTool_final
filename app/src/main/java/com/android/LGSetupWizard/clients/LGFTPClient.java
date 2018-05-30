@@ -331,6 +331,7 @@ public class LGFTPClient {
 
             // 4. perform download.
             ret = this.mFTPClient.retrieveFile(sRemoteFileName, sOutputStream);
+            Log.d(TAG, "result = " + ret);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -360,7 +361,7 @@ public class LGFTPClient {
             Log.d(TAG, "setUseEPSVwithIPv4(");
             this.mFTPClient.setUseEPSVwithIPv4(true);
 
-            Log.d(TAG, "enterLocalPassiveMode()");
+            //Log.d(TAG, "enterLocalPassiveMode()");
             //this.mFTPClient.enterLocalPassiveMode();
 
             Log.d(TAG, "setFileType(BINARY_FILE_TYPE)");

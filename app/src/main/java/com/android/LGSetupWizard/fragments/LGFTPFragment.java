@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -30,6 +31,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.android.LGSetupWizard.clients.ILGFTPCopyStreamListener;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
@@ -180,6 +182,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mBtnDLULStartStop = this.mView.findViewById(R.id.btn_ftp_download);
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
         this.mSwitchFileIO = this.mView.findViewById(R.id.switch_file_IO_enabler);
+
         this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
 
         this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());

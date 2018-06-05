@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -12,10 +13,14 @@ import android.widget.Toast;
 
 import com.android.LGSetupWizard.data.TestResultDTO;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class TestResultDBManager {
     private static final String TAG = TestResultDBManager.class.getSimpleName();
@@ -58,6 +63,10 @@ public class TestResultDBManager {
 
     public ArrayList<TestResultDTO> fetch(@NonNull TestCategory category) {
         return this.mTPutMonitorTestResultDBHelper.fetch(category);
+    }
+
+    public void exportResults() {
+        this.mTPutMonitorTestResultDBHelper.exportResults();
     }
 
     private class TPutMonitorTestResultDBHelper extends SQLiteOpenHelper {
@@ -198,6 +207,56 @@ public class TestResultDBManager {
             }
             db.close();
             return sResultList;
+        }
+
+        private void exportResults() {
+            File sExportDir = new File(Environment.getExternalStorageDirectory(), "");
+            if (!sExportDir.exists()) {
+                sExportDir.mkdirs();
+            }
+            SimpleDateFormat sFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            File sResultFile = new File(sExportDir, "Result_" + sFormat.format(new Date(System.currentTimeMillis())) + ".csv");
+            try {
+                Log.d(TAG, "making result file as " + sResultFile.getName() + " in " + sResultFile.getAbsoluteFile());
+                sResultFile.createNewFile();
+                sResultFile.setReadable(true, false);
+                sResultFile.setWritable(true, false);
+                FileWriter sFileWriter = new FileWriter(sResultFile);
+                BufferedWriter sBufferedWriter = new BufferedWriter(sFileWriter);
+                SQLiteDatabase db = this.getReadableDatabase();
+                Cursor sCursor = db.query(TABLE_NAME,
+                        new String[] {KEY_ROW_ID, KEY_DATE_TIME, KEY_TEST_CATEGORY, KEY_TEST_RESULT, KEY_DESCRIPTION},
+                        formWhereClause(TestCategory.ALL_TYPE), formWhereValueArray(TestCategory.ALL_TYPE), null, null, null);
+                int rowcount = sCursor.getCount();
+                int colcount = sCursor.getColumnCount();
+                if (rowcount > 0) {
+                    for (int i = 0; i < colcount; i++) {
+                        if (i != colcount - 1) {
+                            sBufferedWriter.write(sCursor.getColumnName(i) + ",");
+                        } else {
+                            sBufferedWriter.write(sCursor.getColumnName(i));
+                        }
+                    }
+                    sBufferedWriter.newLine();
+
+                    sCursor.moveToFirst();
+                    for (int i = 0; i < rowcount; i++) {
+
+                        for (int j = 0; j < colcount; j++) {
+                            if (j != colcount - 1)
+                                sBufferedWriter.write(sCursor.getString(j) + ",");
+                            else
+                                sBufferedWriter.write(sCursor.getString(j));
+                        }
+                        sBufferedWriter.newLine();
+                        sCursor.moveToNext();
+                    }
+                    sBufferedWriter.flush();
+                }
+                Toast.makeText(mContext, "Result file " + sResultFile.getName() + " is created.", Toast.LENGTH_SHORT).show();
+            } catch(Exception sqlEx) {
+                Log.e(TAG, "TPutMonitorTestResultDBHelper exportResults() got exception : " + sqlEx.getMessage());
+            }
         }
 
         private void debug_testQry() {

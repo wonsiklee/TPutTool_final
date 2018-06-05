@@ -87,6 +87,7 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
                 TestResultPopupWindow.this.dismiss();
                 break;
             case R.id.btn_export_test_result_to_file:
+                TestResultDBManager.getInstance(mContext).exportResults();
                 break;
         }
     }

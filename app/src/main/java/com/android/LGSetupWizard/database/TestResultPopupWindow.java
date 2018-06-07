@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.TestResultListAdapter;
@@ -28,6 +29,9 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
     private ListView mListViewTestResults;
 
     private Button mBtnExportToFile;
+    private Button mBtnDeleteResults;
+
+    private TestResultDBManager.TestCategory mCategory;
 
     public TestResultPopupWindow(Context context) {
         super();
@@ -39,12 +43,15 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
         this.mBtnExportToFile = this.mPopupViewTestResultContentView.findViewById(R.id.btn_export_test_result_to_file);
         this.mBtnExportToFile.setOnClickListener(this);
 
+        this.mBtnDeleteResults = this.mPopupViewTestResultContentView.findViewById(R.id.btn_delete_results);
+        this.mBtnDeleteResults.setOnClickListener(this);
+
         this.mTestResultListAdapter = new TestResultListAdapter(this.mContext);
         this.mListViewTestResults = this.mPopupViewTestResultContentView.findViewById(R.id.listView_test_result);
         this.mListViewTestResults.setAdapter(this.mTestResultListAdapter);
         this.mListViewTestResults.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 if (position == 0) {
                     return true;
                 } else {
@@ -55,6 +62,14 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.cancel();
+                                }
+                            }).setNegativeButton("삭제",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    TestResultDBManager.getInstance(mContext).delete(mTestResultListAdapter.getItem(position).mIndex);
+                                    TestResultPopupWindow.this.mTestResultListAdapter.updateDataSet(mCategory);
+                                    return;
                                 }
                             }).show();
                     return false;
@@ -75,6 +90,7 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
 
     public void show(View parentView, TestResultDBManager.TestCategory category) {
         this.mTestResultListAdapter.updateDataSet(category);
+        mCategory = category;
 
         this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
         this.showAtLocation(parentView, Gravity.CENTER, (int) parentView.getX(), (int) parentView.getY());
@@ -88,6 +104,27 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
                 break;
             case R.id.btn_export_test_result_to_file:
                 TestResultDBManager.getInstance(mContext).exportResults();
+                break;
+            case R.id.btn_delete_results:
+                AlertDialog.Builder sAlertDeleteResults = new AlertDialog.Builder(mContext);
+                sAlertDeleteResults.setMessage("결과를 모두 삭제하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                TestResultDBManager.getInstance(mContext).delete(TestResultDBManager.ID_ALL);
+                                TestResultPopupWindow.this.mTestResultListAdapter.updateDataSet(mCategory);
+                                Toast.makeText(mContext, "결과가 모두 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        }).setNegativeButton("취소",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // 'No'
+                                return;
+                            }
+                        });
+                AlertDialog alert = sAlertDeleteResults.create();
+                alert.show();
                 break;
         }
     }

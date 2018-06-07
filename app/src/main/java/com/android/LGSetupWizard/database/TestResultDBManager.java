@@ -37,6 +37,8 @@ public class TestResultDBManager {
                                HTTP_APACHE_WITH_FILE_IO, HTTP_APACHE_WITHOUT_FILE_IO,
                                ALL_TYPE } // apache http
 
+    public static final int ID_ALL = -1;
+
     public static TestResultDBManager getInstance(Context context) {
         Log.d(TAG, "getInstance()");
         if (mInstance == null) {
@@ -67,6 +69,10 @@ public class TestResultDBManager {
 
     public void exportResults() {
         this.mTPutMonitorTestResultDBHelper.exportResults();
+    }
+
+    public int delete(int id) {
+        return this.mTPutMonitorTestResultDBHelper.delete(id);
     }
 
     private class TPutMonitorTestResultDBHelper extends SQLiteOpenHelper {
@@ -124,6 +130,18 @@ public class TestResultDBManager {
             SQLiteDatabase db = this.getWritableDatabase();
             db.insert(TABLE_NAME, null, cv);
             db.close();
+        }
+
+        private int delete(int id) {
+            if (id == ID_ALL) {
+                Log.d(TAG, "delete() all row");
+                SQLiteDatabase db = this.getWritableDatabase();
+                return db.delete(TABLE_NAME, null, null);
+            } else {
+                Log.d(TAG, "delete() row id " + id);
+                SQLiteDatabase db = this.getWritableDatabase();
+                return db.delete(TABLE_NAME, KEY_ROW_ID + "=" + id, null);
+            }
         }
 
         private String[] formWhereValueArray(TestCategory category) {

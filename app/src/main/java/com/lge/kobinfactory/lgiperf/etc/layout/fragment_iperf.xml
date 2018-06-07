@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:background="@color/iperf_background"
+    >
+    <FrameLayout
+        android:id="@+id/iperf_padding_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+    </FrameLayout>
+    <include
+        android:id="@+id/iperf_main"
+        android:layout_above="@+id/iperf_padding_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/fragment_iperf_main"
+        android:visibility="visible"/>
+    <include
+        android:id="@+id/iperf_menu"
+        android:layout_above="@+id/iperf_padding_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/fragment_iperf_menu"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

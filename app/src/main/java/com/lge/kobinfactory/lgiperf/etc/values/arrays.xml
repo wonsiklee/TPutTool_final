@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="rate_unit">
+        <item>bps</item>
+        <item>Kbps</item>
+        <item>Mbps</item>
+    </string-array>
+</resources>

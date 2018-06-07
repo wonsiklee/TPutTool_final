@@ -1,0 +1,34 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Iperf Menu Style Start -->
+    <style name="IperfMenuStyle">
+        <item name="android:layout_width">@dimen/iperf_menu_width</item>
+        <item name="android:layout_height">@dimen/iperf_menu_height</item>
+        <item name="android:layout_marginLeft">@dimen/iperf_menu_margin_left</item>
+        <item name="android:layout_marginRight">@dimen/iperf_menu_margin_right</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="IperfSwitchTextAppearance">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/iperf_switch_text_color</item>
+    </style>
+
+    <style name="IperfSwitchStyle" parent="IperfMenuStyle">
+        <item name="android:switchMinWidth">0dp</item>
+        <item name="android:showText">true</item>
+        <item name="android:switchTextAppearance">@style/IperfSwitchTextAppearance</item>
+        <item name="android:track">@drawable/switch_track</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
+    </style>
+
+    <!-- Iperf Menu Style End -->
+</resources>

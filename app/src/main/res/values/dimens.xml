@@ -5,18 +5,4 @@
     <dimen name="list_item_spacing">16dp</dimen>
     <dimen name="list_item_spacing_half">8dp</dimen>
     <dimen name="text_margin">10dp</dimen>
-
-    <dimen name="iperf_menu_width">100dp</dimen>
-    <dimen name="iperf_menu_height">40dp</dimen>
-    <dimen name="iperf_menu_margin_left">0dp</dimen>
-    <dimen name="iperf_menu_margin_right">0dp</dimen>
-
-    <dimen name="iperf_listview_divider_height">1px</dimen>
-
-    <dimen name="iperf_swtich_track_width">90dp</dimen>
-    <dimen name="iperf_swtich_track_height">30dp</dimen>
-    <dimen name="iperf_swtich_tumblr_width">45dp</dimen>
-    <dimen name="iperf_swtich_tumblr_height">30dp</dimen>
-    <dimen name="iperf_switch_radius">10dp</dimen>
-
 </resources>

@@ -7,25 +7,16 @@
     android:layout_marginTop="@dimen/activity_vertical_margin"
     android:layout_marginBottom="@dimen/activity_vertical_margin"
     >
-    <FrameLayout
-        android:id="@+id/iperf_padding_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-    </FrameLayout>
-    <include
-        android:id="@+id/iperf_main"
-        android:layout_above="@+id/iperf_padding_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        layout="@layout/fragment_iperf_main"
-        android:visibility="visible"/>
-    <include
-        android:id="@+id/iperf_menu"
-        android:layout_above="@+id/iperf_padding_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        layout="@layout/fragment_iperf_menu"
-        android:visibility="invisible"/>
+    <Button
+        android:id="@+id/btn_iperf_start"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:text="@string/run_iperf"/>
 
+    <ImageButton
+        android:id="@+id/imgBtn_iperf_result"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/test_logs" />
 </RelativeLayout>

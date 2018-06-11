@@ -19,6 +19,6 @@
     <string name="str_http_result">Result</string>
     <string name="str_http_result_history">History</string>
     <string name="str_save_result">결과 저장</string>
-
+    <string name="str_tool_version">v0.9</string>
     <string name="run_iperf">Start Iperf</string>
 </resources>

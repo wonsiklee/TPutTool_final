@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -31,7 +30,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.LGSetupWizard.clients.ILGFTPCopyStreamListener;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
@@ -609,6 +607,38 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mLGFtpClient.disconnectFromServer();
                 }
             }.start();
+        }
+    };
+
+    private View.OnLongClickListener mLongClickListenerStart = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            final int sRepeatCount = Integer.valueOf(mSpinnerRepeatCount.getSelectedItem().toString());
+            final ArrayList<LGFTPFile> sSelectedFileList = LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileList();
+            Log.d(TAG, "Selected file count : " + sSelectedFileList.size());
+            LGFTPFragment.this.mInitialFileCount = sSelectedFileList.size();
+
+            if (sSelectedFileList.size() > 0) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        ArrayList<LGFTPFile> sTmpSelectedFileList = (ArrayList<LGFTPFile>) sSelectedFileList.clone();
+                        ArrayList<Integer> sTmpSelectedFilePositionList = (ArrayList<Integer>) mFTPFileListVIewAdapter.getSelectedFilePositionList().clone();
+                        try {
+                            for (int i = 0; i != sRepeatCount; ++i) {
+                                LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
+                                LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
+                                LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
+                                Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
+                                Thread.sleep(1000);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+            return true;
         }
     };
 

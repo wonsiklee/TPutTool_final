@@ -293,6 +293,12 @@ public class LGFTPClient {
         if (!sTargetDir.exists()) {
             Log.d(TAG, sTargetDir.getName() + " does not exist, hence make dir");
             sTargetDir.mkdir();
+        } else {
+            File sTargetFile = new File(sTargetDir + "/" + targetFile.getName());
+            if (sTargetFile.exists()) {
+                Log.d(TAG, "");
+                sTargetFile.delete();
+            }
         }
 
         if (!sTargetDir.canWrite()) {

@@ -17,7 +17,7 @@ import com.android.LGSetupWizard.R;
 
 import org.apache.commons.net.ftp.FTPFile;
 
-import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import lombok.Getter;
@@ -100,6 +100,8 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         return position;
     }
 
+    final static DecimalFormat DECIMAL_FORMATTER = new DecimalFormat(".##");
+
     @SuppressLint("ResourceAsColor")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -131,7 +133,17 @@ public class LGFTPFileListViewAdapter extends BaseAdapter {
         } else {
             sHolder.mFileSize.setVisibility(View.VISIBLE);
             sHolder.mIcon.setImageDrawable(this.mContext.getDrawable(R.drawable.ic_file));
-            sHolder.mFileSize.setText((ff.getSize() / 1024/ 1024) + " MB");
+
+            double sFileSize = ff.getSize();
+            double sCalculatedSize = (sFileSize / 1024/ 1024);
+            String sResultString;
+            if (sFileSize > 1073741824 ) {
+                sCalculatedSize /= 1024;
+                sResultString = (DECIMAL_FORMATTER.format(sCalculatedSize) + " GB");
+            } else {
+                sResultString = (DECIMAL_FORMATTER.format(sCalculatedSize) + " MB");
+            }
+            sHolder.mFileSize.setText(sResultString);
         }
 
         if (this.isFileSelectedAt(position)) {

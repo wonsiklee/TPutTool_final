@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,7 +23,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 public class EditTextDialog extends Dialog implements View.OnClickListener{
-    @Setter private String mDefaultValue ;
+    private String mDefaultValue ;
     @Setter private String mTitle = "title";
     @Setter private String mDescription = "description";
     @Setter private OnSetDialogListener mOnSetDialogListener;
@@ -42,6 +43,11 @@ public class EditTextDialog extends Dialog implements View.OnClickListener{
         mDefaultValue = defaultValue;
     }
 
+    public void setDefaultValue(String defaultValue){
+        mDefaultValue = defaultValue;
+        if(editText!=null)editText.setText((mDefaultValue!=null)?mDefaultValue:"");
+    }
+
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
@@ -57,6 +63,8 @@ public class EditTextDialog extends Dialog implements View.OnClickListener{
         editText= (EditText) findViewById(R.id.editText_dialog);
         editText.setText((mDefaultValue!=null)?mDefaultValue:"");
         editText.setInputType(mInputType);
+        editText.setOnFocusChangeListener(mEditFocusOutHideKeboardListener);
+
 
         btn_set = (Button) findViewById(R.id.btn_set_dialog);
         btn_set.setOnClickListener(this);
@@ -69,7 +77,14 @@ public class EditTextDialog extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if( v.getId() == btn_set.getId() ){
-            if(mOnSetDialogListener!=null)mOnSetDialogListener.onSelect(this, editText.getText().toString());
+            String editValue = editText.getText().toString();
+            if (mOnSetDialogListener != null) {
+                if (editValue != null && !editValue.isEmpty()) {
+                    mOnSetDialogListener.onSelect(this, editText.getText().toString());
+                }else{
+                    if(mOnSetDialogListener!=null)mOnSetDialogListener.onCancel(this);
+                }
+            }
         }
         if( v.getId() == btn_cancel.getId() ){
             if(mOnSetDialogListener!=null)mOnSetDialogListener.onCancel(this);
@@ -77,6 +92,26 @@ public class EditTextDialog extends Dialog implements View.OnClickListener{
         if( v.getId() == btn_delete.getId() ){
             if(mOnSetDialogListener!=null)mOnSetDialogListener.onDelete(this);
         }
+
         dismiss();
+    }
+    @Override
+    public void dismiss(){
+        editText.clearFocus();
+        super.dismiss();
+    }
+
+    private View.OnFocusChangeListener mEditFocusOutHideKeboardListener= new View.OnFocusChangeListener(){
+
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(!hasFocus){
+                hideKeyboard(v);
+            }
+        }
+    };
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
     }
 }

@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 @Accessors(prefix = "m")
 public class NumberPickerDialog extends Dialog implements View.OnClickListener {
 
-    @Setter private int mDefaultValue = 0;
+    private int mDefaultValue = 0;
     @Setter private int mMaxValue = Integer.MAX_VALUE;
     @Setter private int mMinValue = 0;
     @Setter private String mTitle = "title";
@@ -44,6 +44,10 @@ public class NumberPickerDialog extends Dialog implements View.OnClickListener {
         mDefaultValue = ((defaultValue < minValue || defaultValue > maxValue))? minValue : defaultValue;
     }
 
+    public void setDefaultValue(int defaultValue){
+        mDefaultValue = defaultValue;
+        if(mNumberPicker!=null) mNumberPicker.setValue(defaultValue);
+    }
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);

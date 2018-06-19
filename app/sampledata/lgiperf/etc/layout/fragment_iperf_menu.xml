@@ -9,22 +9,22 @@
         android:gravity="center">
         <Button
             android:id="@+id/btn_iperf_menu_back"
-            style="@style/IperfMenuStyle"
+            style="@style/IperfMenu"
             android:text="@string/iperf_menu_back"/>
 
         <Button
             android:id="@+id/btn_iperf_menu_add"
-            style="@style/IperfMenuStyle"
+            style="@style/IperfMenu"
             android:text="@string/iperf_menu_add"/>
 
         <Button
             android:id="@+id/btn_iperf_menu_delete"
-            style="@style/IperfMenuStyle"
+            style="@style/IperfMenu"
             android:textAllCaps="false"
             android:text="@string/iperf_menu_delete"/>
         <Button
             android:id="@+id/btn_iperf_menu_select"
-            style="@style/IperfMenuStyle"
+            style="@style/IperfMenu"
             android:textAllCaps="false"
             android:text="@string/iperf_menu_select"/>
     </LinearLayout>
@@ -42,26 +42,28 @@
             android:layout_height="wrap_content"
             android:gravity="center">
 
-            <Switch
+            <com.lge.kobinfactory.lgiperf.IperfSwitch
                 android:id="@+id/switch_iperf_menu_version"
-                style="@style/IperfSwitchStyle"
+                style="@style/IperfMenu"
+                android:showText="true"
                 android:textOff="@string/iperf_menu_version_2"
                 android:textOn="@string/iperf_menu_version_3" />
 
-            <Switch
+            <com.lge.kobinfactory.lgiperf.IperfSwitch
                 android:id="@+id/switch_iperf_menu_server_client"
-                style="@style/IperfSwitchStyle"
+                style="@style/IperfMenu"
+                android:showText="true"
                 android:textOff="@string/iperf_menu_server"
                 android:textOn="@string/iperf_menu_client" />
 
             <Button
                 android:id="@+id/btn_iperf_menu_host"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
                 android:text="@string/iperf_menu_host" />
 
             <Button
                 android:id="@+id/btn_iperf_menu_port"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
                 android:text="@string/iperf_menu_port"
                 />
             <!--                -->
@@ -72,27 +74,28 @@
             android:layout_height="wrap_content"
             android:gravity="center">
 
-            <Switch
+            <com.lge.kobinfactory.lgiperf.IperfSwitch
                 android:id="@+id/swtich_iperf_menu_tcp_udp"
-                style="@style/IperfSwitchStyle"
+                style="@style/IperfMenu"
+                android:showText="true"
                 android:textOff="@string/iperf_menu_tcp"
                 android:textOn="@string/iperf_menu_udp" />
 
             <Button
                 android:id="@+id/btn_iperf_menu_rate"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
                 android:text="@string/iperf_menu_rate"
                 />
 
             <Button
                 android:id="@+id/btn_iperf_menu_duration"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
                 android:text="@string/iperf_menu_duration"
                  />
 
             <Button
                 android:id="@+id/btn_iperf_menu_interval"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
                 android:text="@string/iperf_menu_interval"
                 />
         </LinearLayout>
@@ -104,13 +107,15 @@
 
             <Button
                 android:id="@+id/btn_iperf_menu_steams"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
+                android:layout_weight="1"
                 android:text="@string/iperf_menu_stream"
                 />
 
             <Button
                 android:id="@+id/btn_iperf_menu_others"
-                style="@style/IperfMenuStyle"
+                style="@style/IperfMenu"
+                android:layout_weight="3"
                 android:text="@string/iperf_menu_other"
                 />
         </LinearLayout>

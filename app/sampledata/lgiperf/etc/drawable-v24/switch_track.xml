@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"
+    android:visible="true"
+    android:dither="true"
+    android:useLevel="false">
+    <size
+        android:width="@dimen/iperf_swtich_track_width"
+        android:height="@dimen/iperf_swtich_track_height"/>
+    <solid android:color="@color/iperf_switch_track_color" />
+    <corners android:radius="@dimen/iperf_switch_radius"/>
+</shape>

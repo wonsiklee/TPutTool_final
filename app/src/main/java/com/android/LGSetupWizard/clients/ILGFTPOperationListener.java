@@ -1,5 +1,6 @@
 package com.android.LGSetupWizard.clients;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
@@ -19,7 +20,7 @@ public interface ILGFTPOperationListener {
     // download
     void onDownloadProgressPublished(float tputValue, long downloadedBytes);
     void onDownloadStarted(LGFTPFile fileName);
-    void onDownloadFinished(boolean wasSuccessful, @Nullable File file, float avgTPut);
+    void onDownloadFinished(boolean wasSuccessful, @NonNull File file, float avgTPut);
 
     // file exploring
     void onChangeWorkingDirectoryFinished(ArrayList<LGFTPFile> fileList);

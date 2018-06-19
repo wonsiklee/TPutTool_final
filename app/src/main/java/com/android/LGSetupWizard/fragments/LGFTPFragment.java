@@ -355,7 +355,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         public void onDownloadFinished(boolean result, File file, float avgTPut) {
             Log.d(TAG, "onDownloadFinished() " + result + ", " + file.toString());
             if (result) {
-                new MediaScanning(LGFTPFragment.this.getContext(), file);
+                if (LGFTPFragment.this.mSwitchFileIO.isChecked()) {
+                    new MediaScanning(LGFTPFragment.this.getContext(), file);
+                }
                 LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().remove(0);
             }
 
@@ -662,9 +664,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             for (int i = 0; i != sRepeatCount; ++i) {
                                 LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                                LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
-                                Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
-                                Thread.sleep(1000);
+                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked())) {
+                                    Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left, delaying for 3 secs");
+                                    Thread.sleep(3000);
+                                } else {
+                                    Toast.makeText(LGFTPFragment.this.getContext(), "다운로드가 취소되었습니다.", Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG, "Download has been cancelled.");
+                                    break;
+                                }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

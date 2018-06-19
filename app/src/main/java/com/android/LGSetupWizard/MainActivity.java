@@ -1,9 +1,11 @@
 package com.android.LGSetupWizard;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentActivity;
@@ -71,6 +73,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy()");
+        WAKE_LOCK.release();
         super.onDestroy();
     }
 
@@ -87,6 +90,8 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         super.onPause();
     }
 
+
+    private static PowerManager.WakeLock WAKE_LOCK;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate()");
@@ -101,6 +106,9 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
         this.mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
         this.mNavigation.setOnNavigationItemSelectedListener(this);
+
+        WAKE_LOCK = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+        WAKE_LOCK.acquire();
     }
 
     @Override

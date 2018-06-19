@@ -150,7 +150,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
 
         this.mBtnConnectDisconnect = (Button) this.mView.findViewById(R.id.btn_connect_disconnect);
-        if (this.mLGFtpClient.isConnected()) {
+        if (this.mLGFtpClient != null && this.mLGFtpClient.isConnected()) {
             this.mBtnConnectDisconnect.setOnClickListener(this.mClickListenerDisconnect);
         } else {
             this.mBtnConnectDisconnect.setOnClickListener(this.mClickListenerConnect);
@@ -340,7 +340,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         @Override
         public void onDownloadProgressPublished(float tputValue, long downloadedBytes) {
-            Log.d(TAG, "onDownloadProgressPublished(float tputValue, long downloadedBytes) : " + tputValue + ", " + downloadedBytes + " bytes");
+            //Log.d(TAG, "onDownloadProgressPublished(float tputValue, long downloadedBytes) : " + tputValue + ", " + downloadedBytes + " bytes");
             LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.updateProgressValue(((float) downloadedBytes / mDownloadingFileSize) * 100, downloadedBytes, tputValue);
         }
 
@@ -729,7 +729,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 new Thread() {
                     @Override
                     public void run() {
-                        if (LGFTPFragment.this.mLGFtpClient.stopDownload()) {
+                        boolean ret = LGFTPFragment.this.mLGFtpClient.stopDownloadAndCancelTheRest();
+                        Log.d(TAG, "cancel result = " + ret);
+                        if (ret) {
                             mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_CANCELLED);
                         }
                     }

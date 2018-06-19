@@ -650,7 +650,15 @@ public class LGFTPClient {
     }
 
     public boolean stopDownloadAndCancelTheRest() {
-        new Thread() {
+
+        Log.d(TAG, "force closing inputStream.");
+        try {
+            mInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*new Thread() {
             @Override
             public void run() {
                 Log.d(TAG, "force closing inputStream.");
@@ -660,7 +668,7 @@ public class LGFTPClient {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        }.start();*/
 
         return true;
     }

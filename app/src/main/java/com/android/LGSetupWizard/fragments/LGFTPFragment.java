@@ -485,6 +485,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     Log.d(TAG, "MSG_FILE_DOWNLOAD_CANCELLED");
                     LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                     LGFTPFragment.this.dismissFileDownloadProgressBar();
+                    LGFTPFragment.this.mDownloadResult = false;
                     break;
 
                 case MSG_FILE_DOWNLOAD_FINISHED: {
@@ -516,8 +517,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                         }
                         LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
+                        LGFTPFragment.this.mDownloadResult = false;
                     }
-
                     break;
 
                 case MSG_FILE_DOWNLOAD_UPDATE_DIALOG_INFO:
@@ -732,8 +733,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
             /* TODO : UI has been handled within the handler message code above
              *  but need to cleanup the download thread.*/
-            if (!LGFTPFragment.this.mDownloadResult) {
-                new Thread() {
+            if (!LGFTPFragment.this.mDownloadResult) { // 여기가 문제 TODO
+
+                boolean ret = LGFTPFragment.this.mLGFtpClient.stopDownloadAndCancelTheRest();
+                Log.d(TAG, "cancel result = " + ret);
+                if (ret) {
+                    mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_CANCELLED);
+                }
+                /*new Thread() {
                     @Override
                     public void run() {
                         boolean ret = LGFTPFragment.this.mLGFtpClient.stopDownloadAndCancelTheRest();
@@ -742,7 +749,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_CANCELLED);
                         }
                     }
-                }.start();
+                }.start();*/
             }
 
         } else {

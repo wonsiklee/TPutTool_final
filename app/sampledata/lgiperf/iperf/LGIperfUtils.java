@@ -37,7 +37,7 @@ public class LGIperfUtils {
             VALID_DNS_PATTERN  = Pattern.compile(DNS_PATTERN, Pattern.CASE_INSENSITIVE);
             VALID_RATE_PATTERN  = Pattern.compile(RATE_PATTERN, Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException e) {
-            Log.d(TAG,"not initial lize pattter!");
+            Log.d(TAG,"not initialize pattern!");
         }
     }
 

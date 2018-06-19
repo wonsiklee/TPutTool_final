@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,8 +29,8 @@ import lombok.experimental.Accessors;
 @Accessors(prefix="m")
 public class EditTextUnitDialog extends Dialog implements View.OnClickListener{
     private Context mContext;
-    @Setter private String mDefaultValue;
-    @Setter private int mDefaultUnitPosition;
+    private String mDefaultValue;
+    private int mDefaultUnitPosition;
 
     private List<String> mUnitList;
 
@@ -44,6 +45,15 @@ public class EditTextUnitDialog extends Dialog implements View.OnClickListener{
     private Spinner spinner_dialog;
 
     @Setter private int mInputType = InputType.TYPE_CLASS_TEXT;
+
+    public void setDefaultValue(String defaultValue){
+        mDefaultValue= defaultValue;
+        if(editText!=null)editText.setText((mDefaultValue !=null)? mDefaultValue : "");
+    }
+    public void setDefaultUnitPosition(int position){
+        mDefaultUnitPosition = position;
+        if(spinner_dialog!=null)spinner_dialog.setSelection(mDefaultUnitPosition);
+    }
 
     public EditTextUnitDialog(@NonNull Context context, String title, String description,
                               String defaultValue, int defaultUnitPosition, List<String> unitList) {
@@ -72,6 +82,7 @@ public class EditTextUnitDialog extends Dialog implements View.OnClickListener{
         editText= (EditText) findViewById(R.id.editText_dialog);
         editText.setText((mDefaultValue !=null)? mDefaultValue : "");
         editText.setInputType(mInputType);
+        editText.setOnFocusChangeListener(mEditFocusOutHideKeboardListener);
 
         spinner_dialog = (Spinner) findViewById(R.id.spinner_dialog);
         ArrayAdapter<String> spinner_Adpator = new ArrayAdapter<String>(mContext,android.R.layout.simple_spinner_item, mUnitList);
@@ -90,7 +101,14 @@ public class EditTextUnitDialog extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if( v.getId() == btn_set.getId() ){
-            if(mOnSetDialogListener!=null)mOnSetDialogListener.onSelect(this, editText.getText().toString(), spinner_dialog.getSelectedItemPosition());
+            String editValue = editText.getText().toString();
+            if (mOnSetDialogListener != null) {
+                if (editValue != null && !editValue.isEmpty()) {
+                    mOnSetDialogListener.onSelect(this, editText.getText().toString(),spinner_dialog.getSelectedItemPosition());
+                }else{
+                    if(mOnSetDialogListener!=null)mOnSetDialogListener.onCancel(this);
+                }
+            }
         }
         if( v.getId() == btn_cancel.getId() ){
             if(mOnSetDialogListener!=null)mOnSetDialogListener.onCancel(this);
@@ -100,6 +118,25 @@ public class EditTextUnitDialog extends Dialog implements View.OnClickListener{
         }
         dismiss();
     }
+    @Override
+    public void dismiss(){
+        editText.clearFocus();
+        super.dismiss();
+    }
 
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+    }
+
+    private View.OnFocusChangeListener mEditFocusOutHideKeboardListener= new View.OnFocusChangeListener(){
+
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(!hasFocus){
+                hideKeyboard(v);
+            }
+        }
+    };
 
 }

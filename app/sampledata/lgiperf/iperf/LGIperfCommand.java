@@ -13,6 +13,8 @@ import lombok.experimental.Accessors;
 @Accessors(prefix="m")
 public class LGIperfCommand {
     private static final boolean DBG = false;
+    private static final String TAG = LGIperfCommand.class.getSimpleName();
+
     @Getter @Setter private int mVersion;
     @Getter @Setter private int mMode = LGIperfConstants.IPERF_NOT_SET;
     @Getter @Setter private String mHost;
@@ -27,7 +29,6 @@ public class LGIperfCommand {
 
     @Getter private boolean isValid = true;
 
-    private static final String TAG = LGIperfCommand.class.getSimpleName();
 
     public LGIperfCommand(String command){
 

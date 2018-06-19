@@ -7,19 +7,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Switch
+        <com.lge.kobinfactory.lgiperf.IperfSwitch
             android:id="@+id/switch_iperf_version"
-            style = "@style/IperfSwitchStyle"
+            style = "@style/IperfStyle"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:checked="false"
-            android:textOn="@string/iperf_version3"
-            android:textOff="@string/iperf_version2"
+            android:showText="true"
+            android:textOn="@string/iperf_menu_version_3"
+            android:textOff="@string/iperf_menu_version_2"
             />
 
         <ToggleButton
             android:id ="@+id/toggleBtn_iperf_start_n_stop"
-            style = "@style/IperfMenuStyle"
+            style = "@style/IperfStyle"
             android:layout_alignParentRight="true"
             android:checked="false"
             android:textOn="@string/iperf_stop"
@@ -32,7 +33,7 @@
 
         <Button
             android:id="@+id/btn_iperf_advanced"
-            style="@style/IperfMenuStyle"
+            style="@style/IperfStyle"
             android:layout_alignParentRight="true"
             android:text="@string/iperf_advanced"/>
         <EditText

@@ -39,8 +39,8 @@ public class LGIperfClient {
     @Setter public int mIperfVersion;
     private String currentOption;
 
-    private OnStateChangeListener mListener;
-    public void setOnStateChangeListener (OnStateChangeListener listener){
+    private LGIperfClient.OnStateChangeListener mListener;
+    public void setOnStateChangeListener (LGIperfClient.OnStateChangeListener listener){
         mListener = listener;
     }
 

@@ -31,8 +31,8 @@
     <string name="iperf_menu_select">Select</string>
     <string name="iperf_menu_version_2">V2</string>
     <string name="iperf_menu_version_3">V3</string>
-    <string name="iperf_menu_server">Sever</string>
-    <string name="iperf_menu_client">Client</string>
+    <string name="iperf_menu_server">S</string>
+    <string name="iperf_menu_client">C</string>
     <string name="iperf_menu_host">Host</string>
     <string name="iperf_menu_reverse">Reverse(-R)</string>
     <string name="iperf_menu_tcp">TCP</string>

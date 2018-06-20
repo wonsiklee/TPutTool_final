@@ -26,6 +26,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -68,6 +70,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private Button mBtnDLULStartStop;
 
     private ListView mFTPFileListView;
+
+    private RadioGroup mRadioGroupMethodType;
+    private RadioButton mRadioButtonConventionalMethod;
+    private RadioButton mRadioButtonApacheMethod;
+    private RadioButton mRadioButtonFileChannelMethod;
 
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
@@ -185,10 +192,30 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
 
+        this.mRadioGroupMethodType = this.mView.findViewById(R.id.radioGroup_method_type);
+        this.mRadioButtonConventionalMethod = this.mView.findViewById(R.id.radioButton_method_type_conventional);
+        this.mRadioButtonApacheMethod = this.mView.findViewById(R.id.radioButton_method_type_apache);
+        this.mRadioButtonFileChannelMethod= this.mView.findViewById(R.id.radioButton_method_type_file_channel);
+
+        this.mRadioGroupMethodType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == mRadioButtonConventionalMethod.getId()) {
+                    mCheckedMethod = 0x00;
+                } else if (checkedId == mRadioButtonApacheMethod.getId()) {
+                    mCheckedMethod = 0x01;
+                } else if (checkedId == mRadioButtonFileChannelMethod.getId()) {
+                    mCheckedMethod = 0x02;
+                }
+            }
+        });
         this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
         Log.d(TAG, "onResume() completed");
     }
+
+    private int mCheckedMethod;
+
 
     /* file download progress dialog show/hide [START] */
     private void showFileDownloadProgressBar() {
@@ -631,7 +658,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             for (int i = 0; i != sRepeatCount; ++i) {
                                 LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                                LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked());
+                                LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked(), mCheckedMethod);
                                 Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
                                 Thread.sleep(1000);
                             }
@@ -665,7 +692,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             for (int i = 0; i != sRepeatCount; ++i) {
                                 LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked())) {
+                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mSwitchFileIO.isChecked(), mCheckedMethod)) {
                                     Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left, delaying for 3 secs");
                                     Thread.sleep(3000);
                                 } else {

@@ -10,7 +10,7 @@ android {
     }
     defaultConfig {
         applicationId "com.android.LGSetupWizard"
-        minSdkVersion 25
+        minSdkVersion 26
         targetSdkVersion 26
         versionCode 90000000
         versionName "9.0.0.0"

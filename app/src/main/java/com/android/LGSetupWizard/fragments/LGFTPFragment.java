@@ -14,6 +14,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -96,12 +98,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static private String KEY_AVG_TPUT = "avg_tput";
     final static private String KEY_LOGIN_RESULT = "login_result";
 
+    private String mMccMnc;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LGFTPFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
-        mInitialFileCount = Integer.MIN_VALUE;
+        this.mInitialFileCount = Integer.MIN_VALUE;
+        this.mMccMnc = ((TelephonyManager) this.getContext().getSystemService(Context.TELEPHONY_SERVICE)).getNetworkOperator();
     }
 
     @Nullable
@@ -163,10 +167,32 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mBtnConnectDisconnect.setOnClickListener(this.mClickListenerConnect);
         }
 
-        this.mEditTextServerAddress = (EditText) this.mView.findViewById(R.id.editText_server_addr);
-        this.mEditTextPortNum = (EditText) this.mView.findViewById(R.id.editText_port_num);
-        this.mEditTextUserID = (EditText) this.mView.findViewById(R.id.editText_user_id);
-        this.mEditTextPassword = (EditText) this.mView.findViewById(R.id.editText_password);
+        this.mEditTextServerAddress = this.mView.findViewById(R.id.editText_server_addr);
+        this.mEditTextPortNum = this.mView.findViewById(R.id.editText_port_num);
+        this.mEditTextUserID = this.mView.findViewById(R.id.editText_user_id);
+        this.mEditTextPassword = this.mView.findViewById(R.id.editText_password);
+
+        if (this.mMccMnc.equals("00101")) {
+            this.mEditTextServerAddress.setText("192.168.1.2");
+            this.mEditTextPortNum.setText("21");
+            this.mEditTextUserID.setText("user");
+            this.mEditTextServerAddress.setText("@lge1234");
+        } else if (this.mMccMnc.equals("45005")) {
+            this.mEditTextServerAddress.setText("sdftp.nate.com");
+            this.mEditTextPortNum.setText("21");
+            this.mEditTextUserID.setText("suser");
+            this.mEditTextServerAddress.setText("s!sdqns2121");
+        } else if (this.mMccMnc.contains("450")) {
+            this.mEditTextServerAddress.setText("203.229.247.254");
+            this.mEditTextPortNum.setText("21");
+            this.mEditTextUserID.setText("testbed01");
+            this.mEditTextServerAddress.setText("gprs@tbed!01");
+        } else {
+            this.mEditTextServerAddress.setText("127.0.0.1");
+            this.mEditTextPortNum.setText("2221");
+            this.mEditTextUserID.setText("test");
+            this.mEditTextServerAddress.setText("test");
+        }
 
         if (!this.isNetworkAvailable()) {
             this.mBtnConnectDisconnect.setEnabled(false);

@@ -15,7 +15,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -34,13 +33,13 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.LGSetupWizard.database.TestResultDBManager;
-import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
-import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
+import com.android.LGSetupWizard.clients.LGFTPClient;
+import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.data.MediaScanning;
+import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.database.TestResultPopupWindow;
 
 import java.io.File;
@@ -176,22 +175,22 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mEditTextServerAddress.setText("192.168.1.2");
             this.mEditTextPortNum.setText("21");
             this.mEditTextUserID.setText("user");
-            this.mEditTextServerAddress.setText("@lge1234");
+            this.mEditTextPassword.setText("@lge1234");
         } else if (this.mMccMnc.equals("45005")) {
             this.mEditTextServerAddress.setText("sdftp.nate.com");
             this.mEditTextPortNum.setText("21");
             this.mEditTextUserID.setText("suser");
-            this.mEditTextServerAddress.setText("s!sdqns2121");
+            this.mEditTextPassword.setText("s!sdqns2121");
         } else if (this.mMccMnc.contains("450")) {
             this.mEditTextServerAddress.setText("203.229.247.254");
             this.mEditTextPortNum.setText("21");
             this.mEditTextUserID.setText("testbed01");
-            this.mEditTextServerAddress.setText("gprs@tbed!01");
+            this.mEditTextPassword.setText("gprs@tbed!01");
         } else {
             this.mEditTextServerAddress.setText("127.0.0.1");
             this.mEditTextPortNum.setText("2221");
             this.mEditTextUserID.setText("test");
-            this.mEditTextServerAddress.setText("test");
+            this.mEditTextPassword.setText("test");
         }
 
         if (!this.isNetworkAvailable()) {

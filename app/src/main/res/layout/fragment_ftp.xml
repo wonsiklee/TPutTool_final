@@ -93,7 +93,7 @@
                 android:layout_marginRight="15dp"
                 android:maxLines="1"
                 android:minLines="1"
-                android:text="user"
+                android:text="test"
                 android:textAlignment="center"
                 android:textSize="15sp" />
 
@@ -108,7 +108,7 @@
                 android:layout_width="100sp"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:text="user"
+                android:text="test"
                 android:textAlignment="center"
                 android:singleLine="true"
                 android:password="true"/>
@@ -165,7 +165,8 @@
     <LinearLayout
         android:id="@+id/ll_method_type"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
         <RadioGroup
             android:id="@+id/radioGroup_method_type"
             android:layout_width="match_parent"
@@ -175,7 +176,7 @@
                 android:id="@+id/radioButton_method_type_conventional"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="고전"
+                android:text="outputStream"
                 android:checked="true"/>
             <RadioButton
                 android:id="@+id/radioButton_method_type_apache"

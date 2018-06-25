@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
@@ -15,6 +16,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
 
@@ -94,7 +96,26 @@ public class LGFTPClient {
         };*/
     }
 
-    //
+    private boolean mShouldTerminateTestLoop = true;
+    private ProtocolCommandListener mFTPProtocolListener = new ProtocolCommandListener() {
+        @Override
+        public void protocolCommandSent(ProtocolCommandEvent event) {
+            Log.d(TAG, "protocolCommandSent : " + event.getMessage());
+        }
+
+        @Override
+        public void protocolReplyReceived(ProtocolCommandEvent event) {
+            Log.d(TAG, "protocolReplyReceived : " + event.getMessage());
+            if (event.getReplyCode() == FTPReply.TRANSFER_ABORTED) {
+                Log.d(TAG, "mark to terminate test loop");
+                mShouldTerminateTestLoop = true;
+            } else if (event.getReplyCode() == FTPReply.SERVICE_NOT_AVAILABLE) {
+                Log.d(TAG, "perform connectToServer due to 421 response");
+                //LGFTPClient.this.connectToServer(mServerAddress, mPortNum, mUserID, mPassword);
+                LGFTPClient.this.disconnectFromServer();
+            }
+        }
+    };
     public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password) {
         Log.d(TAG, "connectToServer() " + serverAddress);
         this.mServerAddress = serverAddress;
@@ -105,23 +126,21 @@ public class LGFTPClient {
         boolean sResult = false;
 
         this.mFTPClient = new FTPClient();
-        this.mFTPClient.setControlEncoding("euc-kr");
-        this.mFTPClient.addProtocolCommandListener(new ProtocolCommandListener() {
-            @Override
-            public void protocolCommandSent(ProtocolCommandEvent event) {
-                Log.d(TAG, "sent cmd : " + event.getMessage());
-            }
-
-            @Override
-            public void protocolReplyReceived(ProtocolCommandEvent event) {
-                Log.d(TAG, "received reply : " + event.getMessage());
-            }
-        });
+        this.mFTPClient.setControlEncoding("UTF-8");
+        this.mFTPClient.setConnectTimeout(10 * 1000);
+        this.mFTPClient.setDefaultTimeout(20 * 1000);
+        this.mFTPClient.addProtocolCommandListener(mFTPProtocolListener);
 
         ArrayList<LGFTPFile> fileList = null;
 
         try {
             this.mFTPClient.connect(serverAddress, portNum);
+            if (this.mFTPClient instanceof FTPSClient) {
+                Log.d(TAG, "FTP Cafe mimic, instance of FTPSClient");
+                ((FTPSClient)this.mFTPClient).execPBSZ(0L);
+
+                ((FTPSClient)this.mFTPClient).execPROT("C");
+            }
             int reply = mFTPClient.getReplyCode();
             Log.d(TAG, "server connect reply : " + reply);
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -136,6 +155,7 @@ public class LGFTPClient {
                     fileList = getFileList();
                     mConnectionKeepAliveHandler.sendEmptyMessage(MSG_START_KEEP_ALIVE_CONNECTION);
                 }
+                //sendCommandAndGetReply("FEAT");
             }
         } catch (SocketException e) {
             e.printStackTrace();
@@ -148,6 +168,22 @@ public class LGFTPClient {
         }
     }
 
+    private void sendCommandAndGetReply(String cmd) {
+        try {
+            if (FTPReply.isPositiveCompletion(this.mFTPClient.sendCommand(cmd))) {
+                String sReplyString = this.mFTPClient.getReplyString();
+                Log.d(TAG, cmd + " replyString : " + sReplyString);
+                String[] sReplyStringArray = this.mFTPClient.getReplyStrings();
+                Log.d(TAG, "ArrayPrint START");
+                for (String str : sReplyStringArray) {
+                    Log.d(TAG, cmd + " replyString : " + str);
+                }
+                Log.d(TAG, "ArrayPrint END");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void disconnectFromServer() {
         mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
         logoutFromServer();
@@ -179,7 +215,10 @@ public class LGFTPClient {
     }
 
     public boolean isAvailable() {
-        return this.mFTPClient.isAvailable();
+        if (this.mFTPClient != null && this.mFTPClient.isAvailable()) {
+            return true;
+        }
+        return false;
     }
 
     public boolean isConnected() {
@@ -408,9 +447,10 @@ public class LGFTPClient {
           http://www.codejava.net/java-se/networking/ftp/java-ftp-file-download-tutorial-and-example
     * */
     public boolean retrieveFile(LGFTPFile remoteFile, boolean shouldWrite) {
+        mShouldTerminateTestLoop = true;
         boolean ret;
 
-        Log.d(TAG, "setUseEPSVwithIPv4(");
+        Log.d(TAG, "setUseEPSVwithIPv4()");
         this.mFTPClient.setUseEPSVwithIPv4(true);
 
         //Log.d(TAG, "enterLocalPassiveMode()");
@@ -466,7 +506,7 @@ public class LGFTPClient {
 
         if (!sTargetDir.canWrite()) {
             Log.e(TAG, "ERROR : Cannot write logs to dir");
-            //throw new Exception("File cannot be written");
+            return false;
         }
 
         sTargetFile = new File(sTargetDir + "/" + sRemoteFileName);
@@ -490,7 +530,9 @@ public class LGFTPClient {
         FileOutputStream sFileOutputStream = null;
         try {
             sFileOutputStream =  new FileOutputStream(targetFile.getAbsolutePath(), false);
+            Log.d(TAG, "retrievingFileStream...");
             mInputStream = this.mFTPClient.retrieveFileStream(remoteFile.getName());
+            Log.d(TAG, "file stream retrieved... : " + mInputStream.available());
 
             Message msg = LGFTPClient.this.mTPutCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
@@ -508,7 +550,8 @@ public class LGFTPClient {
             // 3. inform the fragment that file DL has been started.
             LGFTPClient.this.mOperationListener.onDownloadStarted(remoteFile);
 
-            byte[] sBytesArray = new byte[20971520]; // 20 MBytes
+            //byte[] sBytesArray = new byte[20971520]; // 20 MBytes
+            byte[] sBytesArray = new byte[24576]; // 20 MBytes
             int sBytesRead = -1;
             while ((sBytesRead = mInputStream.read(sBytesArray)) != -1) {
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;
@@ -518,7 +561,12 @@ public class LGFTPClient {
 
             Log.d(TAG, "conventional duration : " + (mElapsedTime/1000.0f));
             sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
-            ret = this.mFTPClient.completePendingCommand();
+            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
+            if (mShouldTerminateTestLoop) {
+                ret = false;
+            } else {
+                ret = this.mFTPClient.completePendingCommand();
+            }
 
             if (ret) {
                 Log.d(TAG, "Download successful");
@@ -535,6 +583,11 @@ public class LGFTPClient {
         } catch (IOException e) {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());
+            try {
+                this.mFTPClient.abort();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         } finally {
             LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
             // 4. invoke callback
@@ -610,7 +663,13 @@ public class LGFTPClient {
             Log.d(TAG, "apache duration : " + (mElapsedTime/1000.0f));
             sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
             this.mFTPClient.setCopyStreamListener(null);
-            ret = this.mFTPClient.completePendingCommand();
+
+            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
+            if (mShouldTerminateTestLoop) {
+                ret = false;
+            } else {
+                ret = this.mFTPClient.completePendingCommand();
+            }
 
             if (ret) {
                 Log.d(TAG, "Download successful");
@@ -702,7 +761,12 @@ public class LGFTPClient {
             }
 
             // 5. retrieve result.
-            ret = this.mFTPClient.completePendingCommand();
+            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
+            if (mShouldTerminateTestLoop) {
+                ret = false;
+            } else {
+                ret = this.mFTPClient.completePendingCommand();
+            }
 
             if (ret) {
                 Log.d(TAG, "Download successful");
@@ -840,7 +904,8 @@ public class LGFTPClient {
             // 3. inform the fragment that file DL has been started.
             LGFTPClient.this.mOperationListener.onDownloadStarted(targetFile);
 
-            byte[] sBytesArray = new byte[20971520]; // 20 MBytes
+            //byte[] sBytesArray = new byte[20971520]; // 20 MBytes
+            byte[] sBytesArray = new byte[24576]; // 20 MBytes
             int sBytesRead = -1;
             while ((sBytesRead = mInputStream.read(sBytesArray)) != -1) {
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;
@@ -848,7 +913,12 @@ public class LGFTPClient {
             }
 
             sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
-            ret = this.mFTPClient.completePendingCommand();
+            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
+            if (mShouldTerminateTestLoop) {
+                ret = false;
+            } else {
+                ret = this.mFTPClient.completePendingCommand();
+            }
 
             if (ret) {
                 Log.d(TAG, "Download successful");
@@ -898,23 +968,24 @@ public class LGFTPClient {
     public boolean stopDownloadAndCancelTheRest() {
 
         Log.d(TAG, "force closing inputStream.");
-        try {
+        /*try {
             mInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        /*new Thread() {
+        new Thread() {
             @Override
             public void run() {
                 Log.d(TAG, "force closing inputStream.");
                 try {
-                    mInputStream.close();
+
+                    Log.d(TAG, "closing result = " + mFTPClient.abort());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        }.start();*/
+        }.start();
 
         return true;
     }

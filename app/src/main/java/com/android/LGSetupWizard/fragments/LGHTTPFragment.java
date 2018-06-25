@@ -40,7 +40,8 @@ import lombok.experimental.Accessors;
 public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
 
-    private String testAddr = "http://tool.xcdn.gdms.lge.com/swdata/MOBILESYNC/GO/P5.3.23.20150119/LGPCSuite/Autorun/LGPCSuite_Setup.exe";
+    private String testAddr = "http://192.168.1.2/1G";
+    //private String testAddr = "http://tool.xcdn.gdms.lge.com/swdata/MOBILESYNC/GO/P5.3.23.20150119/LGPCSuite/Autorun/LGPCSuite_Setup.exe";
     //private String testAddr = null;
 
     private static final int START_TEST = 0x00;

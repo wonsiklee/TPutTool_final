@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -52,6 +53,14 @@
                 android:text="2221"
                 android:textAlignment="center"
                 android:textSize="15sp" />
+
+            <ImageButton
+                android:id="@+id/imgBtn_history"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/test_logs" />
         </LinearLayout>
 
         <LinearLayout
@@ -84,7 +93,8 @@
                 android:id="@+id/txtView_id"
                 android:layout_width="30sp"
                 android:layout_height="wrap_content"
-                android:text="ID"/>
+                android:text="ID"
+                tools:ignore="HardcodedText" />
 
             <EditText
                 android:id="@+id/editText_user_id"
@@ -95,7 +105,8 @@
                 android:minLines="1"
                 android:text="test"
                 android:textAlignment="center"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/txtView_password"
@@ -122,19 +133,15 @@
         android:layout_height="wrap_content"
         android:gravity="right"
         android:animateLayoutChanges="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginEnd="5dp">
 
-        <ImageButton
-            android:id="@+id/imgBtn_history"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="15dp"
-            android:background="@drawable/test_logs" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="반복 "/>
+            android:text="반복 "
+            tools:ignore="HardcodedText" />
         <Spinner
             android:id="@+id/spinner_ftp_download_repeat_count"
             android:layout_width="wrap_content"
@@ -146,50 +153,83 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:text="회"/>
-        <Switch
-            android:id="@+id/switch_file_IO_enabler"
+            android:text="회"
+            tools:ignore="HardcodedText" />
+        <CheckBox
+            android:id="@+id/checkbox_use_file_IO"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
             android:checked="true"
             android:text="File I/O"
-            android:textOff="File I/O"
-            android:textOn="File I/O" />
+            tools:ignore="HardcodedText" />
 
-        <Button
-            android:id="@+id/btn_ftp_download"
+        <CheckBox
+            android:id="@+id/checkbox_set_passive"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Download" />
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|end"
+            android:text="Passive"
+            android:checked="true"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
+
     <LinearLayout
-        android:id="@+id/ll_method_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
-        <RadioGroup
-            android:id="@+id/radioGroup_method_type"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/ll_method_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <RadioButton
-                android:id="@+id/radioButton_method_type_conventional"
+            android:gravity="end">
+            <!--android:visibility="gone">-->
+            <RadioGroup
+                android:id="@+id/radioGroup_method_type"
+                android:layout_width="0dp"
+                android:layout_weight="7"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <RadioButton
+                    android:id="@+id/radioButton_method_type_conventional"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FileOutputStream"
+                    android:checked="true"
+                    tools:ignore="HardcodedText" />
+
+                <RadioButton
+                    android:id="@+id/radioButton_method_type_apache"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="아파치"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText" />
+
+                <RadioButton
+                    android:id="@+id/radioButton_method_type_file_channel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FileChannel"
+                    tools:ignore="HardcodedText" />
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/btn_ftp_download"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="outputStream"
-                android:checked="true"/>
-            <RadioButton
-                android:id="@+id/radioButton_method_type_apache"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="아파치"/>
-            <RadioButton
-                android:id="@+id/radioButton_method_type_file_channel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="파일 채널"/>
-        </RadioGroup>
+                android:gravity="center_vertical|end"
+                android:text="Download"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
     </LinearLayout>
+
     <ListView
         android:id="@+id/listView_ftpFileList"
         android:layout_width="match_parent"

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -67,36 +67,13 @@ public class LGFTPClient {
     private int mPortNum;
     private String mUserID;
     private String mPassword;
+    private boolean mUsePassive;
 
     public LGFTPClient(ILGFTPOperationListener operationListener) {
         this.mOperationListener = operationListener;
-        //this.mIsForcedAbort = false;
-
-       /* this.mCopyStreamListener = new CopyStreamListener() {
-            @Override
-            public void bytesTransferred(CopyStreamEvent event) {
-                Log.d(TAG + " copyStream", "bytesTransferred(CopyStreamEvent) " + event.toString());
-                // TODO
-            }
-
-            @Override
-            public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-                LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTimeForCalculationHandler;
-                *//*Log.d(TAG, "totalBytesTransferred = " + totalBytesTransferred + " bytes\n" +
-                        "bytesTransferred = " + bytesTransferred + " bytes\n" +
-                        "streamSize = " + streamSize + " bytes");*//*
-                mDownloadedBytes = totalBytesTransferred;
-                LGFTPClient.this.mAvgTPut = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
-                Log.d(TAG + " copyStream", "totalBytesTransferred = " + totalBytesTransferred + " bytes");
-                Log.d(TAG + " copyStream", "bytesTransferred = " + bytesTransferred + " bytes");
-                Log.d(TAG + " copyStream", "AvgTput : " + mAvgTPut);
-                // TODO
-                //LGFTPClient.this.mOperationListener.onDownloadProgressPublished(LGFTPClient.this.mAvgTPut, mDownloadedBytes);
-            }
-        };*/
     }
 
-    private boolean mShouldTerminateTestLoop = true;
+    private boolean mIsForcibleTerminate = false;
     private ProtocolCommandListener mFTPProtocolListener = new ProtocolCommandListener() {
         @Override
         public void protocolCommandSent(ProtocolCommandEvent event) {
@@ -107,26 +84,30 @@ public class LGFTPClient {
         public void protocolReplyReceived(ProtocolCommandEvent event) {
             Log.d(TAG, "protocolReplyReceived : " + event.getMessage());
             if (event.getReplyCode() == FTPReply.TRANSFER_ABORTED) {
-                Log.d(TAG, "mark to terminate test loop");
-                mShouldTerminateTestLoop = true;
+
+            } else if (event.getReplyCode() == FTPReply.CLOSING_DATA_CONNECTION) {
+                Log.d(TAG, "getCommand() : " + event.getCommand());
+                Log.d(TAG, "getMessage() : " + event.getMessage() );
+
+                //connectToServer();
             } else if (event.getReplyCode() == FTPReply.SERVICE_NOT_AVAILABLE) {
                 Log.d(TAG, "perform connectToServer due to 421 response");
-                //LGFTPClient.this.connectToServer(mServerAddress, mPortNum, mUserID, mPassword);
                 LGFTPClient.this.disconnectFromServer();
             }
         }
     };
-    public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password) {
+
+    public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password, boolean usePassiveMode) {
         Log.d(TAG, "connectToServer() " + serverAddress);
         this.mServerAddress = serverAddress;
         this.mPortNum = portNum;
         this.mUserID = userID;
         this.mPassword = password;
+        this.mUsePassive = usePassiveMode;
 
         boolean sResult = false;
 
         this.mFTPClient = new FTPClient();
-        this.mFTPClient.setControlEncoding("UTF-8");
         this.mFTPClient.setConnectTimeout(10 * 1000);
         this.mFTPClient.setDefaultTimeout(20 * 1000);
         this.mFTPClient.addProtocolCommandListener(mFTPProtocolListener);
@@ -135,12 +116,6 @@ public class LGFTPClient {
 
         try {
             this.mFTPClient.connect(serverAddress, portNum);
-            if (this.mFTPClient instanceof FTPSClient) {
-                Log.d(TAG, "FTP Cafe mimic, instance of FTPSClient");
-                ((FTPSClient)this.mFTPClient).execPBSZ(0L);
-
-                ((FTPSClient)this.mFTPClient).execPROT("C");
-            }
             int reply = mFTPClient.getReplyCode();
             Log.d(TAG, "server connect reply : " + reply);
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -149,13 +124,24 @@ public class LGFTPClient {
             } else {
                 Log.d(TAG, "successfully connected");
                 sResult = true;
-                this.mFTPClient.setFileType(BINARY_FILE_TYPE);
                 if (loginToServer(userID, password)) {
                     Log.d(TAG, "Logged in successfully");
+
+                    if (usePassiveMode) {
+                        this.mFTPClient.enterLocalPassiveMode();
+                        this.mFTPClient.setUseEPSVwithIPv4(true);
+                    } else {
+                        this.mFTPClient.enterLocalActiveMode();
+                        this.mFTPClient.setUseEPSVwithIPv4(false);
+                    }
+
+                    this.mFTPClient.setControlEncoding("UTF-8");
+                    this.mFTPClient.setFileType(BINARY_FILE_TYPE);
+                    this.mFTPClient.setDataTimeout(2000);
+
                     fileList = getFileList();
                     mConnectionKeepAliveHandler.sendEmptyMessage(MSG_START_KEEP_ALIVE_CONNECTION);
                 }
-                //sendCommandAndGetReply("FEAT");
             }
         } catch (SocketException e) {
             e.printStackTrace();
@@ -300,6 +286,7 @@ public class LGFTPClient {
     final static private int MSG_START_KEEP_ALIVE_CONNECTION = 0x00;
     final static private int MSG_STOP_KEEP_ALIVE_CONNECTION = 0x01;
     final static private int MSG_SEND_NOOP = 0x02;
+    final static private int MSG_REESTABLISH_CONNECTION = 0x03;
 
     final static private int KEEP_ALIVE_INTERVAL = 110 * 1000;
 
@@ -317,12 +304,12 @@ public class LGFTPClient {
                         new Thread() {
                             @Override
                             public void run() {
-                                try {
+                                /*try {
                                     mFTPClient.sendNoOp();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                     Log.d(TAG, "IOException while sending NoOp ");
-                                }
+                                }*/
                             }
                         }.start();
 
@@ -334,7 +321,9 @@ public class LGFTPClient {
                     this.removeMessages(MSG_START_KEEP_ALIVE_CONNECTION);
                     this.removeMessages(MSG_SEND_NOOP);
                     break;
-
+                case MSG_REESTABLISH_CONNECTION:
+                    //conne
+                    break;
                 default :
                     break;
             }
@@ -405,7 +394,7 @@ public class LGFTPClient {
         this.mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
 
         for (LGFTPFile remoteFile: remoteFileList) {
-            boolean sRet = this.retrieveFile(remoteFile, shouldWrite);
+            boolean sRet = this.retrieveFile(remoteFile, shouldWrite, methodType);
             Log.d(TAG, "single file download result = " + sRet);
             if (!sRet) {
                 Log.d(TAG, "start keep alive loop.");
@@ -446,29 +435,33 @@ public class LGFTPClient {
 
           http://www.codejava.net/java-se/networking/ftp/java-ftp-file-download-tutorial-and-example
     * */
-    public boolean retrieveFile(LGFTPFile remoteFile, boolean shouldWrite) {
-        mShouldTerminateTestLoop = true;
+    public boolean retrieveFile(LGFTPFile remoteFile, boolean shouldWrite, int methodType) {
+        mIsForcibleTerminate = false;
         boolean ret;
 
         Log.d(TAG, "setUseEPSVwithIPv4()");
-        this.mFTPClient.setUseEPSVwithIPv4(true);
+        //this.mFTPClient.setUseEPSVwithIPv4(true);
 
-        //Log.d(TAG, "enterLocalPassiveMode()");
-        //this.mFTPClient.enterLocalPassiveMode();
-
-        Log.d(TAG, "setFileType(BINARY_FILE_TYPE)");
         try {
-            this.mFTPClient.setFileType(BINARY_FILE_TYPE);
+            if (this.mFTPClient.sendNoOp()) {
+                Log.d(TAG, "NOOP send successful");
+            } else {
+                Log.d(TAG, "NOOP send failed");
+                return false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //Log.d(TAG, "enterLocalPassiveMode()");
+        //this.mFTPClient.enterLocalPassiveMode();
 
         LGFTPClient.this.mDownloadedBytes = 0;
         LGFTPClient.this.mElapsedTime = 0;
         LGFTPClient.this.mAvgTPut = 0;
 
         if (shouldWrite) {
-            ret = retrieveFileWithFileIO(remoteFile, 0);
+            ret = retrieveFileWithFileIO(remoteFile, methodType);
         } else {
             ret = retrieveFileWithoutFileIO(remoteFile);
         }
@@ -480,10 +473,9 @@ public class LGFTPClient {
         return ret;
     }
 
-
-    final static int METHOD_TYPE_CONVENTIONAL = 0x00;
-    final static int METHOD_TYPE_APACHE = 0x01;
-    final static int METHOD_TYPE_FILE_CHANNEL = 0x02;
+    public final static int METHOD_TYPE_CONVENTIONAL = 0x00;
+    public final static int METHOD_TYPE_APACHE = 0x01;
+    public final static int METHOD_TYPE_FILE_CHANNEL = 0x02;
 
     private boolean retrieveFileWithFileIO(LGFTPFile remoteFile, int methodType) {
         String sRemoteFileName = remoteFile.getName();
@@ -514,10 +506,13 @@ public class LGFTPClient {
 
         switch (methodType) {
             case METHOD_TYPE_CONVENTIONAL:
+                Log.d(TAG, "calling retrieveFileUsingConventionalMethod()");
                 return retrieveFileUsingConventionalMethod(remoteFile, sTargetFile);
             case METHOD_TYPE_APACHE:
+                Log.d(TAG, "calling retrieveFileUsingApacheAPI()");
                 return retrieveFileUsingApacheAPI(remoteFile, sTargetFile);
             case METHOD_TYPE_FILE_CHANNEL:
+                Log.d(TAG, "calling retrieveFileUsingFileChannel()");
                 return retrieveFileUsingFileChannel(remoteFile, sTargetFile);
             default :
                 return false;
@@ -532,7 +527,12 @@ public class LGFTPClient {
             sFileOutputStream =  new FileOutputStream(targetFile.getAbsolutePath(), false);
             Log.d(TAG, "retrievingFileStream...");
             mInputStream = this.mFTPClient.retrieveFileStream(remoteFile.getName());
-            Log.d(TAG, "file stream retrieved... : " + mInputStream.available());
+            if (!FTPReply.isPositivePreliminary(mFTPClient.getReplyCode())) {
+                Log.d(TAG, "retrieveFileStream failed");
+                return false;
+            } else {
+                Log.d(TAG, "retrieveFileStream retrieved successfully");
+            }
 
             Message msg = LGFTPClient.this.mTPutCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
@@ -561,18 +561,11 @@ public class LGFTPClient {
 
             Log.d(TAG, "conventional duration : " + (mElapsedTime/1000.0f));
             sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
-            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
-            if (mShouldTerminateTestLoop) {
-                ret = false;
-            } else {
-                ret = this.mFTPClient.completePendingCommand();
-            }
 
-            if (ret) {
-                Log.d(TAG, "Download successful");
-            } else {
-                Log.d(TAG, "Download failed");
-            }
+
+        } catch(SocketTimeoutException e) {
+            e.printStackTrace();
+            Log.e(TAG, "SocketTimeoutException : " + e.getMessage());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.e(TAG, "FileNotFoundException : " + e.getMessage());
@@ -583,13 +576,20 @@ public class LGFTPClient {
         } catch (IOException e) {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());
-            try {
-                this.mFTPClient.abort();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
         } finally {
             LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
+
+            try {
+                ret = this.mFTPClient.completePendingCommand();
+                Log.d(TAG, "completePendingCommand() " + ret);
+                Log.d(TAG, "test loop terminate : " + mIsForcibleTerminate);
+                if (mIsForcibleTerminate) {
+                    ret = false;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             // 4. invoke callback
             LGFTPClient.this.mOperationListener.onDownloadFinished(ret, targetFile, sFinalAvgTput);
 
@@ -603,6 +603,8 @@ public class LGFTPClient {
                     mInputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    mInputStream = null;
                 }
             }
 
@@ -625,7 +627,6 @@ public class LGFTPClient {
 
         try {
             sFileOutputStream =  new FileOutputStream(targetFile.getAbsolutePath(), false);
-            mInputStream = this.mFTPClient.retrieveFileStream(remoteFile.getName());
 
             Message msg = LGFTPClient.this.mTPutCalculationLoopHandler.obtainMessage(MSG_START_TPUT_CALCULATION_LOOP);
             Bundle b  = new Bundle();
@@ -639,9 +640,6 @@ public class LGFTPClient {
 
             // 2. start t-put calculation msg loop
             this.mTPutCalculationLoopHandler.sendMessage(msg);
-
-            // 3. inform the fragment that file DL has been started.
-            this.mOperationListener.onDownloadStarted(remoteFile);
 
             this.mFTPClient.setCopyStreamListener(new CopyStreamListener() {
                 @Override
@@ -658,24 +656,18 @@ public class LGFTPClient {
                     Log.d(TAG, "avg tput = " + mAvgTPut + " Mbps");
                 }
             });
-            this.mFTPClient.retrieveFile(remoteFile.getName(), sFileOutputStream);
+
+            // 3. inform the fragment that file DL has been started.
+            this.mOperationListener.onDownloadStarted(remoteFile);
+
+            Log.d(TAG, "calling apache retrieveFile()");
+            Log.d(TAG, "sRemote " + remoteFile.getName());
+            ret = this.mFTPClient.retrieveFile(remoteFile.getName(), sFileOutputStream);
+            Log.d(TAG, "finished apache retrieveFile() " + ret);
 
             Log.d(TAG, "apache duration : " + (mElapsedTime/1000.0f));
             sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
             this.mFTPClient.setCopyStreamListener(null);
-
-            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
-            if (mShouldTerminateTestLoop) {
-                ret = false;
-            } else {
-                ret = this.mFTPClient.completePendingCommand();
-            }
-
-            if (ret) {
-                Log.d(TAG, "Download successful");
-            } else {
-                Log.d(TAG, "Download failed");
-            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.e(TAG, "FileNotFoundException : " + e.getMessage());
@@ -688,6 +680,11 @@ public class LGFTPClient {
             Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
             LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
+            if (mIsForcibleTerminate) {
+                Log.d(TAG, "test loop terminate : " + mIsForcibleTerminate);
+                ret = false;
+            }
+
             // 4. invoke callback
             LGFTPClient.this.mOperationListener.onDownloadFinished(ret, targetFile, sFinalAvgTput);
 
@@ -695,14 +692,6 @@ public class LGFTPClient {
             LGFTPClient.this.mDownloadedBytes = 0;
             LGFTPClient.this.mElapsedTime = 0;
             LGFTPClient.this.mAvgTPut = 0;
-
-            if (mInputStream != null) {
-                try {
-                    mInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
             if (sFileOutputStream != null) {
                 try {
@@ -760,14 +749,6 @@ public class LGFTPClient {
                 Log.d(TAG, "e2 " + e.getMessage());
             }
 
-            // 5. retrieve result.
-            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
-            if (mShouldTerminateTestLoop) {
-                ret = false;
-            } else {
-                ret = this.mFTPClient.completePendingCommand();
-            }
-
             if (ret) {
                 Log.d(TAG, "Download successful");
             } else {
@@ -785,6 +766,19 @@ public class LGFTPClient {
             e.printStackTrace();
             Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
+            LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
+
+            try {
+                ret = this.mFTPClient.completePendingCommand();
+                Log.d(TAG, "completePendingCommand() " + ret);
+                Log.d(TAG, "test loop terminate : " + mIsForcibleTerminate);
+                if (mIsForcibleTerminate) {
+                    ret = false;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             // 6. invoke callback
             LGFTPClient.this.mOperationListener.onDownloadFinished(ret, targetFile, sFinalAvgTput);
 
@@ -793,84 +787,14 @@ public class LGFTPClient {
                     mInputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    mInputStream = null;
                 }
             }
-            LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
         }
 
         return ret;
     }
-
-    /*@TargetApi(Build.VERSION_CODES.O)
-    private boolean retrieveFileWithFileIOViaAsynchronousFileChannel(LGFTPFile targetFile, int dummy) {
-        Log.d(TAG, "retrieveFileWithFileIOViaAsynchronousFileChannel " + targetFile);
-
-        String sRemoteFileName = targetFile.getName();
-        Log.d(TAG, "sRemoteFileName " + sRemoteFileName);
-
-        String sDirPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-
-        File sTargetDir = new File(sDirPath + "/TPutMonitor");
-        if (!sTargetDir.exists()) {
-            Log.d(TAG, sTargetDir.getName() + " does not exist, hence make dir");
-            sTargetDir.mkdir();
-        } else {
-            File sTargetFile = new File(sTargetDir + "/" + targetFile.getName());
-            if (sTargetFile.exists()) {
-                Log.d(TAG, "");
-                sTargetFile.delete();
-            }
-        }
-
-        if (!sTargetDir.canWrite()) {
-            Log.e(TAG, "ERROR : Cannot write logs to dir");
-            //throw new Exception("File cannot be written");
-        }
-
-        File sDownloadFile = new File(sTargetDir + "/" + sRemoteFileName);
-        LGFTPClient.this.mDownloadFilePathAndName = sTargetDir + "/" + sRemoteFileName;
-
-        try {
-            mInputStream = this.mFTPClient.retrieveFileStream(sRemoteFileName);
-            ReadableByteChannel inputChannel = Channels.newChannel(mInputStream);
-            AsynchronousFileChannel outputChannel = AsynchronousFileChannel.open(
-                    sDownloadFile.toPath(),
-                    StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-
-            outputChannel.read()
-
-            ByteBuffer buffer = ByteBuffer.allocate(100 * 1024 * 1024);
-            int position = 0;
-            int recievedBytes = 0;
-            Future<Integer> lastWrite = null;
-
-            while ((recievedBytes = inputChannel.read(buffer)) >= 0
-                    || buffer.position() != 0) {
-                Log.d(TAG, "Recieved bytes: " + recievedBytes);
-                Log.d(TAG, "Buffer position: " + buffer.position());
-                buffer.flip();
-                lastWrite = outputChannel.write(buffer, position);
-                // do extra work while asynchronous channel is writing bytes to disk,
-                // in perfect case more extra work can be done, not just simple calculations
-                position += recievedBytes;
-                // extra work is done, we should wait, because we use only one buffer which can be still busy
-                if (lastWrite != null)  lastWrite.get();
-                buffer.compact();
-            }
-
-            outputChannel.close();
-            inputChannel.close();
-            mInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-    */
 
     private boolean retrieveFileWithoutFileIO(LGFTPFile targetFile) {
         boolean ret = false;
@@ -913,18 +837,7 @@ public class LGFTPClient {
             }
 
             sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
-            Log.d(TAG, "test loop terminate : " + mShouldTerminateTestLoop);
-            if (mShouldTerminateTestLoop) {
-                ret = false;
-            } else {
-                ret = this.mFTPClient.completePendingCommand();
-            }
 
-            if (ret) {
-                Log.d(TAG, "Download successful");
-            } else {
-                Log.d(TAG, "Download failed");
-            }
             Log.d(TAG, "************************************************************");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -938,6 +851,17 @@ public class LGFTPClient {
             Log.e(TAG, "IOException : " + e.getMessage());
         } finally {
             LGFTPClient.this.mTPutCalculationLoopHandler.sendEmptyMessage(MSG_STOP_TPUT_CALCULATION_LOOP);
+            try {
+                Log.d(TAG, "complete pending command()");
+                ret = this.mFTPClient.completePendingCommand();
+                Log.d(TAG, "test loop terminate : " + mIsForcibleTerminate);
+                if (mIsForcibleTerminate) {
+                    ret = false;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             // 4. invoke callback
             File sDownloadFile = new File(sRemoteFileName);
             LGFTPClient.this.mOperationListener.onDownloadFinished(ret, sDownloadFile, sFinalAvgTput);
@@ -950,8 +874,11 @@ public class LGFTPClient {
             if (mInputStream != null) {
                 try {
                     mInputStream.close();
+                    mInputStream = null;
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    mInputStream = null;
                 }
             }
         }
@@ -965,28 +892,50 @@ public class LGFTPClient {
         return this.mFTPClient.printWorkingDirectory();
     }
 
+    private void switchDataConnectionMode() {
+
+    }
+
     public boolean stopDownloadAndCancelTheRest() {
+        mIsForcibleTerminate = true;
+        if (mInputStream != null) {
+            try {
+                mInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        Log.d(TAG, "force closing inputStream.");
-        /*try {
-            mInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        new Thread() {
+        /*new Thread() {
             @Override
             public void run() {
-                Log.d(TAG, "force closing inputStream.");
                 try {
+                    Log.d(TAG, "mark to terminate test loop");
+                    mIsForcibleTerminate = true;
+                    Log.d(TAG, "calling abort");
+                    boolean ret = mFTPClient.abort();
+                    Log.d(TAG, "abort call line passed");
+                    Log.d(TAG, "completePendingCommand : " + mFTPClient.completePendingCommand());
 
-                    Log.d(TAG, "closing result = " + mFTPClient.abort());
+                    Log.d(TAG, "end of stopDownloadAndCancelTheRest");
+                    //mConnectionKeepAliveHandler.sendEmptyMessage(MSG_REESTABLISH_CONNECTION);
+                    //connectToServer();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        }.start();*/
 
         return true;
+    }
+
+    public void setPassiveMode(boolean shouldSetPassive) {
+        if (shouldSetPassive) {
+            mFTPClient.enterLocalPassiveMode();
+            mFTPClient.setUseEPSVwithIPv4(true);
+        } else {
+            mFTPClient.enterLocalActiveMode();
+            mFTPClient.setUseEPSVwithIPv4(false);
+        }
     }
 }

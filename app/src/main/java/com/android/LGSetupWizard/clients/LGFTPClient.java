@@ -84,7 +84,7 @@ public class LGFTPClient {
         public void protocolReplyReceived(ProtocolCommandEvent event) {
             Log.d(TAG, "protocolReplyReceived : " + event.getMessage());
             if (event.getReplyCode() == FTPReply.TRANSFER_ABORTED) {
-
+                disconnectFromServer();
             } else if (event.getReplyCode() == FTPReply.CLOSING_DATA_CONNECTION) {
                 Log.d(TAG, "getCommand() : " + event.getCommand());
                 Log.d(TAG, "getMessage() : " + event.getMessage() );
@@ -97,7 +97,7 @@ public class LGFTPClient {
         }
     };
 
-    public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password, boolean usePassiveMode) {
+    public void connectToServer(final String serverAddress, final int portNum, final String userID, final String password, boolean usePassiveMode, boolean useEPSVforIPv4) {
         Log.d(TAG, "connectToServer() " + serverAddress);
         this.mServerAddress = serverAddress;
         this.mPortNum = portNum;
@@ -129,15 +129,21 @@ public class LGFTPClient {
 
                     if (usePassiveMode) {
                         this.mFTPClient.enterLocalPassiveMode();
-                        this.mFTPClient.setUseEPSVwithIPv4(true);
                     } else {
                         this.mFTPClient.enterLocalActiveMode();
+                    }
+
+                    if (useEPSVforIPv4) {
+                        this.mFTPClient.setUseEPSVwithIPv4(true);
+                    } else {
                         this.mFTPClient.setUseEPSVwithIPv4(false);
                     }
 
                     this.mFTPClient.setControlEncoding("UTF-8");
                     this.mFTPClient.setFileType(BINARY_FILE_TYPE);
                     this.mFTPClient.setDataTimeout(2000);
+
+                    sendCommandAndGetReply("FEAT");
 
                     fileList = getFileList();
                     mConnectionKeepAliveHandler.sendEmptyMessage(MSG_START_KEEP_ALIVE_CONNECTION);
@@ -439,9 +445,6 @@ public class LGFTPClient {
         mIsForcibleTerminate = false;
         boolean ret;
 
-        Log.d(TAG, "setUseEPSVwithIPv4()");
-        //this.mFTPClient.setUseEPSVwithIPv4(true);
-
         try {
             if (this.mFTPClient.sendNoOp()) {
                 Log.d(TAG, "NOOP send successful");
@@ -452,9 +455,6 @@ public class LGFTPClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //Log.d(TAG, "enterLocalPassiveMode()");
-        //this.mFTPClient.enterLocalPassiveMode();
 
         LGFTPClient.this.mDownloadedBytes = 0;
         LGFTPClient.this.mElapsedTime = 0;
@@ -892,10 +892,6 @@ public class LGFTPClient {
         return this.mFTPClient.printWorkingDirectory();
     }
 
-    private void switchDataConnectionMode() {
-
-    }
-
     public boolean stopDownloadAndCancelTheRest() {
         mIsForcibleTerminate = true;
         if (mInputStream != null) {
@@ -906,35 +902,25 @@ public class LGFTPClient {
             }
         }
 
-        /*new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Log.d(TAG, "mark to terminate test loop");
-                    mIsForcibleTerminate = true;
-                    Log.d(TAG, "calling abort");
-                    boolean ret = mFTPClient.abort();
-                    Log.d(TAG, "abort call line passed");
-                    Log.d(TAG, "completePendingCommand : " + mFTPClient.completePendingCommand());
-
-                    Log.d(TAG, "end of stopDownloadAndCancelTheRest");
-                    //mConnectionKeepAliveHandler.sendEmptyMessage(MSG_REESTABLISH_CONNECTION);
-                    //connectToServer();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();*/
-
         return true;
     }
 
     public void setPassiveMode(boolean shouldSetPassive) {
         if (shouldSetPassive) {
+            Log.d(TAG, "enterLocalPassive");
             mFTPClient.enterLocalPassiveMode();
+        } else {
+            Log.d(TAG, "enterLocalActiveMode");
+            mFTPClient.enterLocalActiveMode();
+        }
+    }
+
+    public void setEPSVforIPv4(boolean shouldSetEPSVforIPv4) {
+        if (shouldSetEPSVforIPv4) {
+            Log.d(TAG, "setUseEPSVwithIPv4 true");
             mFTPClient.setUseEPSVwithIPv4(true);
         } else {
-            mFTPClient.enterLocalActiveMode();
+            Log.d(TAG, "setUseEPSVwithIPv4 false");
             mFTPClient.setUseEPSVwithIPv4(false);
         }
     }

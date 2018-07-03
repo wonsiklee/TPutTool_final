@@ -5,73 +5,213 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/rl_id_password"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5sp">
+        android:layout_marginTop="5sp"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/ll_server_info"
-            android:layout_width="315dp"
+        <RelativeLayout
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/ll_account_info"
-            android:layout_marginStart="10sp"
-            android:gravity="left"
-            android:layout_alignParentLeft="true"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtView_server_addr"
-                android:layout_width="30sp"
+            android:layout_width="0dp"
+            android:layout_weight="8">
+            <LinearLayout
+                android:id="@+id/ll_logged_out_view_group"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="주소" />
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/editText_server_addr"
-                android:layout_width="130sp"
+                <LinearLayout
+                    android:id="@+id/ll_server_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="10sp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtView_server_addr"
+                        android:layout_width="30sp"
+                        android:layout_height="wrap_content"
+                        android:text="주소"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/editText_server_addr"
+                        android:layout_width="130sp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:text="127.0.0.1"
+                        android:textAlignment="center"
+                        android:textSize="15sp"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/txtView_port_num"
+                        android:layout_width="30sp"
+                        android:layout_height="wrap_content"
+                        android:text="포트"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/editText_port_num"
+                        android:layout_width="50sp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:inputType="number"
+                        android:text="2221"
+                        android:textAlignment="center"
+                        android:textSize="15sp"
+                        tools:ignore="HardcodedText" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_account_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtView_id"
+                        android:layout_width="30sp"
+                        android:layout_height="wrap_content"
+                        android:text="ID"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/editText_user_id"
+                        android:layout_width="130sp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:text="test"
+                        android:textAlignment="center"
+                        android:textSize="15sp"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/txtView_password"
+                        android:layout_width="30sp"
+                        android:layout_height="wrap_content"
+                        android:text="PW "
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/editText_password"
+                        android:layout_width="100sp"
+                        android:layout_height="wrap_content"
+                        android:password="true"
+                        android:singleLine="true"
+                        android:text="test"
+                        android:textAlignment="center"
+                        android:textSize="15sp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_logged_in_view_group"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:maxLines="1"
-                android:minLines="1"
-                android:text="127.0.0.1"
-                android:textAlignment="center"
-                android:textSize="15sp" />
+                android:orientation="vertical"
+                android:visibility="invisible">
 
-            <TextView
-                android:id="@+id/txtView_port_num"
-                android:layout_width="30sp"
-                android:layout_height="wrap_content"
-                android:text="포트" />
+                <CheckBox
+                    android:id="@+id/checkbox_use_file_IO"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="10dp"
+                    android:checked="true"
+                    android:gravity="center_vertical"
+                    android:text="File I/O"
+                    tools:ignore="HardcodedText" />
 
-            <EditText
-                android:id="@+id/editText_port_num"
-                android:layout_width="50sp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:inputType="number"
-                android:text="2221"
-                android:textAlignment="center"
-                android:textSize="15sp" />
+                <RadioGroup
+                    android:id="@+id/radioGroup_method_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/imgBtn_history"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="15dp"
-                android:background="@drawable/test_logs" />
-        </LinearLayout>
+                    <RadioButton
+                        android:id="@+id/radioButton_method_type_conventional"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="FileOutputStream"
+                        tools:ignore="HardcodedText" />
+
+                    <RadioButton
+                        android:id="@+id/radioButton_method_type_apache"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="아파치"
+                        android:visibility="gone"
+                        tools:ignore="HardcodedText" />
+
+                    <RadioButton
+                        android:id="@+id/radioButton_method_type_file_channel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FileChannel"
+                        tools:ignore="HardcodedText" />
+                </RadioGroup>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:animateLayoutChanges="true"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="반복 "
+                        tools:ignore="HardcodedText" />
+
+                    <Spinner
+                        android:id="@+id/spinner_ftp_download_repeat_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/repeat_count"
+                        android:gravity="end"
+                        android:textAlignment="viewEnd" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:text="회"
+                        tools:ignore="HardcodedText" />
+
+                    <Button
+                        android:id="@+id/btn_ftp_download"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|end"
+                        android:text="Download"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/ll_connect_disconnect"
-            android:layout_toEndOf="@+id/ll_server_info"
-            android:layout_alignTop="@+id/ll_server_info"
-            android:layout_alignBottom="@+id/ll_account_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
             android:gravity="right"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
+
             <Button
                 android:id="@+id/btn_connect_disconnect"
                 android:layout_width="match_parent"
@@ -80,154 +220,43 @@
                 android:text="LOG IN" />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_account_info"
-            android:layout_below="@+id/ll_server_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="10sp">
-
-            <TextView
-                android:id="@+id/txtView_id"
-                android:layout_width="30sp"
-                android:layout_height="wrap_content"
-                android:text="ID"
-                tools:ignore="HardcodedText" />
-
-            <EditText
-                android:id="@+id/editText_user_id"
-                android:layout_width="130sp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:maxLines="1"
-                android:minLines="1"
-                android:text="test"
-                android:textAlignment="center"
-                android:textSize="15sp"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:id="@+id/txtView_password"
-                android:layout_width="30sp"
-                android:layout_height="wrap_content"
-                android:text="PW "/>
-
-            <EditText
-                android:id="@+id/editText_password"
-                android:layout_width="100sp"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:text="test"
-                android:textAlignment="center"
-                android:singleLine="true"
-                android:password="true"/>
-        </LinearLayout>
-    </RelativeLayout>
-
-
-    <LinearLayout
-        android:id="@+id/linearLayout_logged_in_view_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:animateLayoutChanges="true"
-        android:orientation="horizontal"
-        android:layout_marginEnd="5dp">
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="반복 "
-            tools:ignore="HardcodedText" />
-        <Spinner
-            android:id="@+id/spinner_ftp_download_repeat_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:textAlignment="viewEnd"
-            android:entries="@array/repeat_count"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:text="회"
-            tools:ignore="HardcodedText" />
-        <CheckBox
-            android:id="@+id/checkbox_use_file_IO"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:checked="true"
-            android:text="File I/O"
-            tools:ignore="HardcodedText" />
-
-        <CheckBox
-            android:id="@+id/checkbox_set_passive"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|end"
-            android:text="Passive"
-            android:checked="true"
-            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_marginEnd="5dp"
+        android:animateLayoutChanges="true"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/ll_method_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end">
-            <!--android:visibility="gone">-->
-            <RadioGroup
-                android:id="@+id/radioGroup_method_type"
-                android:layout_width="0dp"
-                android:layout_weight="7"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="invisible">
+        <ImageButton
+            android:id="@+id/imgBtn_history"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/test_logs" />
 
-                <RadioButton
-                    android:id="@+id/radioButton_method_type_conventional"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FileOutputStream"
-                    android:checked="true"
-                    tools:ignore="HardcodedText" />
+        <CheckBox
+            android:id="@+id/checkbox_set_passive"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:checked="true"
+            android:enabled="false"
+            android:gravity="center_vertical|end"
+            android:text="PSV"
+            tools:ignore="HardcodedText" />
 
-                <RadioButton
-                    android:id="@+id/radioButton_method_type_apache"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="아파치"
-                    android:visibility="gone"
-                    tools:ignore="HardcodedText" />
-
-                <RadioButton
-                    android:id="@+id/radioButton_method_type_file_channel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FileChannel"
-                    tools:ignore="HardcodedText" />
-            </RadioGroup>
-
-            <Button
-                android:id="@+id/btn_ftp_download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical|end"
-                android:text="Download"
-                tools:ignore="HardcodedText" />
-
-        </LinearLayout>
+        <CheckBox
+            android:id="@+id/checkbox_set_epsv_for_ipv4"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:checked="true"
+            android:gravity="center_vertical|end"
+            android:text="IPv4 EPSV"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <ListView

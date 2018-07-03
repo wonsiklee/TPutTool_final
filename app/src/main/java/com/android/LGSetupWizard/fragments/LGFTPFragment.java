@@ -31,6 +31,7 @@ import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -54,7 +55,7 @@ import lombok.experimental.Accessors;
  * Created by wonsik.lee on 2017-06-13.
  */
 @Accessors(prefix = "m")
-public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener, CompoundButton.OnCheckedChangeListener {
+public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener {
     private static final String TAG = LGFTPFragment.class.getSimpleName();
 
     private View mView;
@@ -65,16 +66,18 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private EditText mEditTextUserID;
     private EditText mEditTextPassword;
 
+    private LinearLayout mLinearLayoutLoggedOutViewGroup;
+
     private LinearLayout mLinearLayoutLoggedInViewGroup;
     private ImageButton mImgBtnTestHistory;
     private CheckBox mCheckBoxUseFileIO;
     private CheckBox mCheckBoxUsePassiveMode;
+    private CheckBox mCheckBoxUseEPSVforIPv4;
     private Spinner mSpinnerRepeatCount;
     private Button mBtnDLULStartStop;
 
     private ListView mFTPFileListView;
 
-    private LinearLayout mLinearLayoutMethodType;
     private RadioGroup mRadioGroupMethodType;
     private RadioButton mRadioButtonConventionalMethod;
     private RadioButton mRadioButtonApacheMethod;
@@ -196,7 +199,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mBtnConnectDisconnect.setEnabled(false);
         }
 
-        this.mFTPFileListView = (ListView) this.mView.findViewById(R.id.listView_ftpFileList);
+        this.mFTPFileListView = this.mView.findViewById(R.id.listView_ftpFileList);
         this.mFTPFileListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         this.mFTPFileListView.setOnItemClickListener(this);
 
@@ -205,22 +208,56 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
         }
 
-        this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.linearLayout_logged_in_view_group);
+        this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.ll_logged_in_view_group);
+        this.mLinearLayoutLoggedOutViewGroup = this.mView.findViewById(R.id.ll_logged_out_view_group);
+        this.mLinearLayoutLoggedInViewGroup.setMinimumHeight(mLinearLayoutLoggedOutViewGroup.getHeight());
+
         this.mImgBtnTestHistory = (this.mView.findViewById(R.id.imgBtn_history));
         this.mImgBtnTestHistory.setOnClickListener(this.mClickListenerShowHistory);
         this.mBtnDLULStartStop = this.mView.findViewById(R.id.btn_ftp_download);
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
 
         this.mCheckBoxUseFileIO = this.mView.findViewById(R.id.checkbox_use_file_IO);
-        this.mCheckBoxUseFileIO.setOnCheckedChangeListener(this);
+        this.mCheckBoxUseFileIO.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    LGFTPFragment.this.mRadioButtonConventionalMethod.setEnabled(true);
+                    LGFTPFragment.this.mRadioButtonFileChannelMethod.setEnabled(true);
+                } else {
+                    LGFTPFragment.this.mRadioButtonConventionalMethod.setEnabled(false);
+                    LGFTPFragment.this.mRadioButtonFileChannelMethod.setEnabled(false);
+                }
+            }
+        });
 
         this.mCheckBoxUsePassiveMode = this.mView.findViewById(R.id.checkbox_set_passive);
         this.mCheckBoxUsePassiveMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mLGFtpClient.isConnected()) {
-                    LGFTPFragment.this.mLGFtpClient.setPassiveMode(isChecked);
+                Log.d(TAG, "calling setPassiveMode " + isChecked);
+                LGFTPFragment.this.mLGFtpClient.setPassiveMode(isChecked);
+            }
+        });
+
+        this.mCheckBoxUseEPSVforIPv4 = this.mView.findViewById(R.id.checkbox_set_epsv_for_ipv4);
+        this.mCheckBoxUseEPSVforIPv4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            boolean mIsPassivePreviouslyChecked = mCheckBoxUsePassiveMode.isChecked();
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                boolean tmp = mCheckBoxUsePassiveMode.isChecked();
+                if (isChecked) {
+                    mCheckBoxUsePassiveMode.setEnabled(false);
+                    mCheckBoxUsePassiveMode.setChecked(true);
+                } else {
+                    mCheckBoxUsePassiveMode.setEnabled(true);
+                    mCheckBoxUsePassiveMode.setChecked(mIsPassivePreviouslyChecked);
                 }
+
+                Log.d(TAG, "calling setEPSVforIPv4 " + isChecked);
+                LGFTPFragment.this.mLGFtpClient.setEPSVforIPv4(isChecked);
+
+                mIsPassivePreviouslyChecked = tmp;
             }
         });
 
@@ -228,7 +265,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
 
-        this.mLinearLayoutMethodType = this.mView.findViewById(R.id.ll_method_type);
         this.mRadioGroupMethodType = this.mView.findViewById(R.id.radioGroup_method_type);
         this.mRadioButtonConventionalMethod = this.mView.findViewById(R.id.radioButton_method_type_conventional);
         this.mRadioButtonApacheMethod = this.mView.findViewById(R.id.radioButton_method_type_apache);
@@ -237,6 +273,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mRadioGroupMethodType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                Log.d(TAG , "mRadioGroupMethodType onCheckedChanged()");
                 if (checkedId == mRadioButtonConventionalMethod.getId()) {
                     mCheckedMethod = LGFTPClient.METHOD_TYPE_CONVENTIONAL;
                 } else if (checkedId == mRadioButtonApacheMethod.getId()) {
@@ -281,11 +318,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
     /* network operation progress bar show/hide [END] */
 
-    private void showDLBtnLayout() {
-        LGFTPFragment.this.mRadioGroupMethodType.animate().translationY(0).alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
+   /* private void showDLBtnLayout() {
+        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(0).alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                LGFTPFragment.this.mRadioGroupMethodType.setVisibility(View.VISIBLE);
+                LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
                 LGFTPFragment.this.mSpinnerRepeatCount.setDropDownWidth(LGFTPFragment.this.mSpinnerRepeatCount.getWidth());
                 try {
                     Field popup = Spinner.class.getDeclaredField("mPopup");
@@ -299,7 +336,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                mRadioGroupMethodType.setVisibility(View.VISIBLE);
+                mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -311,14 +348,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     private void hideDLBtnLayout() {
-        LGFTPFragment.this.mRadioGroupMethodType.animate().translationY(mRadioGroupMethodType.getHeight()).alpha(0.0f).setDuration(600)
+        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
                 .setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) { }
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        LGFTPFragment.this.mRadioGroupMethodType.setVisibility(View.GONE);
+                        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -328,7 +365,105 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     public void onAnimationRepeat(Animator animation) { }
                 });
 
-        mRadioGroupMethodType.setVisibility(View.GONE);
+        mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
+    }*/
+
+    private void setLoggedInLayout() {
+        Log.d(TAG, "setLoggedInLayout() ");
+
+        this.mLinearLayoutLoggedOutViewGroup.animate()
+                .alpha(0.0f)
+                .setDuration(600)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mLinearLayoutLoggedOutViewGroup.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) { }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) { }
+                });
+        this.mLinearLayoutLoggedInViewGroup.setAlpha(0.0f);
+        this.mLinearLayoutLoggedInViewGroup.animate()
+                .alpha(1.0f)
+                .setDuration(600)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+    }
+
+    private void setLoggedOutLayout() {
+        Log.d(TAG, "setLoggedOutLayout() ");
+        this.mLinearLayoutLoggedOutViewGroup.animate()
+                .alpha(1.0f)
+                .setDuration(600)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        mLinearLayoutLoggedOutViewGroup.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) { }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) { }
+                });
+
+        this.mLinearLayoutLoggedInViewGroup.animate()
+                .alpha(0.0f)
+                .setDuration(600)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mLinearLayoutLoggedInViewGroup.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
     }
 
     private boolean isNetworkAvailable() {
@@ -473,7 +608,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerDisconnect);
                             LGFTPFragment.this.mBtnConnectDisconnect.setText("Log out");
                             LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
-                            LGFTPFragment.this.showDLBtnLayout();
+                            // ******************************* TODO
+                            LGFTPFragment.this.setLoggedInLayout();
+
                             this.sendEmptyMessage(MSG_FILE_SET_CHANGED);
                             if (LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileList().size() > 0) {
                                 LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
@@ -500,13 +637,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
                 case MSG_DISCONNECT_FROM_SERVER_FINISHED:
                     Log.d(TAG, "MSG_DISCONNECT_FROM_SERVER_FINISHED");
+                    // ******************************* TODO
                     LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerConnect);
                     LGFTPFragment.this.mBtnConnectDisconnect.setText("Log in");
                     LGFTPFragment.this.mBtnDLULStartStop.setEnabled(false);
                     LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(null);
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     LGFTPFragment.this.dismissNetworkOperationProgressBar();
-                    LGFTPFragment.this.hideDLBtnLayout();
+                    LGFTPFragment.this.setLoggedOutLayout();
                     break;
 
                 case MSG_CHANGE_WORKING_DIRECTORY_FINISHED:
@@ -599,6 +737,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.updateFileCount(mInitialFileCount, mInitialFileCount - LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileCount() + 1);
                     LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.setDownloadingFileName(LGFTPFragment.this.mDownloadingFileName);
                     break;
+
                 case MSG_SELECTED_FILES_CHANGED:
                     Log.d(TAG, "MSG_SELECTED_FILES_CHANGED");
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
@@ -609,6 +748,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
                     LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                     break;
+
                 case MSG_REFRESH_ALL_UI:
                     Log.d(TAG, "MSG_REFRESH_ALL_UI");
                     Log.d(TAG, "isConnected : " + LGFTPFragment.this.mLGFtpClient.isConnected());
@@ -627,22 +767,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         LGFTPFragment.this.mFTPFileListVIewAdapter.setFileList(null);
                         LGFTPFragment.this.mFTPFileListVIewAdapter.notifyDataSetChanged();
                         LGFTPFragment.this.dismissNetworkOperationProgressBar();
-                        LGFTPFragment.this.mRadioGroupMethodType.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
-                                .setListener(new Animator.AnimatorListener() {
-                                    @Override
-                                    public void onAnimationStart(Animator animation) { }
-
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        LGFTPFragment.this.mRadioGroupMethodType.setVisibility(View.GONE);
-                                    }
-
-                                    @Override
-                                    public void onAnimationCancel(Animator animation) { }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animator animation) { }
-                                });
                     }
                     break;
                 case MSG_SHOW_RESULT_POPUP_WINDOW:
@@ -669,7 +793,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 public void run() {
                     LGFTPFragment.this.mLGFtpClient.connectToServer(
                             mEditTextServerAddress.getText().toString(), Integer.valueOf(mEditTextPortNum.getText().toString()),
-                            mEditTextUserID.getText().toString(), mEditTextPassword.getText().toString(), mCheckBoxUsePassiveMode.isChecked());
+                            mEditTextUserID.getText().toString(), mEditTextPassword.getText().toString(), mCheckBoxUsePassiveMode.isChecked(), mCheckBoxUseEPSVforIPv4.isChecked());
                 }
             }.start();
         }
@@ -798,44 +922,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
         } else {
             Log.d(TAG, "not a LGFTPFileDownloadProgressDialog.");
-        }
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            LGFTPFragment.this.mRadioGroupMethodType.animate().translationY(0).alpha(1.0f).setDuration(600).setListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    LGFTPFragment.this.mRadioGroupMethodType.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) { }
-
-                @Override
-                public void onAnimationCancel(Animator animation) { }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) { }
-            });
-        } else {
-            LGFTPFragment.this.mRadioGroupMethodType.animate().translationY(mRadioGroupMethodType.getHeight()).alpha(0.0f).setDuration(600)
-                    .setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) { }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            LGFTPFragment.this.mRadioGroupMethodType.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) { }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) { }
-                    });
         }
     }
 }

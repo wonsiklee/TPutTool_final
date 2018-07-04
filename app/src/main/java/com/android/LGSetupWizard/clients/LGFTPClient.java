@@ -84,7 +84,7 @@ public class LGFTPClient {
         public void protocolReplyReceived(ProtocolCommandEvent event) {
             Log.d(TAG, "protocolReplyReceived : " + event.getMessage());
             if (event.getReplyCode() == FTPReply.TRANSFER_ABORTED) {
-                disconnectFromServer();
+                //disconnectFromServer();
             } else if (event.getReplyCode() == FTPReply.CLOSING_DATA_CONNECTION) {
                 Log.d(TAG, "getCommand() : " + event.getCommand());
                 Log.d(TAG, "getMessage() : " + event.getMessage() );
@@ -177,6 +177,7 @@ public class LGFTPClient {
         }
     }
     public void disconnectFromServer() {
+        Log.d(TAG, "disconnectFromServer()");
         mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
         logoutFromServer();
         mOperationListener.onDisconnectToServerFinished();
@@ -292,7 +293,7 @@ public class LGFTPClient {
     final static private int MSG_START_KEEP_ALIVE_CONNECTION = 0x00;
     final static private int MSG_STOP_KEEP_ALIVE_CONNECTION = 0x01;
     final static private int MSG_SEND_NOOP = 0x02;
-    final static private int MSG_REESTABLISH_CONNECTION = 0x03;
+    //final static private int MSG_REESTABLISH_CONNECTION = 0x03;
 
     final static private int KEEP_ALIVE_INTERVAL = 110 * 1000;
 
@@ -310,12 +311,12 @@ public class LGFTPClient {
                         new Thread() {
                             @Override
                             public void run() {
-                                /*try {
+                                try {
                                     mFTPClient.sendNoOp();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                     Log.d(TAG, "IOException while sending NoOp ");
-                                }*/
+                                }
                             }
                         }.start();
 
@@ -326,9 +327,6 @@ public class LGFTPClient {
                 case MSG_STOP_KEEP_ALIVE_CONNECTION:
                     this.removeMessages(MSG_START_KEEP_ALIVE_CONNECTION);
                     this.removeMessages(MSG_SEND_NOOP);
-                    break;
-                case MSG_REESTABLISH_CONNECTION:
-                    //conne
                     break;
                 default :
                     break;

@@ -13,9 +13,10 @@
         android:orientation="horizontal">
 
         <RelativeLayout
-            android:layout_height="wrap_content"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="8">
+
             <LinearLayout
                 android:id="@+id/ll_logged_out_view_group"
                 android:layout_width="match_parent"
@@ -47,7 +48,8 @@
                         android:text="127.0.0.1"
                         android:textAlignment="center"
                         android:textSize="15sp"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText"
+                        android:selectAllOnFocus="true"/>
 
                     <TextView
                         android:id="@+id/txtView_port_num"
@@ -65,7 +67,8 @@
                         android:text="2221"
                         android:textAlignment="center"
                         android:textSize="15sp"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText"
+                        android:selectAllOnFocus="true"/>
 
                 </LinearLayout>
 
@@ -93,7 +96,8 @@
                         android:text="test"
                         android:textAlignment="center"
                         android:textSize="15sp"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText"
+                        android:selectAllOnFocus="true"/>
 
                     <TextView
                         android:id="@+id/txtView_password"
@@ -111,7 +115,8 @@
                         android:text="test"
                         android:textAlignment="center"
                         android:textSize="15sp"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText"
+                        android:selectAllOnFocus="true"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -120,7 +125,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible">
+                android:visibility="invisible"
+                android:focusable="true">
 
                 <CheckBox
                     android:id="@+id/checkbox_use_file_IO"
@@ -131,7 +137,9 @@
                     android:checked="true"
                     android:gravity="center_vertical"
                     android:text="File I/O"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"/>
 
                 <RadioGroup
                     android:id="@+id/radioGroup_method_type"
@@ -170,6 +178,7 @@
                     android:layout_marginEnd="5dp"
                     android:layout_marginStart="5dp"
                     android:animateLayoutChanges="true"
+                    android:focusableInTouchMode="true"
                     android:orientation="horizontal">
 
                     <TextView
@@ -178,13 +187,16 @@
                         android:text="반복 "
                         tools:ignore="HardcodedText" />
 
-                    <Spinner
-                        android:id="@+id/spinner_ftp_download_repeat_count"
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:id="@+id/editTxt_ftp_download_repeat_count"
+                        android:layout_width="50dp"
                         android:layout_height="wrap_content"
-                        android:entries="@array/repeat_count"
                         android:gravity="end"
-                        android:textAlignment="viewEnd" />
+                        android:text="1"
+                        android:textAlignment="center"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:focusableInTouchMode="true"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -193,12 +205,36 @@
                         android:text="회"
                         tools:ignore="HardcodedText" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="간격"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/editTxt_ftp_download_repeat_interval"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:gravity="end"
+                        android:textAlignment="center"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:focusableInTouchMode="true"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="초"
+                        tools:ignore="HardcodedText" />
+
                     <Button
                         android:id="@+id/btn_ftp_download"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical|end"
-                        android:text="Download"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:text="GO!"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
             </LinearLayout>
@@ -207,8 +243,8 @@
         <LinearLayout
             android:id="@+id/ll_connect_disconnect"
             android:layout_width="0dp"
-            android:layout_weight="2"
             android:layout_height="match_parent"
+            android:layout_weight="2"
             android:gravity="right"
             android:orientation="horizontal">
 
@@ -217,7 +253,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
-                android:text="LOG IN" />
+                android:text="LOG\nIN" />
 
         </LinearLayout>
     </LinearLayout>
@@ -246,7 +282,8 @@
             android:enabled="false"
             android:gravity="center_vertical|end"
             android:text="PSV"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"
+            android:focusable="true"/>
 
         <CheckBox
             android:id="@+id/checkbox_set_epsv_for_ipv4"
@@ -256,7 +293,8 @@
             android:checked="true"
             android:gravity="center_vertical|end"
             android:text="IPv4 EPSV"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"
+            android:focusable="true"/>
     </LinearLayout>
 
     <ListView

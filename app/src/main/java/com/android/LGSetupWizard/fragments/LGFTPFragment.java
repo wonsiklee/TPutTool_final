@@ -2,6 +2,7 @@ package com.android.LGSetupWizard.fragments;
 
 import android.animation.Animator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -15,11 +16,17 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -27,12 +34,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.database.TestResultDBManager;
@@ -45,7 +49,6 @@ import com.android.LGSetupWizard.data.MediaScanning;
 import com.android.LGSetupWizard.database.TestResultPopupWindow;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -55,33 +58,39 @@ import lombok.experimental.Accessors;
  * Created by wonsik.lee on 2017-06-13.
  */
 @Accessors(prefix = "m")
-public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener {
+public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener, View.OnFocusChangeListener {
+    private static boolean DEBUG = false;
     private static final String TAG = LGFTPFragment.class.getSimpleName();
 
     private View mView;
 
-    private Button mBtnConnectDisconnect;
+    // Logged out view
+    private LinearLayout mLinearLayoutLoggedOutViewGroup;
     private EditText mEditTextServerAddress;
     private EditText mEditTextPortNum;
     private EditText mEditTextUserID;
     private EditText mEditTextPassword;
 
-    private LinearLayout mLinearLayoutLoggedOutViewGroup;
-
+    // Logged in view
     private LinearLayout mLinearLayoutLoggedInViewGroup;
-    private ImageButton mImgBtnTestHistory;
     private CheckBox mCheckBoxUseFileIO;
-    private CheckBox mCheckBoxUsePassiveMode;
-    private CheckBox mCheckBoxUseEPSVforIPv4;
-    private Spinner mSpinnerRepeatCount;
-    private Button mBtnDLULStartStop;
-
-    private ListView mFTPFileListView;
-
     private RadioGroup mRadioGroupMethodType;
     private RadioButton mRadioButtonConventionalMethod;
     private RadioButton mRadioButtonApacheMethod;
     private RadioButton mRadioButtonFileChannelMethod;
+    private EditText mEditTextRepeatCount;
+    private EditText mEditTextTestIntervalInSec;
+    private Button mBtnDLULStartStop;
+
+    private int mCheckedMethod;
+
+    // always shown views
+    private ImageButton mImgBtnTestHistory;
+    private CheckBox mCheckBoxUsePassiveMode;
+    private CheckBox mCheckBoxUseEPSVforIPv4;
+    private Button mBtnConnectDisconnect;
+    private ListView mFTPFileListView;
+
 
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
@@ -98,12 +107,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     private int mInitialFileCount;
 
+    private String mMccMnc;
+
     final static private String KEY_DOWNLOAD_FILE_NAME = "file_name";
     final static private String KEY_DOWNLOAD_RESULT = "file_size";
     final static private String KEY_AVG_TPUT = "avg_tput";
     final static private String KEY_LOGIN_RESULT = "login_result";
 
-    private String mMccMnc;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +122,12 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mInitialFileCount = Integer.MIN_VALUE;
         this.mMccMnc = ((TelephonyManager) this.getContext().getSystemService(Context.TELEPHONY_SERVICE)).getNetworkOperator();
         Log.d(TAG, "MccMnc = " + mMccMnc);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        hideSoftKeyboard();
     }
 
     @Nullable
@@ -152,19 +168,71 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }.start();
     }
 
-    private static boolean DEBUG = false;
 
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onResume() {
         super.onResume();
 
-        this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
-        this.mLGFTPFileDownloadProgressDialog = new LGFTPFileDownloadProgressDialog(this.getContext());
-        this.mLGFTPFileDownloadProgressDialog.setOnDismissListener(this);
-
         if (this.mLGFtpClient == null) {
             this.mLGFtpClient = new LGFTPClient(this.mILGFTPOperationListener);
         }
+
+        this.mNetworkOperationProgressDialog = new ProgressDialog(this.getContext());
+        this.mLGFTPFileDownloadProgressDialog = new LGFTPFileDownloadProgressDialog(this.getContext());
+        this.mLGFTPFileDownloadProgressDialog.setOnDismissListener(this);
+        this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
+
+        this.initLoggedInViews();
+        this.initLoggedOutViews();
+        this.initAlwaysShownViews();
+
+        this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
+        Log.d(TAG, "onResume() completed");
+    }
+
+    private void initAlwaysShownViews() {
+        this.mImgBtnTestHistory = (this.mView.findViewById(R.id.imgBtn_history));
+        this.mImgBtnTestHistory.setOnClickListener(this.mClickListenerShowHistory);
+
+        this.mCheckBoxUsePassiveMode = this.mView.findViewById(R.id.checkbox_set_passive);
+        this.mCheckBoxUsePassiveMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                hideSoftKeyboard();
+                Log.d(TAG, "calling setPassiveMode " + isChecked);
+                if (mLGFtpClient.isConnected()) {
+                    LGFTPFragment.this.mLGFtpClient.setPassiveMode(isChecked);
+                }
+            }
+        });
+
+        this.mCheckBoxUseEPSVforIPv4 = this.mView.findViewById(R.id.checkbox_set_epsv_for_ipv4);
+        this.mCheckBoxUseEPSVforIPv4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            boolean mIsPassivePreviouslyChecked = mCheckBoxUsePassiveMode.isChecked();
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                hideSoftKeyboard();
+                boolean tmp = mCheckBoxUsePassiveMode.isChecked();
+                if (isChecked) {
+                    mCheckBoxUsePassiveMode.setEnabled(false);
+                    mCheckBoxUsePassiveMode.setChecked(true);
+                } else {
+                    mCheckBoxUsePassiveMode.setEnabled(true);
+                    mCheckBoxUsePassiveMode.setChecked(mIsPassivePreviouslyChecked);
+                }
+
+                Log.d(TAG, "calling setEPSVforIPv4 " + isChecked);
+                if (mLGFtpClient.isConnected()) {
+                    LGFTPFragment.this.mLGFtpClient.setEPSVforIPv4(isChecked);
+                }
+
+                mIsPassivePreviouslyChecked = tmp;
+            }
+        });
+
+
 
         this.mBtnConnectDisconnect = (Button) this.mView.findViewById(R.id.btn_connect_disconnect);
         if (this.mLGFtpClient != null && this.mLGFtpClient.isConnected()) {
@@ -172,6 +240,24 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         } else {
             this.mBtnConnectDisconnect.setOnClickListener(this.mClickListenerConnect);
         }
+
+        if (!this.isNetworkAvailable()) {
+            this.mBtnConnectDisconnect.setEnabled(false);
+        }
+
+        this.mFTPFileListView = this.mView.findViewById(R.id.listView_ftpFileList);
+        this.mFTPFileListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        this.mFTPFileListView.setOnItemClickListener(this);
+
+        if (this.mFTPFileListVIewAdapter == null) {
+            this.mFTPFileListVIewAdapter = new LGFTPFileListViewAdapter(this.getContext());
+            this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
+        }
+    }
+
+    private void initLoggedOutViews() {
+        this.mLinearLayoutLoggedOutViewGroup = this.mView.findViewById(R.id.ll_logged_out_view_group);
+        this.mLinearLayoutLoggedInViewGroup.setMinimumHeight(mLinearLayoutLoggedOutViewGroup.getHeight());
 
         this.mEditTextServerAddress = this.mView.findViewById(R.id.editText_server_addr);
         this.mEditTextPortNum = this.mView.findViewById(R.id.editText_port_num);
@@ -194,28 +280,51 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mEditTextUserID.setText("user");
             this.mEditTextPassword.setText("@lge1234");
         }
+    }
 
-        if (!this.isNetworkAvailable()) {
-            this.mBtnConnectDisconnect.setEnabled(false);
+    private InputFilter mNumberInputFilter = new InputFilter() {
+
+        private boolean isInRange(int a, int b, int c) {
+            return b > a ? c >= a && c <= b : c >= b && c <= a;
         }
 
-        this.mFTPFileListView = this.mView.findViewById(R.id.listView_ftpFileList);
-        this.mFTPFileListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        this.mFTPFileListView.setOnItemClickListener(this);
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            try {
+                int input = Integer.parseInt(dest.toString() + source.toString());
 
-        if (this.mFTPFileListVIewAdapter == null) {
-            this.mFTPFileListVIewAdapter = new LGFTPFileListViewAdapter(this.getContext());
-            this.mFTPFileListView.setAdapter(this.mFTPFileListVIewAdapter);
+                if (source.length() == 0) { // in case deletion
+                    if (dest.length() == 1) {
+                        return "1";
+                    } else {
+                        return null;
+                    }
+                }
+                if (isInRange(1, 100, input)) {
+                    Log.d(TAG, "still in range");
+                    return source;
+                }
+            } catch (NumberFormatException nfe) {
+
+            }
+            return "";
         }
+    };
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void initLoggedInViews() {
+        // Logged in views init start.
         this.mLinearLayoutLoggedInViewGroup = this.mView.findViewById(R.id.ll_logged_in_view_group);
-        this.mLinearLayoutLoggedOutViewGroup = this.mView.findViewById(R.id.ll_logged_out_view_group);
-        this.mLinearLayoutLoggedInViewGroup.setMinimumHeight(mLinearLayoutLoggedOutViewGroup.getHeight());
-
-        this.mImgBtnTestHistory = (this.mView.findViewById(R.id.imgBtn_history));
-        this.mImgBtnTestHistory.setOnClickListener(this.mClickListenerShowHistory);
-        this.mBtnDLULStartStop = this.mView.findViewById(R.id.btn_ftp_download);
-        this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
+        this.mLinearLayoutLoggedInViewGroup.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "onTouch() " + event.getAction());
+                    hideSoftKeyboard();
+                }
+                return true;
+            }
+        });
 
         this.mCheckBoxUseFileIO = this.mView.findViewById(R.id.checkbox_use_file_IO);
         this.mCheckBoxUseFileIO.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -230,49 +339,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 }
             }
         });
-
-        this.mCheckBoxUsePassiveMode = this.mView.findViewById(R.id.checkbox_set_passive);
-        this.mCheckBoxUsePassiveMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(TAG, "calling setPassiveMode " + isChecked);
-                LGFTPFragment.this.mLGFtpClient.setPassiveMode(isChecked);
-            }
-        });
-
-        this.mCheckBoxUseEPSVforIPv4 = this.mView.findViewById(R.id.checkbox_set_epsv_for_ipv4);
-        this.mCheckBoxUseEPSVforIPv4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            boolean mIsPassivePreviouslyChecked = mCheckBoxUsePassiveMode.isChecked();
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean tmp = mCheckBoxUsePassiveMode.isChecked();
-                if (isChecked) {
-                    mCheckBoxUsePassiveMode.setEnabled(false);
-                    mCheckBoxUsePassiveMode.setChecked(true);
-                } else {
-                    mCheckBoxUsePassiveMode.setEnabled(true);
-                    mCheckBoxUsePassiveMode.setChecked(mIsPassivePreviouslyChecked);
-                }
-
-                Log.d(TAG, "calling setEPSVforIPv4 " + isChecked);
-                LGFTPFragment.this.mLGFtpClient.setEPSVforIPv4(isChecked);
-
-                mIsPassivePreviouslyChecked = tmp;
-            }
-        });
-
-        this.mSpinnerRepeatCount = this.mView.findViewById(R.id.spinner_ftp_download_repeat_count);
-
-        this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
+        this.mCheckBoxUseFileIO.setOnFocusChangeListener(this);
 
         this.mRadioGroupMethodType = this.mView.findViewById(R.id.radioGroup_method_type);
-        this.mRadioButtonConventionalMethod = this.mView.findViewById(R.id.radioButton_method_type_conventional);
-        this.mRadioButtonApacheMethod = this.mView.findViewById(R.id.radioButton_method_type_apache);
-        this.mRadioButtonFileChannelMethod= this.mView.findViewById(R.id.radioButton_method_type_file_channel);
-
         this.mRadioGroupMethodType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                hideSoftKeyboard();
                 Log.d(TAG , "mRadioGroupMethodType onCheckedChanged()");
                 if (checkedId == mRadioButtonConventionalMethod.getId()) {
                     mCheckedMethod = LGFTPClient.METHOD_TYPE_CONVENTIONAL;
@@ -283,13 +356,77 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 }
             }
         });
-        this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
 
-        Log.d(TAG, "onResume() completed");
+        this.mRadioButtonConventionalMethod = this.mView.findViewById(R.id.radioButton_method_type_conventional);
+        this.mRadioButtonConventionalMethod.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mEditTextRepeatCount.clearFocus();
+                mEditTextTestIntervalInSec.clearFocus();
+                hideSoftKeyboard();
+                return false;
+            }
+        });
+        this.mRadioButtonApacheMethod = this.mView.findViewById(R.id.radioButton_method_type_apache);
+        this.mRadioButtonApacheMethod.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mEditTextRepeatCount.clearFocus();
+                mEditTextTestIntervalInSec.clearFocus();
+                hideSoftKeyboard();
+                return false;
+            }
+        });
+        this.mRadioButtonFileChannelMethod= this.mView.findViewById(R.id.radioButton_method_type_file_channel);
+        this.mRadioButtonApacheMethod.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mEditTextRepeatCount.clearFocus();
+                mEditTextTestIntervalInSec.clearFocus();
+                hideSoftKeyboard();
+                return false;
+            }
+        });
+
+        this.mEditTextRepeatCount = this.mView.findViewById(R.id.editTxt_ftp_download_repeat_count);
+        this.mEditTextRepeatCount.setOnFocusChangeListener(this);
+        this.mEditTextRepeatCount.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextRepeatCount)});
+        this.mEditTextRepeatCount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d(TAG, "afterTextChanged " + s);
+                if (s.toString().equals("1")) {
+                    mEditTextTestIntervalInSec.setEnabled(false);
+                } else {
+                    mEditTextTestIntervalInSec.setEnabled(true);
+                }
+            }
+        });
+
+        this.mEditTextTestIntervalInSec = this.mView.findViewById(R.id.editTxt_ftp_download_repeat_interval);
+        this.mEditTextTestIntervalInSec.setOnFocusChangeListener(this);
+        this.mEditTextTestIntervalInSec.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextTestIntervalInSec)});
+
+        this.mBtnDLULStartStop = this.mView.findViewById(R.id.btn_ftp_download);
+        this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
     }
 
-    private int mCheckedMethod;
-
+    private void hideSoftKeyboard() {
+        mEditTextRepeatCount.clearFocus();
+        mEditTextTestIntervalInSec.clearFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) this.getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+    }
 
     /* file download progress dialog show/hide [START] */
     private void showFileDownloadProgressBar() {
@@ -316,57 +453,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mNetworkOperationProgressDialog.dismiss();
         }
     }
-    /* network operation progress bar show/hide [END] */
-
-   /* private void showDLBtnLayout() {
-        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(0).alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
-                LGFTPFragment.this.mSpinnerRepeatCount.setDropDownWidth(LGFTPFragment.this.mSpinnerRepeatCount.getWidth());
-                try {
-                    Field popup = Spinner.class.getDeclaredField("mPopup");
-                    popup.setAccessible(true);
-                    ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(mSpinnerRepeatCount);
-                    popupWindow.setHeight(LGFTPFragment.this.mSpinnerRepeatCount.getHeight() * 16);
-                } catch (NoClassDefFoundError | ClassCastException | NoSuchFieldException | IllegalAccessException e) {
-                    Log.e(TAG, "" + e.getMessage());
-                }
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mLinearLayoutLoggedInViewGroup.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) { }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) { }
-        });
-    }
-
-    private void hideDLBtnLayout() {
-        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.animate().translationY(mLinearLayoutLoggedInViewGroup.getHeight()).alpha(0.0f).setDuration(600)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) { }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        LGFTPFragment.this.mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) { }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) { }
-                });
-
-        mLinearLayoutLoggedInViewGroup.setVisibility(View.GONE);
-    }*/
 
     private void setLoggedInLayout() {
         Log.d(TAG, "setLoggedInLayout() ");
@@ -606,7 +692,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         LGFTPFragment.this.dismissNetworkOperationProgressBar();
                         if (sResult) {
                             LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerDisconnect);
-                            LGFTPFragment.this.mBtnConnectDisconnect.setText("Log out");
+                            LGFTPFragment.this.mBtnConnectDisconnect.setText("Log\nout");
                             LGFTPFragment.this.mBtnDLULStartStop.setEnabled(true);
                             // ******************************* TODO
                             LGFTPFragment.this.setLoggedInLayout();
@@ -786,6 +872,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private View.OnClickListener mClickListenerConnect = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            hideSoftKeyboard();
             LGFTPFragment.this.showNetworkOperationProgressBar("Log in", "Logging in...");
             LGFTPFragment.this.mFileList = null;
             new Thread() {
@@ -803,7 +890,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private View.OnClickListener mClickListenerDisconnect = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            hideSoftKeyboard();
             LGFTPFragment.this.mFileList = null;
+            LGFTPFragment.this.mFTPFileListVIewAdapter.clearSelectedFilePositionList();
             LGFTPFragment.this.showNetworkOperationProgressBar("Log out", "Disconnecting...");
             new Thread() {
                 @Override
@@ -821,8 +910,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private View.OnClickListener mClickListenerStart = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            hideSoftKeyboard();
             Log.d(TAG, "mClickListenerStart.onClick()");
-            final int sRepeatCount = Integer.valueOf(mSpinnerRepeatCount.getSelectedItem().toString());
+            final int sRepeatCount = Integer.valueOf(mEditTextRepeatCount.getText().toString());
             final ArrayList<LGFTPFile> sSelectedFileList = LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFileList();
             Log.d(TAG, "Selected file count : " + sSelectedFileList.size());
             LGFTPFragment.this.mInitialFileCount = sSelectedFileList.size();
@@ -860,6 +950,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Override
         public void onClick(View v) {
             Log.d(TAG, "onClick() show history");
+            hideSoftKeyboard();
             // TODO : DB list show.
 
             // test code for DB creation, insertion, delegation
@@ -885,6 +976,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        hideSoftKeyboard();
         Log.d(TAG, "onItemClick() position : " + position + ", id : " + id  );
         final LGFTPFile file = (LGFTPFile) LGFTPFragment.this.mFTPFileListVIewAdapter.getItem(position);
         if (file.isFile()) {
@@ -922,6 +1014,51 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
         } else {
             Log.d(TAG, "not a LGFTPFileDownloadProgressDialog.");
+        }
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        Log.d(TAG, "onFocusChange() " + v.getTransitionName() + ", " + hasFocus);
+        if (mEditTextRepeatCount.getId() != v.getId() && mEditTextTestIntervalInSec.getId() != v.getId()){
+            Log.d(TAG, "hiding softKeyboard");
+            hideSoftKeyboard();
+        }
+    }
+
+    private class NumberFormatFilter implements InputFilter {
+
+        private EditText mTargetView;
+
+        public NumberFormatFilter(EditText targetView) {
+            this.mTargetView = targetView;
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            try {
+                int input = Integer.parseInt(dest.toString() + source.toString());
+
+                if (source.length() == 0) { // in case deletion
+                    if (dest.length() == 1) {
+                        this.mTargetView.setSelection(0, this.mTargetView.getText().length());
+                        return "1";
+                    } else {
+                        return null;
+                    }
+                }
+                if (isInRange(1, 100, input)) {
+                    Log.d(TAG, "still in range");
+                    return source;
+                }
+            } catch (NumberFormatException nfe) {
+
+            }
+            return "";
+        }
+
+        private boolean isInRange(int a, int b, int c) {
+            return b > a ? c >= a && c <= b : c >= b && c <= a;
         }
     }
 }

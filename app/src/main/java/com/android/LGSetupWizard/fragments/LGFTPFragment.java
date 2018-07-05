@@ -20,12 +20,15 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -35,6 +38,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -389,7 +393,19 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         });
 
         this.mEditTextRepeatCount = this.mView.findViewById(R.id.editTxt_ftp_download_repeat_count);
-        this.mEditTextRepeatCount.setOnFocusChangeListener(this);
+        this.mEditTextRepeatCount.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch " + event.getAction());
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(),
+                            LGFTPFragment.this.getView());
+                    c.show();
+                }
+                return false;
+            }
+        });
+        /*this.mEditTextRepeatCount.setOnFocusChangeListener(this);
         this.mEditTextRepeatCount.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextRepeatCount)});
         this.mEditTextRepeatCount.addTextChangedListener(new TextWatcher() {
             @Override
@@ -411,7 +427,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     mEditTextTestIntervalInSec.setEnabled(true);
                 }
             }
-        });
+        });*/
 
         this.mEditTextTestIntervalInSec = this.mView.findViewById(R.id.editTxt_ftp_download_repeat_interval);
         this.mEditTextTestIntervalInSec.setOnFocusChangeListener(this);
@@ -724,6 +740,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 case MSG_DISCONNECT_FROM_SERVER_FINISHED:
                     Log.d(TAG, "MSG_DISCONNECT_FROM_SERVER_FINISHED");
                     // ******************************* TODO
+                    LGFTPFragment.this.hideSoftKeyboard();
                     LGFTPFragment.this.mBtnConnectDisconnect.setOnClickListener(mClickListenerConnect);
                     LGFTPFragment.this.mBtnConnectDisconnect.setText("Log in");
                     LGFTPFragment.this.mBtnDLULStartStop.setEnabled(false);
@@ -1059,6 +1076,37 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         private boolean isInRange(int a, int b, int c) {
             return b > a ? c >= a && c <= b : c >= b && c <= a;
+        }
+    }
+
+    protected class CounterSettingPopupWindow extends PopupWindow {
+        private final String TAG = CounterSettingPopupWindow.class.getSimpleName();
+
+        private View mParentView;
+        private View mPopupWindowView;
+        private Context mContext;
+
+        public CounterSettingPopupWindow(Context context, View parentView) {
+            this.mParentView = parentView;
+            this.mContext = context;
+            this.mPopupWindowView = ((LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.popup_view_count_input, null);
+
+            LinearLayout ll = this.mPopupWindowView.findViewById(R.id.ll_popup_view_count_input);
+            Log.d(TAG, ll.getMeasuredWidth() + ", " + ll.getMeasuredHeight());
+
+            this.setContentView(this.mPopupWindowView);
+            DisplayMetrics metrics = new DisplayMetrics();
+            (((WindowManager) this.mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()).getMetrics(metrics);
+
+            this.setWidth((int)(metrics.widthPixels * 0.8f));
+            this.setHeight((int) (this.getWidth() * 0.5f));
+            this.setFocusable(true);
+        }
+
+        public void show() {
+            Log.d(TAG, "show() ");
+            this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
+            this.showAtLocation(mParentView, Gravity.CENTER, (int) mParentView.getX(), (int) mParentView.getY());
         }
     }
 }

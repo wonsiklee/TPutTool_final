@@ -194,9 +194,11 @@
                         android:gravity="end"
                         android:text="1"
                         android:textAlignment="center"
-                        android:inputType="number"
-                        android:selectAllOnFocus="true"
-                        android:focusableInTouchMode="true"/>
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"/>
+                        <!--android:inputType="number"-->
+                        <!--android:selectAllOnFocus="true"
+                        android:focusableInTouchMode="true"/>-->
 
                     <TextView
                         android:layout_width="wrap_content"

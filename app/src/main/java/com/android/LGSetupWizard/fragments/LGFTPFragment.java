@@ -95,7 +95,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private Button mBtnConnectDisconnect;
     private ListView mFTPFileListView;
 
-
     private LGFTPFileDownloadProgressDialog mLGFTPFileDownloadProgressDialog;
 
     private ProgressDialog mNetworkOperationProgressDialog;
@@ -398,8 +397,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d(TAG, "onTouch " + event.getAction());
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(),
-                            LGFTPFragment.this.getView());
+                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(), LGFTPFragment.this.mEditTextRepeatCount);
                     c.show();
                 }
                 return false;
@@ -1091,8 +1089,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mContext = context;
             this.mPopupWindowView = ((LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.popup_view_count_input, null);
 
-            LinearLayout ll = this.mPopupWindowView.findViewById(R.id.ll_popup_view_count_input);
-            Log.d(TAG, ll.getMeasuredWidth() + ", " + ll.getMeasuredHeight());
+
 
             this.setContentView(this.mPopupWindowView);
             DisplayMetrics metrics = new DisplayMetrics();
@@ -1100,13 +1097,41 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
             this.setWidth((int)(metrics.widthPixels * 0.8f));
             this.setHeight((int) (this.getWidth() * 0.5f));
+
+            LinearLayout ll = this.mPopupWindowView.findViewById(R.id.ll_popup_view_count_input);
+            Log.d(TAG, ll.getMeasuredWidth() + ", " + ll.getMeasuredHeight());
+            ll.setAlpha(0.0f);
             this.setFocusable(true);
         }
 
         public void show() {
             Log.d(TAG, "show() ");
-            this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
+            mPopupWindowView.setVisibility(View.VISIBLE);
+            mPopupWindowView.setAlpha(0.0f);
             this.showAtLocation(mParentView, Gravity.CENTER, (int) mParentView.getX(), (int) mParentView.getY());
+            this.mPopupWindowView.animate()
+                    .alpha(1.0f)
+                    .setDuration(600)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            mPopupWindowView.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) { }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) { }
+                    });
         }
+    }
+
+    public void dismiss() {
+
     }
 }

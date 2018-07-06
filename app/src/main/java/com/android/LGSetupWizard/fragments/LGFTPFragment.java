@@ -1339,8 +1339,4 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     });
         }
     }
-
-    public void dismiss() {
-
-    }
 }

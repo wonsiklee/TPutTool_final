@@ -93,7 +93,7 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
         mCategory = category;
 
         this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
-        this.showAtLocation(parentView, Gravity.CENTER, (int) parentView.getX(), (int) parentView.getY());
+        this.showAtLocation(parentView, Gravity.CENTER, 0, 0);
     }
 
     @Override

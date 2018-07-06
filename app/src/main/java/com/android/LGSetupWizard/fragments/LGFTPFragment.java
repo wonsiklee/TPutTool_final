@@ -9,13 +9,8 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.LinkProperties;
-import android.net.Network;
-import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
-import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -491,8 +486,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 return true;
             }
         });*/
-        /*this.mEditTextRepeatCount.setOnFocusChangeListener(this);
-        this.mEditTextRepeatCount.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextRepeatCount)});
+        this.mEditTextRepeatCount.setOnFocusChangeListener(this);
         this.mEditTextRepeatCount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -513,11 +507,21 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     mEditTextTestIntervalInSec.setEnabled(true);
                 }
             }
-        });*/
+        });
 
         this.mEditTextTestIntervalInSec = this.mView.findViewById(R.id.editTxt_ftp_download_repeat_interval);
         this.mEditTextTestIntervalInSec.setOnFocusChangeListener(this);
-        this.mEditTextTestIntervalInSec.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextTestIntervalInSec)});
+        this.mEditTextTestIntervalInSec.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch " + event.getAction());
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(), LGFTPFragment.this.mEditTextTestIntervalInSec);
+                    c.show();
+                }
+                return false;
+            }
+        });
 
         this.mBtnDLULStartStop = this.mView.findViewById(R.id.btn_ftp_download);
         this.mBtnDLULStartStop.setOnClickListener(this.mClickListenerStart);
@@ -1168,16 +1172,134 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     protected class CounterSettingPopupWindow extends PopupWindow {
         private final String TAG = CounterSettingPopupWindow.class.getSimpleName();
 
-        private View mParentView;
+        private EditText mParentView;
         private View mPopupWindowView;
         private Context mContext;
 
-        public CounterSettingPopupWindow(Context context, View parentView) {
+        private EditText mEditTextCounterValue;
+        private ImageButton mImgBtnIncrease;
+        private ImageButton mImgBtnDecrease;
+        private Button mBtnDismissChange;
+        private Button mBtnApplyChange;
+
+        private boolean mIsLongClickMarked = false;
+
+        private static final int MSG_INCREASE = 0x00;
+        private static final int MSG_DECREASE = 0x01;
+        private static final int MSG_STOP = 0x02;
+
+        @SuppressLint("HandlerLeak")
+        private Handler mRepeatIncreaseHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case MSG_INCREASE:
+                        increase();
+                        sendEmptyMessageDelayed(MSG_INCREASE, 30);
+                        break;
+                    case MSG_DECREASE:
+                        decrease();
+                        sendEmptyMessageDelayed(MSG_DECREASE, 30);
+                        break;
+                    case MSG_STOP:
+                        this.removeMessages(MSG_DECREASE);
+                        this.removeMessages(MSG_INCREASE);
+                        break;
+                }
+            }
+        };
+
+        private void increase() {
+            int sCurrentValue = Integer.valueOf(mEditTextCounterValue.getText().toString());
+            if (sCurrentValue < 100) {
+                mEditTextCounterValue.setText(String.valueOf(sCurrentValue + 1));
+            }
+            mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());
+        }
+
+        private void decrease() {
+            int sCurrentValue = Integer.valueOf(mEditTextCounterValue.getText().toString());
+            if (sCurrentValue > 1) {
+                mEditTextCounterValue.setText(String.valueOf(sCurrentValue - 1));
+            }
+            mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        public CounterSettingPopupWindow(Context context, EditText parentView) {
             this.mParentView = parentView;
             this.mContext = context;
             this.mPopupWindowView = ((LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.popup_view_count_input, null);
 
+            this.mEditTextCounterValue = this.mPopupWindowView.findViewById(R.id.txtView_counter_value);
+            this.mEditTextCounterValue.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextCounterValue)});
+            this.mEditTextCounterValue.setText(mParentView.getText());
 
+            this.mImgBtnIncrease = this.mPopupWindowView.findViewById(R.id.btn_increase);
+            this.mImgBtnIncrease.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                        if (mIsLongClickMarked) {
+                            mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
+                            mIsLongClickMarked = false;
+                        } else {
+                            increase();
+                        }
+                    }
+                    return false;
+                }
+            });
+            this.mImgBtnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mIsLongClickMarked = true;
+                    mRepeatIncreaseHandler.sendEmptyMessage(MSG_INCREASE);
+                    return false;
+                }
+            });
+
+            this.mImgBtnDecrease = this.mPopupWindowView.findViewById(R.id.btn_decrease);
+            this.mImgBtnDecrease.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        if (mIsLongClickMarked) {
+                            mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
+                            mIsLongClickMarked = false;
+                        } else {
+                            decrease();
+                        }
+                    }
+                    return false;
+                }
+            });
+            this.mImgBtnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mIsLongClickMarked = true;
+                    mRepeatIncreaseHandler.sendEmptyMessage(MSG_DECREASE);
+                    return false;
+                }
+            });
+
+            this.mBtnDismissChange = this.mPopupWindowView.findViewById(R.id.btn_discard_change);
+            this.mBtnDismissChange.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CounterSettingPopupWindow.this.dismiss();
+                }
+            });
+
+            this.mBtnApplyChange = this.mPopupWindowView.findViewById(R.id.btn_apply_change);
+            this.mBtnApplyChange.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mParentView.setText(mEditTextCounterValue.getText());
+                    CounterSettingPopupWindow.this.dismiss();
+                }
+            });
 
             this.setContentView(this.mPopupWindowView);
             DisplayMetrics metrics = new DisplayMetrics();
@@ -1193,13 +1315,12 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
 
         public void show() {
-            Log.d(TAG, "show() ");
             mPopupWindowView.setVisibility(View.VISIBLE);
             mPopupWindowView.setAlpha(0.0f);
-            this.showAtLocation(mParentView, Gravity.CENTER, (int) mParentView.getX(), (int) mParentView.getY());
+            this.showAtLocation(mParentView, Gravity.NO_GRAVITY, (int) mParentView.getX(), (int) mParentView.getY() + mLinearLayoutLoggedInViewGroup.getHeight());
             this.mPopupWindowView.animate()
                     .alpha(1.0f)
-                    .setDuration(600)
+                    .setDuration(300)
                     .setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {

@@ -20,6 +20,7 @@ import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -1135,6 +1136,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     private class NumberFormatFilter implements InputFilter {
 
+        private final String TAG = NumberFormatFilter.class.getSimpleName();
         private EditText mTargetView;
 
         public NumberFormatFilter(EditText targetView) {
@@ -1143,20 +1145,35 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            Log.d(TAG, "targetView : " + mTargetView.getText());
+            Log.d(TAG, "source : " + source);
+            Log.d(TAG, "start : " + start);
+            Log.d(TAG, "end : " + end);
+            Log.d(TAG, "dest : " + dest);
+            Log.d(TAG, "dstart : " + dstart);
+            Log.d(TAG, "dend : " + dend);
             try {
-                int input = Integer.parseInt(dest.toString() + source.toString());
+                if (start == 0 && end == 1 && dstart == 0 && dend == 1 && TextUtils.equals(source, "0")) {
+                    return "1";
+                }
 
+                int input = Integer.parseInt(dest.toString() + source.toString());
                 if (source.length() == 0) { // in case deletion
-                    if (dest.length() == 1) {
+                    if ((dend - dstart) == dest.length()) {
                         this.mTargetView.setSelection(0, this.mTargetView.getText().length());
                         return "1";
                     } else {
                         return null;
                     }
                 }
+
+
                 if (isInRange(1, 100, input)) {
                     Log.d(TAG, "still in range");
                     return source;
+                } else {
+                    Log.d(TAG, "not in range");
+                    return "";
                 }
             } catch (NumberFormatException nfe) {
 
@@ -1164,8 +1181,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             return "";
         }
 
-        private boolean isInRange(int a, int b, int c) {
-            return b > a ? c >= a && c <= b : c >= b && c <= a;
+        private boolean isInRange(int min, int max, int value) {
+            Log.d(TAG, "min : " + min + ", max : " + max + ", value : " + value);
+            return max > min ? (value >= min && value <= max) : (value >= max && value <= min);
         }
     }
 
@@ -1234,6 +1252,24 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mEditTextCounterValue = this.mPopupWindowView.findViewById(R.id.txtView_counter_value);
             this.mEditTextCounterValue.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextCounterValue)});
             this.mEditTextCounterValue.setText(mParentView.getText());
+            this.mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());
+            this.mEditTextCounterValue.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
 
             this.mImgBtnIncrease = this.mPopupWindowView.findViewById(R.id.btn_increase);
             this.mImgBtnIncrease.setOnTouchListener(new View.OnTouchListener() {

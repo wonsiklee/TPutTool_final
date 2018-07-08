@@ -1032,12 +1032,18 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                         ArrayList<LGFTPFile> sTmpSelectedFileList = (ArrayList<LGFTPFile>) sSelectedFileList.clone();
                         ArrayList<Integer> sTmpSelectedFilePositionList = (ArrayList<Integer>) mFTPFileListVIewAdapter.getSelectedFilePositionList().clone();
                         try {
+                            int sInterval = Integer.valueOf(mEditTextTestIntervalInSec.getText().toString());
                             for (int i = 0; i != sRepeatCount; ++i) {
                                 LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mCheckBoxUseFileIO.isChecked(), mCheckedMethod)) {
-                                    Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left, delaying for 3 secs");
-                                    Thread.sleep(3000);
+                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mCheckBoxUseFileIO.isChecked(), mCheckedMethod, sInterval * 1000)) {
+                                    Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
+                                    if (mEditTextTestIntervalInSec.isEnabled()) {
+                                        Log.d(TAG, "waiting for " + sInterval + " seconds");
+                                        Thread.sleep(sInterval * 1000);
+                                    } else {
+                                        Log.d(TAG, "no need to wait");
+                                    }
                                 } else {
                                     Log.d(TAG, "Download has been cancelled.");
                                     break;

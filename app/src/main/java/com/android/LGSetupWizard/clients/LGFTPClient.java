@@ -394,7 +394,7 @@ public class LGFTPClient {
         }
     };
 
-    public boolean retrieveFile(ArrayList<LGFTPFile> remoteFileList, boolean shouldWrite, int methodType) throws Exception {
+    public boolean retrieveFile(ArrayList<LGFTPFile> remoteFileList, boolean shouldWrite, int methodType, int delayInMilliseconds) throws InterruptedException {
         this.mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
 
         for (LGFTPFile remoteFile: remoteFileList) {
@@ -406,7 +406,7 @@ public class LGFTPClient {
                 Log.d(TAG, "cancelling the rest of the files to download");
                 return false;
             }
-            Thread.sleep(3000);
+            Thread.sleep(delayInMilliseconds);
         }
 
         Log.d(TAG, "all downloads completed.");

@@ -529,10 +529,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     private void hideSoftKeyboard() {
+        Context sContext = this.getContext();
+        if (sContext != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) sContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+        }
         mEditTextRepeatCount.clearFocus();
         mEditTextTestIntervalInSec.clearFocus();
-        InputMethodManager inputMethodManager = (InputMethodManager) this.getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
     }
 
     /* file download progress dialog show/hide [START] */

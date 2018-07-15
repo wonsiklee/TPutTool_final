@@ -403,7 +403,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 Log.d(TAG, "onTouch " + event.getAction());
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(), LGFTPFragment.this.mEditTextRepeatCount);
-                    c.show();
+                    c.show((int) LGFTPFragment.this.mEditTextRepeatCount.getX(), (int) LGFTPFragment.this.mEditTextRepeatCount.getY() + mLinearLayoutLoggedInViewGroup.getHeight());
                 }
                 return false;
             }
@@ -518,7 +518,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 Log.d(TAG, "onTouch " + event.getAction());
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(), LGFTPFragment.this.mEditTextTestIntervalInSec);
-                    c.show();
+                    c.show((int) LGFTPFragment.this.mEditTextTestIntervalInSec.getX(), (int) LGFTPFragment.this.mEditTextTestIntervalInSec.getY() + mLinearLayoutLoggedInViewGroup.getHeight());
                 }
                 return false;
             }
@@ -1286,9 +1286,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                        if (mIsLongClickMarked) {
-                            mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
-                            mIsLongClickMarked = false;
+                        if (CounterSettingPopupWindow.this.mIsLongClickMarked) {
+                            CounterSettingPopupWindow.this.mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
+                            CounterSettingPopupWindow.this.mIsLongClickMarked = false;
                         } else {
                             increase();
                         }
@@ -1299,8 +1299,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mImgBtnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mIsLongClickMarked = true;
-                    mRepeatIncreaseHandler.sendEmptyMessage(MSG_INCREASE);
+                    CounterSettingPopupWindow.this.mIsLongClickMarked = true;
+                    CounterSettingPopupWindow.this.mRepeatIncreaseHandler.sendEmptyMessage(MSG_INCREASE);
                     return false;
                 }
             });
@@ -1310,11 +1310,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-                        if (mIsLongClickMarked) {
-                            mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
-                            mIsLongClickMarked = false;
+                        if (CounterSettingPopupWindow.this.mIsLongClickMarked) {
+                            CounterSettingPopupWindow.this.mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
+                            CounterSettingPopupWindow.this.mIsLongClickMarked = false;
                         } else {
-                            decrease();
+                            CounterSettingPopupWindow.this.decrease();
                         }
                     }
                     return false;
@@ -1323,8 +1323,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mImgBtnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mIsLongClickMarked = true;
-                    mRepeatIncreaseHandler.sendEmptyMessage(MSG_DECREASE);
+                    CounterSettingPopupWindow.this.mIsLongClickMarked = true;
+                    CounterSettingPopupWindow.this.mRepeatIncreaseHandler.sendEmptyMessage(MSG_DECREASE);
                     return false;
                 }
             });
@@ -1341,28 +1341,32 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mBtnApplyChange.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mParentView.setText(mEditTextCounterValue.getText());
+                    CounterSettingPopupWindow.this.mParentView.setText(mEditTextCounterValue.getText());
                     CounterSettingPopupWindow.this.dismiss();
                 }
             });
 
             this.setContentView(this.mPopupWindowView);
-            DisplayMetrics metrics = new DisplayMetrics();
-            (((WindowManager) this.mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()).getMetrics(metrics);
+            DisplayMetrics sMetrics = new DisplayMetrics();
+            (((WindowManager) this.mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()).getMetrics(sMetrics);
 
-            this.setWidth((int)(metrics.widthPixels * 0.8f));
+            this.setWidth((int)(sMetrics.widthPixels * 0.8f));
             this.setHeight((int) (this.getWidth() * 0.5f));
 
-            LinearLayout ll = this.mPopupWindowView.findViewById(R.id.ll_popup_view_count_input);
-            Log.d(TAG, ll.getMeasuredWidth() + ", " + ll.getMeasuredHeight());
-            ll.setAlpha(0.0f);
+            LinearLayout sLinearLayout = this.mPopupWindowView.findViewById(R.id.ll_popup_view_count_input);
+            Log.d(TAG, sLinearLayout.getMeasuredWidth() + ", " + sLinearLayout.getMeasuredHeight());
+            sLinearLayout.setAlpha(0.0f);
             this.setFocusable(true);
         }
 
-        public void show() {
-            mPopupWindowView.setVisibility(View.VISIBLE);
-            mPopupWindowView.setAlpha(0.0f);
-            this.showAtLocation(mParentView, Gravity.NO_GRAVITY, (int) mParentView.getX(), (int) mParentView.getY() + mLinearLayoutLoggedInViewGroup.getHeight());
+        public void show(int x, int y) {
+            this.mPopupWindowView.setVisibility(View.VISIBLE);
+            this.mPopupWindowView.setAlpha(0.0f);
+            /*this.showAtLocation(this.mParentView, Gravity.NO_GRAVITY,
+                    (int) this.mParentView.getX(),
+                    (int) this.mParentView.getY() + mLinearLayoutLoggedInViewGroup.getHeight());*/
+            this.showAtLocation(this.mParentView, Gravity.NO_GRAVITY,
+                    x, y);
             this.mPopupWindowView.animate()
                     .alpha(1.0f)
                     .setDuration(300)
@@ -1373,7 +1377,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            mPopupWindowView.setVisibility(View.VISIBLE);
+                            CounterSettingPopupWindow.this.mPopupWindowView.setVisibility(View.VISIBLE);
                         }
 
                         @Override

@@ -4,11 +4,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.android.LGSetupWizard.fragments.ConfigurationFragment;
-import com.android.LGSetupWizard.fragments.LGFTPFragment;
-import com.android.LGSetupWizard.fragments.LGHTTPFragment;
-import com.android.LGSetupWizard.fragments.LGIperfFragment;
-import com.android.LGSetupWizard.fragments.LGNIAFragment;
+import com.android.LGSetupWizard.ui.fragments.ConfigurationFragment;
+import com.android.LGSetupWizard.ui.fragments.LGFTPFragment;
+import com.android.LGSetupWizard.ui.fragments.LGHTTPFragment;
+import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
+import com.android.LGSetupWizard.ui.fragments.LGNIAFragment;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard.fragments;
+package com.android.LGSetupWizard.ui.fragments;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,9 +18,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.R;
-import com.android.LGSetupWizard.clients.LGOKHTTPClient;
 import com.android.LGSetupWizard.database.TestResultDBManager;
-import com.android.LGSetupWizard.database.TestResultPopupWindow;
+import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 
 import java.util.List;
 

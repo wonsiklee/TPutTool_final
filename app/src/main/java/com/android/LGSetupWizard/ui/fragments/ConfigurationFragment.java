@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard.fragments;
+package com.android.LGSetupWizard.ui.fragments;
 
 import com.android.LGSetupWizard.IDeviceMonitoringService;
 import com.android.LGSetupWizard.IDeviceMonitoringServiceCallback;

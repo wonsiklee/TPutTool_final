@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard.fragments;
+package com.android.LGSetupWizard.ui.fragments;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.clients.LGNIAClient;

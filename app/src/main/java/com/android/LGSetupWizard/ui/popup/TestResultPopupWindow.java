@@ -1,5 +1,4 @@
-package com.android.LGSetupWizard.database;
-
+package com.android.LGSetupWizard.ui.popup;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.TestResultListAdapter;
+import com.android.LGSetupWizard.database.TestResultDBManager;
 
 public class TestResultPopupWindow extends PopupWindow implements View.OnClickListener {
 
@@ -100,7 +100,7 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_dismiss_result:
-                TestResultPopupWindow.this.dismiss();
+                this.dismiss();
                 break;
             case R.id.btn_export_test_result_to_file:
                 TestResultDBManager.getInstance(mContext).exportResults();

@@ -408,85 +408,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 return false;
             }
         });
-
-        /*this.mEditTextRepeatCount.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                ConnectivityManager cm = (ConnectivityManager) LGFTPFragment.this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-                if (!mIsNetworkRequested) {
-                    mPendingIntent = PendingIntent.getBroadcast(LGFTPFragment.this.getContext(), 0, new Intent("com.lge.data.IMS_TEST"), PendingIntent.FLAG_UPDATE_CURRENT);
-
-                    NetworkRequest nr = new NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_IMS).build();
-                    ncb = new ConnectivityManager.NetworkCallback() {
-                        @Override
-                        public void onAvailable(Network network) {
-                            Log.d(TAG + " request", "************************************");
-                            Log.d(TAG+ " request", "onAvailable(network) "  + System.currentTimeMillis());
-                            Log.d(TAG+ " request", "network : " + network.toString());
-                            Log.d(TAG+ " request", "************************************");
-                            super.onAvailable(network);
-                        }
-
-                        @Override
-                        public void onLosing(Network network, int maxMsToLive) {
-                            Log.d(TAG+ " request", "************************************");
-                            Log.d(TAG+ " request", "onLosing(network, maxMsToLive) "  + System.currentTimeMillis());
-                            Log.d(TAG+ " request", "network : " + network.toString() );
-                            Log.d(TAG+ " request", "maxMsToLive : " + maxMsToLive + " ms");
-                            Log.d(TAG+ " request", "************************************");
-                            super.onLosing(network, maxMsToLive);
-                        }
-
-                        @Override
-                        public void onLost(Network network) {
-                            Log.d(TAG+ " request", "************************************");
-                            Log.d(TAG+ " request", "onLost(network) " + System.currentTimeMillis());
-                            Log.d(TAG+ " request", "onLost : " + network.toString() );
-                            Log.d(TAG+ " request", "************************************");
-                            super.onLost(network);
-                        }
-
-                        @Override
-                        public void onUnavailable() {
-                            Log.d(TAG+ " request", "************************************");
-                            Log.d(TAG+ " request", "onUnavailable() "  + System.currentTimeMillis());
-                            Log.d(TAG+ " request", "************************************");
-                            super.onUnavailable();
-                        }
-
-                        @Override
-                        public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
-                            Log.d(TAG, "************************************");
-                            Log.d(TAG, "onCapabilitiesChanged(network, networkCapabilities) " + System.currentTimeMillis());
-                            Log.d(TAG, "network : " + network.toString());
-                            Log.d(TAG, "networkCapabilities : " + networkCapabilities.toString());
-                            Log.d(TAG, "************************************");
-                            super.onCapabilitiesChanged(network, networkCapabilities);
-                        }
-
-                        @Override
-                        public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
-                            Log.d(TAG+ " request", "************************************");
-                            Log.d(TAG+ " request", "onLinkPropertiesChanged(network, linkProperties) "  + System.currentTimeMillis());
-                            Log.d(TAG+ " request", "network : " + network);
-                            Log.d(TAG+ " request", "linkProperties : " + linkProperties.toString());
-                            Log.d(TAG+ " request", "************************************");
-                            super.onLinkPropertiesChanged(network, linkProperties);
-                        }
-                    };
-                    cm.registerNetworkCallback(nr, ncb);
-                    cm.requestNetwork(nr, mPendingIntent);
-                    //cm.requestNetwork(nr, ncb);
-                    mIsNetworkRequested = true;
-                } else {
-                    Log.d(TAG+ " request", "releaseNetworkRequest " + System.currentTimeMillis());
-                    cm.releaseNetworkRequest(mPendingIntent);
-                    //cm.unregisterNetworkCallback(ncb);
-                    mIsNetworkRequested = false;
-                }
-                return true;
-            }
-        });*/
         this.mEditTextRepeatCount.setOnFocusChangeListener(this);
         this.mEditTextRepeatCount.addTextChangedListener(new TextWatcher() {
             @Override
@@ -1199,6 +1120,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     protected class CounterSettingPopupWindow extends PopupWindow {
         private final String TAG = CounterSettingPopupWindow.class.getSimpleName();
 
+
         private EditText mParentView;
         private View mPopupWindowView;
         private Context mContext;
@@ -1262,30 +1184,12 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.mEditTextCounterValue.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextCounterValue)});
             this.mEditTextCounterValue.setText(mParentView.getText());
             this.mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());
-            this.mEditTextCounterValue.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            });
-
 
             this.mImgBtnIncrease = this.mPopupWindowView.findViewById(R.id.btn_increase);
             this.mImgBtnIncrease.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-
                         if (CounterSettingPopupWindow.this.mIsLongClickMarked) {
                             CounterSettingPopupWindow.this.mRepeatIncreaseHandler.sendEmptyMessage(MSG_STOP);
                             CounterSettingPopupWindow.this.mIsLongClickMarked = false;
@@ -1359,14 +1263,18 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             this.setFocusable(true);
         }
 
+        @Override
+        public void dismiss() {
+            InputMethodManager inputMethodManager = (InputMethodManager) this.mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+            Log.d(TAG, "hide hide hide");
+            super.dismiss();
+        }
+
         public void show(int x, int y) {
             this.mPopupWindowView.setVisibility(View.VISIBLE);
             this.mPopupWindowView.setAlpha(0.0f);
-            /*this.showAtLocation(this.mParentView, Gravity.NO_GRAVITY,
-                    (int) this.mParentView.getX(),
-                    (int) this.mParentView.getY() + mLinearLayoutLoggedInViewGroup.getHeight());*/
-            this.showAtLocation(this.mParentView, Gravity.NO_GRAVITY,
-                    x, y);
+            this.showAtLocation(this.mParentView, Gravity.NO_GRAVITY, x, y);
             this.mPopupWindowView.animate()
                     .alpha(1.0f)
                     .setDuration(300)

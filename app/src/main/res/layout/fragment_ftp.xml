@@ -220,10 +220,9 @@
                         android:text="1"
                         android:gravity="end"
                         android:textAlignment="center"
-                        android:inputType="number"
-                        android:selectAllOnFocus="true"
-                        android:enabled="false"
-                        android:focusableInTouchMode="true"/>
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:enabled="false"/>
 
                     <TextView
                         android:layout_width="wrap_content"

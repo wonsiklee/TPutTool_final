@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="20dp"
             android:gravity="center"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -29,7 +29,6 @@
             <TextView
                 android:layout_width="85dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
                 android:gravity="center_vertical"
                 android:text="@string/str_http_file_addr" />
@@ -55,60 +54,63 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="85dp"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
                 android:gravity="center_vertical"
                 android:text="@string/str_http_http_stack" />
 
             <RadioGroup
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/rdoBtn_http_stack_okhttp"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:checked="true"
-                    android:paddingRight="10dp"
+                    android:layout_marginRight="10dp"
                     android:text="@string/str_http_okhttp" />
 
                 <RadioButton
                     android:id="@+id/rdoBtn_http_stack_apache"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingRight="10dp"
                     android:text="@string/str_http_apache" />
 
-                <ImageButton
-                    android:id="@+id/imgBtn_save_result"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_gravity="center"
-
-                    android:background="@drawable/test_logs" />
-
             </RadioGroup>
+
+            <CheckBox
+                android:id="@+id/checkBox_enable_file_io"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:layout_marginEnd="5dp"
+                android:text="@string/str_http_file_io" />
+
+            <ImageButton
+                android:id="@+id/imgBtn_save_result"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center"
+                android:background="@drawable/test_logs" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="85dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
@@ -117,20 +119,29 @@
 
             <EditText
                 android:id="@+id/editTxt_repeat_count"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:inputType="number"
-                android:text="2" />
-
-            <CheckBox
-                android:id="@+id/checkBox_enable_file_io"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
-                android:checked="true"
-                android:text="@string/str_http_file_io" />
+                android:gravity="center_vertical"
+                android:text="@string/str_http_interval_time" />
+
+            <EditText
+                android:id="@+id/editTxt_interval_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="5" />
 
             <Button
                 android:id="@+id/btn_start_http_dl_test"
@@ -143,7 +154,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
             <ProgressBar
@@ -163,6 +173,7 @@
             <LinearLayout
                 android:layout_width="125dp"
                 android:layout_height="match_parent"
+                android:background="?attr/colorButtonNormal"
                 android:gravity="top"
                 android:orientation="vertical">
 

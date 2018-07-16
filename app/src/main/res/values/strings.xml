@@ -11,10 +11,11 @@
     <string name="str_package_name_manual_input">직접 입력</string>
     <string name="str_http_file_addr">파일 주소</string>
     <string name="str_http_default_file_addr">http://192.168.1.2/1G.dll</string>
-    <string name="str_http_http_stack">HTTP Stack</string>
+    <string name="str_http_http_stack">Stack</string>
     <string name="str_http_okhttp">OkHttp</string>
     <string name="str_http_apache">Apache</string>
-    <string name="str_http_repeat_time">반복 횟수</string>
+    <string name="str_http_repeat_time">횟수</string>
+    <string name="str_http_interval_time">간격</string>
     <string name="str_http_file_io">File I/O</string>
     <string name="str_http_result">Result</string>
     <string name="str_http_result_history">History</string>

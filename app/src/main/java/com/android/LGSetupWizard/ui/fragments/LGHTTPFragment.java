@@ -6,9 +6,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -28,6 +31,7 @@ import com.android.LGSetupWizard.clients.LGHTTPClient;
 import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
 import com.android.LGSetupWizard.database.TestResultDBManager;
+import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 
 import lombok.experimental.Accessors;
@@ -37,12 +41,10 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener {
+public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
 
     private String testAddr = "http://192.168.1.2/1G";
-    //private String testAddr = "http://tool.xcdn.gdms.lge.com/swdata/MOBILESYNC/GO/P5.3.23.20150119/LGPCSuite/Autorun/LGPCSuite_Setup.exe";
-    //private String testAddr = null;
 
     private static final int START_TEST = 0x00;
     private static final int HTTP_DL_START = 0x01;
@@ -58,6 +60,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private RadioButton mRdoBtnApache;
     private ImageButton mImageButtonShowResult;
     private EditText mEditTxtRepeatCount;
+    private EditText mEditTxtIntervalTime;
     private Button mBtnStartDl;
     private TextView mTxtViewHTTPResult;
     private TextView mTxtViewHTTPResultHistory;
@@ -93,6 +96,9 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 String tmp = LGHTTPFragment.this.mEditTxtRepeatCount.getText().toString();
                 LGHTTPFragment.this.mMaxCount = Integer.valueOf(tmp);
                 LGHTTPFragment.this.mRepeatCount = 0;
+
+                tmp = LGHTTPFragment.this.mEditTxtIntervalTime.getText().toString();
+                LGHTTPFragment.this.mRepeatInterval = Integer.valueOf(tmp) * 1000;
             } catch (NumberFormatException e) {
                 Log.d(TAG, "numberFormatException " + e + "\ntmp");
                 Toast.makeText(LGHTTPFragment.this.getContext(), "숫자만 됩니다.", Toast.LENGTH_SHORT).show();
@@ -341,8 +347,14 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
     private void initUIControls() {
         this.mEditTxtFileAddr = (EditText) this.mView.findViewById(R.id.editTxt_file_addr);
-        if (testAddr != null)
-            this.mEditTxtFileAddr.setText(testAddr);
+        TelephonyManager tm = (TelephonyManager) LGHTTPFragment.this.getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        String simOperator = tm.getSimOperator();
+        if ("00101".equals(simOperator))
+            testAddr = "http://192.168.1.2/1G";
+        else {
+            testAddr = "http://tool.xcdn.gdms.lge.com/swdata/MOBILESYNC/GO/P5.3.23.20150119/LGPCSuite/Autorun/LGPCSuite_Setup.exe";
+        }
+        this.mEditTxtFileAddr.setText(testAddr);
 
         this.mRdoBtnOkHttp = (RadioButton) this.mView.findViewById(R.id.rdoBtn_http_stack_okhttp);
         this.mRdoBtnOkHttp.setOnCheckedChangeListener(this);
@@ -352,6 +364,31 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         this.mRdoBtnApache.setOnCheckedChangeListener(this);
 
         this.mEditTxtRepeatCount = (EditText) this.mView.findViewById(R.id.editTxt_repeat_count);
+        this.mEditTxtRepeatCount.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch " + event.getAction());
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGHTTPFragment.this.getContext(), LGHTTPFragment.this.mEditTxtRepeatCount);
+                    c.show((int) LGHTTPFragment.this.mEditTxtRepeatCount.getX(), (int) LGHTTPFragment.this.mEditTxtRepeatCount.getY() + mEditTxtRepeatCount.getHeight());
+                }
+                return false;
+            }
+        });
+        this.mEditTxtRepeatCount.setOnFocusChangeListener(this);
+        this.mEditTxtIntervalTime = (EditText) this.mView.findViewById(R.id.editTxt_interval_time);
+        this.mEditTxtIntervalTime.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch " + event.getAction());
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGHTTPFragment.this.getContext(), LGHTTPFragment.this.mEditTxtIntervalTime);
+                    c.show((int) LGHTTPFragment.this.mEditTxtRepeatCount.getX(), (int) LGHTTPFragment.this.mEditTxtRepeatCount.getY() + mEditTxtRepeatCount.getHeight());
+                }
+                return false;
+            }
+        });
+        this.mEditTxtIntervalTime.setOnFocusChangeListener(this);
 
         this.mCheckBoxEnableFileIO = (CheckBox) this.mView.findViewById(R.id.checkBox_enable_file_io);
 
@@ -378,8 +415,10 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
     private void hideKeyboard()
     {
-        mInputMethodManager.hideSoftInputFromWindow(mEditTxtFileAddr.getWindowToken(), 0);
-        mInputMethodManager.hideSoftInputFromWindow(mEditTxtRepeatCount.getWindowToken(), 0);
+        mInputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+        mEditTxtFileAddr.clearFocus();
+        mEditTxtRepeatCount.clearFocus();
+        mEditTxtIntervalTime.clearFocus();
     }
 
     @Override
@@ -398,6 +437,15 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
                     break;
             }
+        }
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        Log.d(TAG, "onFocusChange() " + v.getTransitionName() + ", " + hasFocus);
+        if (mEditTxtRepeatCount.getId() == v.getId() || mEditTxtIntervalTime.getId() == v.getId()){
+            Log.d(TAG, "hiding softKeyboard");
+            hideKeyboard();
         }
     }
 }

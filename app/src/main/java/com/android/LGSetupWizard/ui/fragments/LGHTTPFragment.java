@@ -7,6 +7,8 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -376,6 +378,28 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             }
         });
         this.mEditTxtRepeatCount.setOnFocusChangeListener(this);
+        this.mEditTxtRepeatCount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d(TAG, "afterTextChanged " + s);
+                if (s.toString().equals("1")) {
+                    mEditTxtIntervalTime.setEnabled(false);
+                } else {
+                    mEditTxtIntervalTime.setEnabled(true);
+                }
+            }
+        });
+
         this.mEditTxtIntervalTime = (EditText) this.mView.findViewById(R.id.editTxt_interval_time);
         this.mEditTxtIntervalTime.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -389,6 +413,9 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             }
         });
         this.mEditTxtIntervalTime.setOnFocusChangeListener(this);
+        if("1".equals(this.mEditTxtRepeatCount.getText().toString())) {
+            this.mEditTxtIntervalTime.setEnabled(false);
+        }
 
         this.mCheckBoxEnableFileIO = (CheckBox) this.mView.findViewById(R.id.checkBox_enable_file_io);
 

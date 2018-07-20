@@ -430,11 +430,11 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
         this.mTxtViewHTTPResult = (TextView) this.mView.findViewById(R.id.txtView_http_result);
         this.mTxtViewHTTPResult.setMovementMethod(new ScrollingMovementMethod());
-        this.mTxtViewHTTPResult.setMaxLines(20);
+        //this.mTxtViewHTTPResult.setMaxLines(20);
 
         this.mTxtViewHTTPResultHistory = (TextView) this.mView.findViewById(R.id.txtView_http_result_history);
         this.mTxtViewHTTPResultHistory.setMovementMethod(new ScrollingMovementMethod());
-        this.mTxtViewHTTPResultHistory.setMaxLines(20);
+        //this.mTxtViewHTTPResultHistory.setMaxLines(20);
 
         this.mImageButtonClearAddr = (ImageButton) this.mView.findViewById(R.id.imageButton_clear_addr);
         this.mImageButtonClearAddr.setOnClickListener(this.mClearAddrClickListener);

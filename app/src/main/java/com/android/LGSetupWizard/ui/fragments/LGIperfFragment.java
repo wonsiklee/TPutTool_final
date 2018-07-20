@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.security.Permission;
 import java.util.List;
 
 import lombok.experimental.Accessors;
@@ -53,6 +55,8 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
 
     private Button btn_iperf_start, btn_iperf_install;
     private ImageButton imgBtn_iperf_result;
+
+    private int mLGIperfAppVersionCode = 2;
 
     @Override
     public void onAttach(Context context){
@@ -76,9 +80,10 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
             btn_iperf_start.setOnClickListener(this);
 
 
+            /*
             btn_iperf_install = (Button)mView.findViewById(R.id.btn_iperf_install);
             btn_iperf_install.setOnClickListener(this);
-
+            */
 
             imgBtn_iperf_result = (ImageButton)mView.findViewById(R.id.imgBtn_iperf_result);
             imgBtn_iperf_result.setOnClickListener(this);
@@ -90,19 +95,27 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
 
     private void loadIperfApp() {
         //load Apk file
+
         boolean needInstall = false;
 
 
-        //check path
-        File file = mContext.getExternalFilesDir(null);
-        if (!file.exists()){
-            file.mkdir();
+        try {
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo("com.lge.kobinfactory.lgiperf",0);
+            if( packageInfo.versionCode < mLGIperfAppVersionCode ){
+                Log.i(TAG, "LGiperf version code update! need update");
+                needInstall = true;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i(TAG, "LGIperf not exist.. install !!");
+            needInstall = true;
         }
 
-        file = new File(file,"LGIperf.apk");
-        //mContext.getExternalFilesDir().getPath()+""
-        if( !file.exists()){
-            Log.i(TAG, "loadIperfApp - lgiperfappapk not exist or not execute");
+        if(needInstall){
+            File file = mContext.getExternalFilesDir(null);
+            if (!file.exists()){
+                file.mkdir();
+            }
+            file = new File(file,"LGIperf.apk");
             InputStream sOpenRawResource = mContext.getResources().openRawResource(R.raw.lgiperfapp);
 
             try {
@@ -115,27 +128,18 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
 
                 sOpenFileOutput.write(sBuffer);
                 sOpenFileOutput.close();
-                //mContext.getFileStreamPath("LGIperf.apk").setExecutable(true);
-                needInstall = true;
             }catch (Exception e){
                 Log.e(TAG,"loadIperfApp - Fail:"+e.toString());
+                //TODO need error logic
                 return;
             }
-        }
-        else{
-            needInstall = !hasIperfApp();
-        }
-
-        if(needInstall){
-            //TODO need change slient install..
-            //installIperfApp();
+            installIperfApp();
         }
     }
 
 
 
     private void installIperfApp() {
-        //TODO need change Silent Install targetSDK lower than L-OS
 
         PackageManager packageManger = mContext.getPackageManager();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -165,7 +169,6 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
 
                 session.fsync(out);
                 out.close();
-                System.out.println("installing...");
                 session.commit(PendingIntent.getBroadcast(mContext, sessionId,
                         new Intent("android.intent.action.MAIN"), 0).getIntentSender());
                 Log.i(TAG, "send Install request");
@@ -189,7 +192,7 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if( action.equals("com.android.LGSetupWizard.lgiperfapp.save_result")){
+            if( action.equals("com.android.LGSetupWizard.LGIperf.save_result")){
                 float avg = intent.getFloatExtra("avg",0);
                 Log.d(TAG, "get result = "+avg );
                 saveIperfTput(avg);
@@ -203,15 +206,16 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
             if (hasIperfApp()) {
                 startIperfApp();
             } else {
-                Toast.makeText(mContext, "Please install LG Iperf!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "try after 5sec or restart app!!", Toast.LENGTH_SHORT).show();
             }
         }
         else if ( v == imgBtn_iperf_result ){
             new TestResultPopupWindow(getContext()).show(getView(),TestResultDBManager.TestCategory.iPerf);
         }
+        /*
         else if (v == btn_iperf_install){
             installIperfApp();
-        }
+        }*/
     }
 
     private void saveIperfTput(float avg){

@@ -13,6 +13,13 @@
         android:layout_height="100dp"
         android:text="@string/run_iperf"/>
 
+    <Button
+        android:id="@+id/btn_iperf_install"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_toRightOf="@+id/btn_iperf_start"
+        android:text="install app"/>
+
     <ImageButton
         android:id="@+id/imgBtn_iperf_result"
         android:layout_width="100dp"

@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL "/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -33,6 +37,8 @@
                 <action android:name="com.lge.data.START_LOGGING"/>
             </intent-filter>
         </service>
+
+        
 
     </application>
 

@@ -14,8 +14,10 @@
     <string name="str_http_http_stack">Stack</string>
     <string name="str_http_okhttp">OkHttp</string>
     <string name="str_http_apache">Apache</string>
-    <string name="str_http_repeat_time">횟수</string>
+    <string name="str_http_repeat_time">반복</string>
+    <string name="str_http_repeat_unit">회</string>
     <string name="str_http_interval_time">간격</string>
+    <string name="str_http_interval_unit">초</string>
     <string name="str_http_file_io">File I/O</string>
     <string name="str_http_result">Result</string>
     <string name="str_http_result_history">History</string>

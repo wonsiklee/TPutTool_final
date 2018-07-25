@@ -1,8 +1,6 @@
 package com.android.LGSetupWizard.ui.fragments;
 
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,12 +8,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,20 +19,16 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.android.LGSetupWizard.BuildConfig;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
+import com.android.LGSetupWizard.utils.LGIperfPackageManager;
+import com.android.LGSetupWizard.utils.OnInstalledPackaged;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.security.Permission;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import lombok.experimental.Accessors;
@@ -65,6 +56,9 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
         IntentFilter resultIntentFilter = new IntentFilter();
         resultIntentFilter.addAction("com.android.LGSetupWizard.LGIperf.save_result");
         context.registerReceiver(mResultReceiver, resultIntentFilter);
+        IntentFilter resultIntentFilter2 = new IntentFilter();
+        resultIntentFilter.addAction("android.lgiperf.INSTALL");
+        context.registerReceiver(mInstallReceiver, resultIntentFilter2);
     }
 
     @Nullable
@@ -141,51 +135,87 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
 
     private void installIperfApp() {
 
+/*
+        TODO : Mehod 1 : but some device is not working !!
         PackageManager packageManger = mContext.getPackageManager();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             PackageInstaller packageInstaller = packageManger.getPackageInstaller();
             PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
                     PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+
             params.setAppPackageName("com.lge.kobinfactory.lgiperf");
+            Log.d(TAG, "packageInstaller = "+packageInstaller.toString());
+
+            int sessionId = 0;
+            PackageInstaller.Session session = null;
             try {
-                int sessionId = packageInstaller.createSession(params);
-                PackageInstaller.Session session = packageInstaller.openSession(sessionId);
-                OutputStream out = session.openWrite("LGIperf.apk", 0, -1);
+                sessionId = packageInstaller.createSession(params);
+                session = packageInstaller.openSession(sessionId);
+            } catch (IOException e) {
+                Log.d(TAG, "install session is not created !!"+e.toString());
+                return;
+            }
 
-                InputStream in = new FileInputStream((new File(mContext.getExternalFilesDir(null),"LGIperf.apk")));
+            try {
+                File file = new File(mContext.getExternalFilesDir(null),"LGIperf.apk");
+                long sizeBytes = file.length();
+                OutputStream out = session.openWrite("LGIperfApp", 0,sizeBytes);
 
-                final int bufsize = 4096;
-                byte[] bytes = new byte[bufsize];
+                InputStream in = new FileInputStream(file);
 
-                int len = 1; // any value > 0
-                //int tot = 0;
-                while (len > 0) {
-                    len = in.read(bytes, 0, bufsize);
-                    if (len < 1) break;
-                    out.write(bytes, 0, len);
-                    //tot += len;
+                final byte[] buffer = new byte[65536];
+                int count;
+                while ((count = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, count);
                 }
-                in.close();
-
                 session.fsync(out);
+                in.close();
                 out.close();
-                session.commit(PendingIntent.getBroadcast(mContext, sessionId,
-                        new Intent("android.intent.action.MAIN"), 0).getIntentSender());
+
+                session.commit(PendingIntent.getBroadcast(getContext(), sessionId,
+                        new Intent("android.lgiperf.INSTALL"), PendingIntent.FLAG_UPDATE_CURRENT).getIntentSender());
+
+
                 Log.i(TAG, "send Install request");
 
                 //return true;
             } catch (IOException e) {
-                e.printStackTrace();
-                //return false;
+                Log.i(TAG,"IO Exception:"+e.toString());
+                session.close();
             }
+        }*/
+
+        try {
+            LGIperfPackageManager pm = new LGIperfPackageManager(mContext);
+            pm.setOnInstalledPackaged(new OnInstalledPackaged() {
+                @Override
+                public void packageInstalled(String packageName, int returnCode) {
+                    if (returnCode == LGIperfPackageManager.INSTALL_SUCCEEDED) {
+                        Log.d(TAG, "Install succeeded");
+                    } else {
+                        Log.d(TAG, "Install failed: " + returnCode);
+                    }
+                }
+            });
+            File file = new File(mContext.getExternalFilesDir(null),"LGIperf.apk");
+            pm.installPackage(file);
+        } catch (NoSuchMethodException e) {
+            Log.d(TAG,"install failed ="+e.toString());
+        } catch (IllegalAccessException e) {
+            Log.d(TAG,"install failed ="+e.toString());
+        } catch (InvocationTargetException e) {
+            Log.d(TAG,"install failed ="+e.toString());
         }
+
     }
+
 
     @Override
     public void onDetach(){
         super.onDetach();
         Log.i(TAG,"onDetach");
         mContext.unregisterReceiver(mResultReceiver);
+        mContext.unregisterReceiver(mInstallReceiver);
     }
 
     private final BroadcastReceiver mResultReceiver = new BroadcastReceiver() {
@@ -199,6 +229,17 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
             }
         }
     };
+    private static final int PACKAGE_INSTALLER_STATUS_UNDEFINED = -1000;
+    private final BroadcastReceiver mInstallReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if( action.equals("android.lgiperf.INSTALL")){
+                int status  = intent.getIntExtra(PackageInstaller.EXTRA_STATUS,PACKAGE_INSTALLER_STATUS_UNDEFINED);
+                Log.i(TAG, "InstallReceiver . get Extra : " + status);
+            }
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -206,6 +247,7 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
             if (hasIperfApp()) {
                 startIperfApp();
             } else {
+                installIperfApp();
                 Toast.makeText(mContext, "try after 5sec or restart app!!", Toast.LENGTH_SHORT).show();
             }
         }
@@ -251,4 +293,5 @@ public class LGIperfFragment extends Fragment implements View.OnClickListener{
 
         startActivity(intent);
     }
+
 }

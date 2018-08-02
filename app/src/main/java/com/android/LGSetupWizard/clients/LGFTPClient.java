@@ -264,7 +264,7 @@ public class LGFTPClient {
                 case MSG_CALCULATE_TPUT:
                     Log.d(TAG, "MSG_CALCULATE_TPUT");
                     Log.d(TAG, "mDownloadedBytes = " + mDownloadedBytes + ", mElapsedTime = " + ((float) mElapsedTime/ 1000) + " secs");
-                    LGFTPClient.this.mAvgTPut = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
+                    LGFTPClient.this.mAvgTPut = ((float)mDownloadedBytes * 8 / 1000 / 1000)/((float) mElapsedTime / 1000);
                     Log.d(TAG, "Avg TPut : " + LGFTPClient.this.mAvgTPut + " Mbps");
                     LGFTPClient.this.mOperationListener.onDownloadProgressPublished(LGFTPClient.this.mAvgTPut, mDownloadedBytes);
                     sendEmptyMessageDelayed(MSG_CALCULATE_TPUT, 1000);
@@ -362,13 +362,13 @@ public class LGFTPClient {
                     File f = new File(mDownloadFilePathAndName);
                     long sFileSizeGap = f.length() - mDownloadedBytes;
                     long sTimeGap = intervalEnd - mIntervalStart;
-                    float sAvgForBetweenPolling = ((float) (sFileSizeGap) * 8 / 1024.0f / 1024) / ((float) sTimeGap / 1000);
+                    float sAvgForBetweenPolling = ((float) (sFileSizeGap) * 8 / 1000.0f / 1000) / ((float) sTimeGap / 1000);
                     Log.d(TAG, "AvgSpeed for " + sTimeGap + " ms = " + sAvgForBetweenPolling + " Mbps");
 
                     // update control variables here.
                     LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - mStartTimeForCalculationHandler;
                     LGFTPClient.this.mDownloadedBytes = f.length();
-                    //LGFTPClient.this.mAvgTPut = ((float) mDownloadedBytes * 8 / 1024.0f / 1024) / ((float) mElapsedTime / 1000);
+                    //LGFTPClient.this.mAvgTPut = ((float) mDownloadedBytes * 8 / 1000.0f / 1000) / ((float) mElapsedTime / 1000);
 
                     f = null;
                     this.mIntervalStart = intervalEnd;
@@ -558,7 +558,7 @@ public class LGFTPClient {
             }
 
             Log.d(TAG, "conventional duration : " + (mElapsedTime/1000.0f));
-            sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
+            sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1000 / 1000)/((float) mElapsedTime / 1000);
 
 
         } catch(SocketTimeoutException e) {
@@ -649,7 +649,7 @@ public class LGFTPClient {
                 public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
                     mDownloadedBytes = totalBytesTransferred;
                     mElapsedTime = System.currentTimeMillis() - mStartTimeForCalculationHandler;
-                    mAvgTPut = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
+                    mAvgTPut = ((float)mDownloadedBytes * 8 / 1000 / 1000)/((float) mElapsedTime / 1000);
                     LGFTPClient.this.mOperationListener.onDownloadProgressPublished(LGFTPClient.this.mAvgTPut, mDownloadedBytes);
                     Log.d(TAG, "avg tput = " + mAvgTPut + " Mbps");
                 }
@@ -664,7 +664,7 @@ public class LGFTPClient {
             Log.d(TAG, "finished apache retrieveFile() " + ret);
 
             Log.d(TAG, "apache duration : " + (mElapsedTime/1000.0f));
-            sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
+            sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1000 / 1000)/((float) mElapsedTime / 1000);
             this.mFTPClient.setCopyStreamListener(null);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -734,7 +734,7 @@ public class LGFTPClient {
                     LGFTPClient.this.mDownloadedBytes = fileChannel.transferFrom(inputChannel, 0, remoteFile.getSize());
                     LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - mStartTimeForCalculationHandler;
                     Log.d(TAG, "File channel duration : " + (mElapsedTime/1000.0f));
-                    sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
+                    sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1000 / 1000)/((float) mElapsedTime / 1000);
                     Log.d(TAG, "transfer completed.");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -834,7 +834,7 @@ public class LGFTPClient {
                 LGFTPClient.this.mElapsedTime = System.currentTimeMillis() - LGFTPClient.this.mStartTimeForCalculationHandler;
             }
 
-            sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1024 / 1024)/((float) mElapsedTime / 1000);
+            sFinalAvgTput = ((float)mDownloadedBytes * 8 / 1000 / 1000)/((float) mElapsedTime / 1000);
 
             Log.d(TAG, "************************************************************");
         } catch (FileNotFoundException e) {

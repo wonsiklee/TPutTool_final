@@ -21,6 +21,7 @@
                 android:id="@+id/ll_logged_out_view_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="invisible"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -125,21 +126,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible"
+                android:visibility="visible"
                 android:focusable="true">
 
-                <CheckBox
-                    android:id="@+id/checkbox_use_file_IO"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/rl_buffer_size_config"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="10dp"
-                    android:checked="true"
-                    android:gravity="center_vertical"
-                    android:text="File I/O"
-                    tools:ignore="HardcodedText"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"/>
+                    android:gravity="center_vertical">
+                    <CheckBox
+                        android:id="@+id/checkbox_use_file_IO"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="10dp"
+                        android:checked="true"
+                        android:gravity="center_vertical"
+                        android:text="File I/O"
+                        tools:ignore="HardcodedText"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/editTxt_adjust_buffer_size"
+                        android:gravity="center_vertical"
+                        android:layout_alignTop="@+id/editTxt_adjust_buffer_size"
+                        android:layout_alignBottom="@+id/editTxt_adjust_buffer_size"
+                        android:layout_marginEnd="5dp"
+                        android:text="Buffer 크기"/>
+
+                    <EditText
+                        android:id="@+id/editTxt_adjust_buffer_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/txtView_bytes"
+                        android:text="24576"
+                        android:inputType="number"
+                        android:layout_marginEnd="5dp"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/txtView_bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/editTxt_adjust_buffer_size"
+                        android:layout_alignBottom="@+id/editTxt_adjust_buffer_size"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="center_vertical"
+                        android:text="bytes"/>
+                </RelativeLayout>
+
 
                 <RadioGroup
                     android:id="@+id/radioGroup_method_type"

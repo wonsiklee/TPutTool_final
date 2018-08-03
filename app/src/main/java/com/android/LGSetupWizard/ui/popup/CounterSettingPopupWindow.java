@@ -27,7 +27,6 @@ import com.android.LGSetupWizard.utils.NumberFormatFilter;
 public class CounterSettingPopupWindow extends PopupWindow {
     private final String TAG = CounterSettingPopupWindow.class.getSimpleName();
 
-
     private EditText mParentView;
     private View mPopupWindowView;
     private Context mContext;
@@ -65,6 +64,9 @@ public class CounterSettingPopupWindow extends PopupWindow {
         }
     };
 
+    final static int MAX = 50000;
+    final static int MIN = 1;
+
     @SuppressLint("ClickableViewAccessibility")
     public CounterSettingPopupWindow(Context context, EditText parentView) {
         this.mParentView = parentView;
@@ -72,8 +74,8 @@ public class CounterSettingPopupWindow extends PopupWindow {
         this.mPopupWindowView = ((LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.popup_view_count_input, null);
 
         this.mEditTextCounterValue = this.mPopupWindowView.findViewById(R.id.txtView_counter_value);
-        this.mEditTextCounterValue.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextCounterValue)});
         this.mEditTextCounterValue.setText(mParentView.getText());
+        this.mEditTextCounterValue.setFilters(new InputFilter[]{new NumberFormatFilter(this.mEditTextCounterValue, CounterSettingPopupWindow.MIN, CounterSettingPopupWindow.MAX)});
         this.mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());
 
         this.mImgBtnIncrease = this.mPopupWindowView.findViewById(R.id.btn_increase);
@@ -158,7 +160,6 @@ public class CounterSettingPopupWindow extends PopupWindow {
     public void dismiss() {
         InputMethodManager sInputMethodManager = (InputMethodManager) this.mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
         sInputMethodManager.hideSoftInputFromWindow(this.mParentView.getWindowToken(), 0);
-        Log.d(TAG, "hide hide hide");
         super.dismiss();
     }
 
@@ -189,7 +190,7 @@ public class CounterSettingPopupWindow extends PopupWindow {
 
     private void increase() {
         int sCurrentValue = Integer.valueOf(mEditTextCounterValue.getText().toString());
-        if (sCurrentValue < 100) {
+        if (sCurrentValue < CounterSettingPopupWindow.MAX) {
             mEditTextCounterValue.setText(String.valueOf(sCurrentValue + 1));
         }
         mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());
@@ -197,7 +198,7 @@ public class CounterSettingPopupWindow extends PopupWindow {
 
     private void decrease() {
         int sCurrentValue = Integer.valueOf(mEditTextCounterValue.getText().toString());
-        if (sCurrentValue > 1) {
+        if (sCurrentValue > CounterSettingPopupWindow.MIN) {
             mEditTextCounterValue.setText(String.valueOf(sCurrentValue - 1));
         }
         mEditTextCounterValue.setSelection(0, mEditTextCounterValue.getText().length());

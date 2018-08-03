@@ -6,13 +6,23 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 
+import java.text.NumberFormat;
+
 public class NumberFormatFilter implements InputFilter {
 
     private final String TAG = NumberFormatFilter.class.getSimpleName();
     private EditText mTargetView;
+    private int mMin;
+    private int mMax;
 
     public NumberFormatFilter(EditText targetView) {
+        this(targetView, 1, 100);
+    }
+
+    public NumberFormatFilter(EditText targetView, int min, int max) {
         this.mTargetView = targetView;
+        this.mMin = min;
+        this.mMax = max;
     }
 
     @Override
@@ -33,7 +43,7 @@ public class NumberFormatFilter implements InputFilter {
             }
 
 
-            if (isInRange(1, 100, input)) {
+            if (isInRange(this.mMin, this.mMax, input)) {
                 Log.d(TAG, "still in range");
                 return source;
             } else {

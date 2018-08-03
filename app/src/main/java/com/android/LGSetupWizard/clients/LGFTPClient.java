@@ -56,6 +56,7 @@ public class LGFTPClient {
     //private boolean mIsForcedAbort;
     private ILGFTPOperationListener mOperationListener;
     private InputStream mInputStream = null;
+    private int mBufferSize;
 
     private long mStartTimeForCalculationHandler;
     private long mElapsedTime;
@@ -394,8 +395,9 @@ public class LGFTPClient {
         }
     };
 
-    public boolean retrieveFile(ArrayList<LGFTPFile> remoteFileList, boolean shouldWrite, int methodType, int delayInMilliseconds) throws InterruptedException {
+    public boolean retrieveFile(ArrayList<LGFTPFile> remoteFileList, boolean shouldWrite, int methodType, int delayInMilliseconds, int bufferSize) throws InterruptedException {
         this.mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
+        this.mBufferSize = bufferSize;
 
         for (LGFTPFile remoteFile: remoteFileList) {
             boolean sRet = this.retrieveFile(remoteFile, shouldWrite, methodType);
@@ -549,7 +551,7 @@ public class LGFTPClient {
             LGFTPClient.this.mOperationListener.onDownloadStarted(remoteFile);
 
             //byte[] sBytesArray = new byte[20971520]; // 20 MBytes
-            byte[] sBytesArray = new byte[24576]; // 20 MBytes
+            byte[] sBytesArray = new byte[this.mBufferSize];
             int sBytesRead = -1;
             while ((sBytesRead = mInputStream.read(sBytesArray)) != -1) {
                 LGFTPClient.this.mDownloadedBytes += sBytesRead;

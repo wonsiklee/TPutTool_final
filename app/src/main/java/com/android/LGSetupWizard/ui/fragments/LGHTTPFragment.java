@@ -241,7 +241,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             DATA_POOL.totalSize = totalSize;
             DATA_POOL.totalDuration = totalDuration;
             DATA_POOL.totalDuration /= 1000;
-            DATA_POOL.avgTPut = (totalSize * 8.0f / 1024 / 1024 / (totalDuration / 1000.0f));
+            DATA_POOL.avgTPut = (totalSize * 8.0f / 1000 / 1000 / (totalDuration / 1000.0f));
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override

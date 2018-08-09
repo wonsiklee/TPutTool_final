@@ -114,6 +114,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static private String KEY_DOWNLOAD_RESULT = "file_size";
     final static private String KEY_AVG_TPUT = "avg_tput";
     final static private String KEY_LOGIN_RESULT = "login_result";
+    private EditText mEditTextBufferSize;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -315,6 +316,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     private boolean mIsNetworkRequested = false;
     private PendingIntent mPendingIntent;
     ConnectivityManager.NetworkCallback ncb;
+
     @SuppressLint("ClickableViewAccessibility")
     private void initLoggedInViews() {
         // Logged in views init start.
@@ -361,16 +363,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
         });
 
-        this.mRadioButtonConventionalMethod = this.mView.findViewById(R.id.radioButton_method_type_conventional);
-        this.mRadioButtonConventionalMethod.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mEditTextRepeatCount.clearFocus();
-                mEditTextTestIntervalInSec.clearFocus();
-                hideSoftKeyboard();
-                return false;
-            }
-        });
         this.mRadioButtonApacheMethod = this.mView.findViewById(R.id.radioButton_method_type_apache);
         this.mRadioButtonApacheMethod.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -381,7 +373,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 return false;
             }
         });
-        this.mRadioButtonFileChannelMethod= this.mView.findViewById(R.id.radioButton_method_type_file_channel);
+        this.mRadioButtonFileChannelMethod = this.mView.findViewById(R.id.radioButton_method_type_file_channel);
         this.mRadioButtonApacheMethod.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -391,6 +383,31 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                 return false;
             }
         });
+
+        this.mRadioButtonConventionalMethod = this.mView.findViewById(R.id.radioButton_method_type_conventional);
+        this.mRadioButtonConventionalMethod.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mEditTextRepeatCount.clearFocus();
+                mEditTextTestIntervalInSec.clearFocus();
+                hideSoftKeyboard();
+                return false;
+            }
+        });
+
+        this.mEditTextBufferSize = this.mView.findViewById(R.id.editText_buf_size);
+        this.mEditTextBufferSize.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch " + event.getAction());
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    CounterSettingPopupWindow c = new CounterSettingPopupWindow(LGFTPFragment.this.getContext(), LGFTPFragment.this.mEditTextBufferSize);
+                    c.show((int) LGFTPFragment.this.mEditTextBufferSize.getX(), (int) LGFTPFragment.this.mEditTextBufferSize.getY() + 200);
+                }
+                return false;
+            }
+        });
+
 
         this.mEditTextRepeatCount = this.mView.findViewById(R.id.editTxt_ftp_download_repeat_count);
         this.mEditTextRepeatCount.setOnTouchListener(new View.OnTouchListener() {
@@ -956,7 +973,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                             for (int i = 0; i != sRepeatCount; ++i) {
                                 LGFTPFragment.this.mFTPFileListVIewAdapter.setSelectedFilePositionList((ArrayList<Integer>) sTmpSelectedFilePositionList.clone());
                                 LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_FILE_DOWNLOAD_STARTED);
-                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mCheckBoxUseFileIO.isChecked(), mCheckedMethod, sInterval * 1000)) {
+                                if (LGFTPFragment.this.mLGFtpClient.retrieveFile(sTmpSelectedFileList, LGFTPFragment.this.mCheckBoxUseFileIO.isChecked(), mCheckedMethod, sInterval * 1000, Integer.valueOf(mEditTextBufferSize.getText().toString()))) {
                                     Log.d(TAG, "one set finished, " + (sRepeatCount -1) + " times left");
                                     if (mEditTextTestIntervalInSec.isEnabled()) {
                                         Log.d(TAG, "waiting for " + sInterval + " seconds");

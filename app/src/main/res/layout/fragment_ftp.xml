@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -128,18 +127,60 @@
                 android:visibility="invisible"
                 android:focusable="true">
 
-                <CheckBox
-                    android:id="@+id/checkbox_use_file_IO"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="10dp"
-                    android:checked="true"
-                    android:gravity="center_vertical"
-                    android:text="File I/O"
-                    tools:ignore="HardcodedText"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"/>
+                <RelativeLayout
+                    android:id="@+id/rl_tmp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <CheckBox
+                        android:id="@+id/checkbox_use_file_IO"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:checked="true"
+                        android:gravity="center_vertical"
+                        android:text="File I/O"
+                        tools:ignore="HardcodedText"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/editText_buf_size"
+                        android:layout_alignTop="@+id/editText_buf_size"
+                        android:layout_alignBottom="@+id/editText_buf_size"
+                        android:textAlignment="center"
+                        android:gravity="center_vertical"
+                        android:text="Buf size :"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/editText_buf_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/txtView_bytes"
+                        android:gravity="center_vertical"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="number"
+                        tools:ignore="HardcodedText"
+                        android:text="24576"
+                        android:textSize="15dp"/>
+
+                    <TextView
+                        android:id="@+id/txtView_bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignTop="@+id/editText_buf_size"
+                        android:layout_alignBottom="@+id/editText_buf_size"
+                        android:gravity="center_vertical"
+                        android:text="bytes"/>
+
+                </RelativeLayout>
+
+
 
                 <RadioGroup
                     android:id="@+id/radioGroup_method_type"

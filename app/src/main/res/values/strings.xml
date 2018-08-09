@@ -23,5 +23,57 @@
     <string name="str_http_result_history">History</string>
     <string name="str_save_result">결과 저장</string>
     <string name="str_tool_version">v0.9</string>
-    <string name="run_iperf">Start Iperf</string>
+
+    <!--iperf main -->
+    <string name="iperf_version2">iperf2</string>
+    <string name="iperf_version3">iperf3</string>
+    <string name="iperf_start">Start</string>
+    <string name="iperf_stop">Stop</string>
+    <string name="iperf_advanced">Advanced</string>
+    <string name="iperf_repeat_count">반복</string>
+    <string name="iperf_repeat_count_unit">회</string>
+    <string name="iperf_repeat_interval">간격</string>
+    <string name="iperf_repeat_interval_unit">초</string>
+
+    <!--iperf menu -->
+    <string name="iperf_menu_back">Back</string>
+    <string name="iperf_menu_add">Add</string>
+    <string name="iperf_menu_delete">Delete</string>
+    <string name="iperf_menu_select">Select</string>
+    <string name="iperf_menu_version_2">V2</string>
+    <string name="iperf_menu_version_3">V3</string>
+    <string name="iperf_menu_server">S</string>
+    <string name="iperf_menu_client">C</string>
+    <string name="iperf_menu_host">Host</string>
+    <string name="iperf_menu_reverse">Reverse(-R)</string>
+    <string name="iperf_menu_tcp">TCP</string>
+    <string name="iperf_menu_udp">UDP</string>
+    <string name="iperf_menu_rate">Rate(-b)</string>
+    <string name="iperf_menu_duration">Duration(-t)</string>
+    <string name="iperf_menu_interval">Interval(-i)</string>
+    <string name="iperf_menu_stream">Stream(-P)</string>
+    <string name="iperf_menu_port">Port(-p)</string>
+    <string name="iperf_menu_other">Others</string>
+
+    <!--iperf Dialog -->
+    <string name="dialog_set_button">Set</string>
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="dialog_del_button">Delete</string>
+
+    <string name="dialog_duration_title">Parameter for -t</string>
+    <string name="dialog_duration_description">Specify a duration(in seconds) for the measurement</string>
+    <string name="dialog_interval_title">Parameter for -i</string>
+    <string name="dialog_interval_description">Specify an interval(in seconds) for reports</string>
+    <string name="dialog_streams_title">Parameter for -P</string>
+    <string name="dialog_streams_description">Specify the number of parallel streams</string>
+    <string name="dialog_port_title">Parameter for -p</string>
+    <string name="dialog_port_description">Server to listen on / Client connect to</string>
+    <string name="dialog_rate_title">Parameter for -b</string>
+    <string name="dialog_rate_description">for UDP, bandwidth to send at in bits/sec</string>
+
+    <string name="dialog_host_title">Parameter for -c </string>
+    <string name="dialog_host_description">Specify a server\'s hostname or IP address</string>
+    <string name="dialog_other_title">Advanced Parameter </string>
+    <string name="dialog_other_description">Advanced Parameter such as -R -O 3,etc </string>
+
 </resources>

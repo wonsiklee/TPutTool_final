@@ -8,6 +8,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
+import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
 
 public class MainActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
@@ -141,6 +143,11 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
     @Override
     public void onBackPressed() {
+        Fragment f = mFragmentPagerAdapter.getItem(mViewPager.getCurrentItem());
+        if ( f instanceof LGIperfFragment) {
+            if(((LGIperfFragment)f).changeLayoutIfNeed()) return;
+        }
+
         Log.d(TAG, "isDoubleTouched " + this.isDoubleTouched);
         if (this.isDoubleTouched) {
             this.mHandler.removeMessages(MSG_RESET_FIRST_TOUCH);

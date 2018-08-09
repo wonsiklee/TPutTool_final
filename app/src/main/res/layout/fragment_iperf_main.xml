@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/editText_iperf_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.android.LGSetupWizard.ui.IperfSwitch
+            android:id="@+id/switch_iperf_version"
+            style = "@style/IperfStyle"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:checked="false"
+            android:showText="true"
+            android:textOn="@string/iperf_menu_version_3"
+            android:textOff="@string/iperf_menu_version_2"
+            />
+        <Button
+            android:id="@+id/btn_iperf_advanced"
+            style="@style/IperfStyle"
+            android:layout_centerInParent="true"
+            android:text="@string/iperf_advanced"/>
+        <ImageButton
+            android:id="@+id/imageButton_iperf_result"
+            style="@style/iperfImageButton"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/test_logs" />
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="10dp">
+
+        <ToggleButton
+            android:id ="@+id/toggleBtn_iperf_start_n_stop"
+            style = "@style/IperfStyle"
+            android:layout_alignParentRight="true"
+            android:checked="false"
+            android:textOn="@string/iperf_stop"
+            android:textOff="@string/iperf_start"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/toggleBtn_iperf_start_n_stop"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:text="@string/iperf_repeat_count"
+                />
+
+            <TextView
+                android:id="@+id/tv_repeat_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="@drawable/repeat_background"
+                android:text="1"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:text="@string/iperf_repeat_count_unit"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:text="@string/iperf_repeat_interval"
+                />
+            <TextView
+                android:id="@+id/tv_repeat_interval"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="@drawable/repeat_background"
+                android:text="5"
+            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:text="@string/iperf_repeat_interval_unit"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+    <ScrollView
+        android:id="@+id/scrollView_output"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tv_iperf_output"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            />
+    </ScrollView>
+</LinearLayout>

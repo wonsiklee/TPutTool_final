@@ -188,8 +188,11 @@ public class LGIperfFragment extends Fragment
                 onResultUpdated(intent.getStringExtra(LGIperfConstants.EXTRA_RESULT_COMMAND));
             }
             else if(LGIperfConstants.ACTION_SAVE_AVG.equals(action)) {
-                float avg = intent.getFloatExtra(LGIperfConstants.ACTION_SAVE_AVG,-1);
-                if (avg < 0 ) Log.d(TAG, "goit invalid avg!!");
+                float avg = intent.getFloatExtra(LGIperfConstants.EXTRA_RESULT_COMMAND,-1);
+                if (avg < 0 ) {
+                    Log.d(TAG, "goit invalid avg!!");
+                    return;
+                }
                 Log.d(TAG,"avg = "+avg);
                 saveIperfTput(avg);
             }

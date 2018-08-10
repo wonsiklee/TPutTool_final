@@ -29,7 +29,7 @@ public class LGIperfCommand {
     @Getter @Setter private int mStream = LGIperfConstants.IPERF_NOT_SET ;
     @Getter @Setter private String mOtherOptions="";
 
-    @Getter private boolean isValid = true;
+    @Getter private boolean mIsValid = true;
 
 
     public LGIperfCommand(String command){
@@ -44,7 +44,7 @@ public class LGIperfCommand {
             if(command.equals(LGIperfConstants.IPERF_NAME))return;
             subString  = command.substring(LGIperfConstants.IPERF_NAME.length()+1);
         }else {
-            isValid = false;
+            mIsValid = false;
             return;
         }
 
@@ -61,7 +61,7 @@ public class LGIperfCommand {
                 case "-c" : mMode = LGIperfConstants.IPERF_MODE_CLIENT;
                     i++;
                     if (i >= commandOptions.length){
-                        isValid = false;
+                        mIsValid = false;
                         return;
                     }
                     if(LGIperfUtils.isValidIpAddress(commandOptions[i]) || LGIperfUtils.isValidDNS(commandOptions[i]))
@@ -77,12 +77,12 @@ public class LGIperfCommand {
                 case "-b" :
                     i++;
                     if (i >= commandOptions.length) {
-                        isValid = false;
+                        mIsValid = false;
                         return;
                     }
 
                     if(!LGIperfUtils.isValidRate(commandOptions[i])){
-                        isValid = false;
+                        mIsValid = false;
                         return;
                     }
                     String temp = commandOptions[i];
@@ -104,7 +104,7 @@ public class LGIperfCommand {
                 case "-t":
                     i++;
                     if (i >= commandOptions.length) {
-                        isValid = false;
+                        mIsValid = false;
                         if (DBG) Log.d(TAG, "-t need value!");
                         return;
                     }
@@ -115,7 +115,7 @@ public class LGIperfCommand {
                 case "-i" :
                     i++;
                     if (i >= commandOptions.length) {
-                        isValid = false;
+                        mIsValid = false;
                         if (DBG) Log.d(TAG, "-i need value!");
                         return;
                     }
@@ -125,7 +125,7 @@ public class LGIperfCommand {
                 case "-p" :
                     i++;
                     if (i >= commandOptions.length) {
-                        isValid = false;
+                        mIsValid = false;
                         if (DBG) Log.d(TAG, "-p need value!");
                         return;
                     }
@@ -136,7 +136,7 @@ public class LGIperfCommand {
                 case "-P" :
                     i++;
                     if (i >= commandOptions.length) {
-                        isValid = false;
+                        mIsValid = false;
                         return;
                     }
                     if (DBG) Log.d(TAG, "-P value = "+commandOptions[i] +">> " + Integer.valueOf(commandOptions[i]) );

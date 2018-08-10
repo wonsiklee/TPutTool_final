@@ -70,8 +70,10 @@ public class IperfSwitch extends Switch {
         trackDrawable.setIntrinsicHeight(h-10);
         trackDrawable.setPadding(6,6,6,6);
         this.setTrackDrawable(trackDrawable);
+
     }
 
+    private boolean mIsSet = false;
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
 
@@ -90,9 +92,10 @@ public class IperfSwitch extends Switch {
                 break;
         }
 
-        if ( w != 0 && h != 0) {
+        if ( w != 0 && h != 0 && !mIsSet) {
             setThumbSize(w , h);
             setTrack(w , h);
+            mIsSet = true;
         }
         super.onMeasure(widthMeasureSpec,heightMeasureSpec);
     }

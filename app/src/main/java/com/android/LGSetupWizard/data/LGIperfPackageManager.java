@@ -27,7 +27,7 @@ public class LGIperfPackageManager {
         /**
          * need to increase when LGIperfApp's Version is changed. please Sync to LGIperfApp's VersionCode.
          * */
-        private int mLGIperfAppVersionCode = 3;
+        private int mLGIperfAppVersionCode = 4;
 
         private static final String LGIPERF_APP_PACKAGE_NAME = "com.lge.kobinfactory.lgiperf";
         private static final String LGIPERF_APP_FILE_NAME = "LGIperf.apk";

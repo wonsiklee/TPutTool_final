@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -53,6 +54,9 @@ import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lombok.experimental.Accessors;
 
@@ -257,6 +261,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
     }
 
+    private static String PREF_KEY_SERVER_CONFIG = "server_config";
+    private static String PREF_KEY_SERVER_ADDRESS = "server_address";
+    private static String PREF_KEY_PORT_NUM = "port_num";
+    private static String PREF_KEY_ID = "ftp_id";
+    private static String PREF_KEY_PASSWORD = "ftp_password";
+
+    @SuppressLint("SetTextI18n")
     private void initLoggedOutViews() {
         this.mLinearLayoutLoggedOutViewGroup = this.mView.findViewById(R.id.ll_logged_out_view_group);
         this.mLinearLayoutLoggedInViewGroup.setMinimumHeight(mLinearLayoutLoggedOutViewGroup.getHeight());
@@ -266,21 +277,30 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         this.mEditTextUserID = this.mView.findViewById(R.id.editText_user_id);
         this.mEditTextPassword = this.mView.findViewById(R.id.editText_password);
 
-        if (this.mMccMnc.equals("45005")) {
-            this.mEditTextServerAddress.setText("sdftp.nate.com");
-            this.mEditTextPortNum.setText("21");
-            this.mEditTextUserID.setText("suser");
-            this.mEditTextPassword.setText("s!sdqns2121");
-        } else if (this.mMccMnc.contains("450")) {
-            this.mEditTextServerAddress.setText("203.229.247.254");
-            this.mEditTextPortNum.setText("21");
-            this.mEditTextUserID.setText("testbed01");
-            this.mEditTextPassword.setText("gprs@tbed!01");
+        SharedPreferences pref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        if (pref.contains("server_config")) {
+            this.mEditTextServerAddress.setText(pref.getString(PREF_KEY_SERVER_ADDRESS, "192.168.1.2"));
+            this.mEditTextPortNum.setText(pref.getString(PREF_KEY_PORT_NUM, "21"));
+            this.mEditTextUserID.setText(pref.getString(PREF_KEY_ID, "user"));
+            this.mEditTextPassword.setText(pref.getString(PREF_KEY_PASSWORD, "@lge1234"));
         } else {
-            this.mEditTextServerAddress.setText("192.168.1.2");
-            this.mEditTextPortNum.setText("21");
-            this.mEditTextUserID.setText("user");
-            this.mEditTextPassword.setText("@lge1234");
+            if (this.mMccMnc.equals("45005")) {
+                this.mEditTextServerAddress.setText("sdftp.nate.com");
+                this.mEditTextPortNum.setText("21");
+                this.mEditTextUserID.setText("suser");
+                this.mEditTextPassword.setText("s!sdqns2121");
+            } else if (this.mMccMnc.contains("450")) {
+                this.mEditTextServerAddress.setText("203.229.247.254");
+                this.mEditTextPortNum.setText("21");
+                this.mEditTextUserID.setText("testbed01");
+                this.mEditTextPassword.setText("gprs@tbed!01");
+            } else {
+                this.mEditTextServerAddress.setText("192.168.1.2");
+                this.mEditTextPortNum.setText("21");
+                this.mEditTextUserID.setText("user");
+                this.mEditTextPassword.setText("@lge1234");
+            }
         }
     }
 
@@ -918,6 +938,13 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Override
         public void onClick(View v) {
             hideSoftKeyboard();
+            SharedPreferences pref = LGFTPFragment.this.getActivity().getPreferences(Context.MODE_PRIVATE);
+            pref.edit().putBoolean(PREF_KEY_SERVER_CONFIG, true).apply();
+            pref.edit().putString(PREF_KEY_SERVER_ADDRESS, mEditTextServerAddress.getText().toString()).apply();
+            pref.edit().putString(PREF_KEY_PORT_NUM, mEditTextPortNum.getText().toString()).apply();
+            pref.edit().putString(PREF_KEY_ID, mEditTextUserID.getText().toString()).apply();
+            pref.edit().putString(PREF_KEY_PASSWORD, mEditTextPassword.getText().toString()).apply();
+
             LGFTPFragment.this.showNetworkOperationProgressBar("Log in", "Logging in...");
             LGFTPFragment.this.mFileList = null;
             new Thread() {

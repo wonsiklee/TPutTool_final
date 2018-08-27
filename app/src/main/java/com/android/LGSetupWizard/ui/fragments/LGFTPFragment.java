@@ -54,9 +54,6 @@ import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import lombok.experimental.Accessors;
 
@@ -938,13 +935,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Override
         public void onClick(View v) {
             hideSoftKeyboard();
-            SharedPreferences pref = LGFTPFragment.this.getActivity().getPreferences(Context.MODE_PRIVATE);
-            pref.edit().putBoolean(PREF_KEY_SERVER_CONFIG, true).apply();
-            pref.edit().putString(PREF_KEY_SERVER_ADDRESS, mEditTextServerAddress.getText().toString()).apply();
-            pref.edit().putString(PREF_KEY_PORT_NUM, mEditTextPortNum.getText().toString()).apply();
-            pref.edit().putString(PREF_KEY_ID, mEditTextUserID.getText().toString()).apply();
-            pref.edit().putString(PREF_KEY_PASSWORD, mEditTextPassword.getText().toString()).apply();
-
             LGFTPFragment.this.showNetworkOperationProgressBar("Log in", "Logging in...");
             LGFTPFragment.this.mFileList = null;
             new Thread() {

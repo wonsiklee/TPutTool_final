@@ -20,6 +20,7 @@
                 android:id="@+id/ll_logged_out_view_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="invisible"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -124,9 +125,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible"
-                android:focusable="true">
 
+                android:focusable="true">
+                <!--android:visibility="invisible"-->
                 <RelativeLayout
                     android:id="@+id/rl_tmp"
                     android:layout_width="match_parent"
@@ -141,10 +142,43 @@
                         android:gravity="center_vertical"
                         android:text="File I/O"
                         tools:ignore="HardcodedText"
+                        android:layout_alignTop="@+id/editText_buf_size"
+                        android:layout_alignBottom="@+id/editText_buf_size"
                         android:focusable="true"
                         android:focusableInTouchMode="true"/>
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/switch_dl_ul"
+                        android:layout_alignTop="@+id/editText_buf_size"
+                        android:layout_alignBottom="@+id/editText_buf_size"
+                        android:gravity="center_vertical"
+                        android:text="DL" />
+
+                    <Switch
+                        android:id="@+id/switch_dl_ul"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/txtView_ul"
+                        android:gravity="center_vertical"
+                        android:layout_alignTop="@+id/editText_buf_size"
+                        android:layout_alignBottom="@+id/editText_buf_size"
+                        android:layout_margin="0dp"/>
+
+                    <TextView
+                        android:id="@+id/txtView_ul"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@+id/textView_buff_size"
+                        android:layout_alignTop="@+id/editText_buf_size"
+                        android:layout_alignBottom="@+id/editText_buf_size"
+                        android:gravity="center_vertical"
+                        android:layout_marginEnd="20dp"
+                        android:text="UL" />
+
+                    <TextView
+                        android:id="@+id/textView_buff_size"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toStartOf="@+id/editText_buf_size"
@@ -159,7 +193,7 @@
                         android:id="@+id/editText_buf_size"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@+id/txtView_bytes"
+                        android:layout_alignParentEnd="true"
                         android:gravity="center_vertical"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
@@ -167,16 +201,6 @@
                         tools:ignore="HardcodedText"
                         android:text="24576"
                         android:textSize="15dp"/>
-
-                    <TextView
-                        android:id="@+id/txtView_bytes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignTop="@+id/editText_buf_size"
-                        android:layout_alignBottom="@+id/editText_buf_size"
-                        android:gravity="center_vertical"
-                        android:text="bytes"/>
 
                 </RelativeLayout>
 

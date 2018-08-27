@@ -886,7 +886,20 @@ public class LGFTPClient {
         return ret;
     }
 
-
+    private boolean uploadFile(File targetFile) {
+        try {
+            this.mInputStream = new InputStream() {
+                @Override
+                public int read() throws IOException {
+                    return 0;
+                }
+            };
+            this.mFTPClient.storeFile(targetFile.getName(), mInputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 
     public String printWorkingDirectory() throws IOException {
         return this.mFTPClient.printWorkingDirectory();

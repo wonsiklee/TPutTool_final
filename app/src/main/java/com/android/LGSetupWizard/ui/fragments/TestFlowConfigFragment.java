@@ -33,8 +33,10 @@ import java.util.List;
  * Created by wonsik.lee on 2017-06-13.
  */
 
-public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChangeListener {
-    private static final String TAG = LGNIAFragment.class.getSimpleName();
+public class TestFlowConfigFragment extends Fragment implements RadioButton.OnCheckedChangeListener {
+    private static final String TAG = TestFlowConfigFragment.class.getSimpleName();
+
+    private Handler mFullTestControlHandler;
 
     private static final int START_TEST = 0x00;
     private static final int NIA_DL_START = 0x01;
@@ -75,16 +77,16 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
             Log.d(TAG, "RepeatByCountStartClickListener.onClick()");
 
             try {
-                String tmp = LGNIAFragment.this.mEditTxtRepeatCount.getText().toString();
-                LGNIAFragment.this.mRepeatCount = Integer.valueOf(tmp);
+                String tmp = TestFlowConfigFragment.this.mEditTxtRepeatCount.getText().toString();
+                TestFlowConfigFragment.this.mRepeatCount = Integer.valueOf(tmp);
             } catch (NumberFormatException e) {
                 Log.d(TAG, "numberFormatException " + e + "\ntmp");
-                Toast.makeText(LGNIAFragment.this.getContext(), "숫자만 됩니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TestFlowConfigFragment.this.getContext(), "숫자만 됩니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             Log.d(TAG, "Repeat count : " + mRepeatCount);
-            LGNIAFragment.this.mTargetHandler.sendEmptyMessage(START_TEST);
+            TestFlowConfigFragment.this.mTargetHandler.sendEmptyMessage(START_TEST);
         }
     };
 
@@ -99,8 +101,8 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
         @Override
         public void onClick(View view) {
             Log.d(TAG, "StopTestClickListener.onClick()");
-            LGNIAFragment.this.mRepeatCount = 0;
-            LGNIAFragment.this.mTargetHandler.sendEmptyMessage(END_TEST);
+            TestFlowConfigFragment.this.mRepeatCount = 0;
+            TestFlowConfigFragment.this.mTargetHandler.sendEmptyMessage(END_TEST);
         }
     };
 
@@ -126,8 +128,8 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
                 case START_TEST:
                     Log.d(TAG, "START_TEST");
                     // switch listener
-                    LGNIAFragment.this.mBtnStartDl.setOnClickListener(LGNIAFragment.this.mStopTestClickListener);
-                    LGNIAFragment.this.mBtnStartDl.setText(R.string.str_stop_nia_test);
+                    TestFlowConfigFragment.this.mBtnStartDl.setOnClickListener(TestFlowConfigFragment.this.mStopTestClickListener);
+                    TestFlowConfigFragment.this.mBtnStartDl.setText(R.string.str_stop_nia_test);
                     this.sendEmptyMessage(NIA_DL_START);
                     mGrepAvgTPutHandler.sendEmptyMessageDelayed(0, 1000);
                     break;
@@ -141,9 +143,9 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
                 case NIA_DL_FINISHED:
                     Log.d(TAG, "NIA_DL_FINISHED");
                     mRepeatCount--;
-                    Toast.makeText(LGNIAFragment.this.getContext(), "TEST Finished : " + DATA_POOL.totalSize + " bytes received \nfor " + DATA_POOL.totalDuration + ",\nTput : " + DATA_POOL.avgTPut + " Mbps", Toast.LENGTH_LONG).show();
+                    Toast.makeText(TestFlowConfigFragment.this.getContext(), "TEST Finished : " + DATA_POOL.totalSize + " bytes received \nfor " + DATA_POOL.totalDuration + ",\nTput : " + DATA_POOL.avgTPut + " Mbps", Toast.LENGTH_LONG).show();
                     if (mRepeatCount > 0) {
-                        this.sendEmptyMessageDelayed(NIA_DL_START, LGNIAFragment.this.mRepeatInterval);
+                        this.sendEmptyMessageDelayed(NIA_DL_START, TestFlowConfigFragment.this.mRepeatInterval);
                     } else {
                         this.sendEmptyMessage(END_TEST);
                     }
@@ -156,8 +158,8 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
                     this.removeMessages(START_TEST);
                     this.removeMessages(NIA_DL_START);
                     mGrepAvgTPutHandler.removeMessages(0);
-                    LGNIAFragment.this.mBtnStartDl.setOnClickListener(LGNIAFragment.this.mRepeatByCountClickListener);
-                    LGNIAFragment.this.mBtnStartDl.setText(R.string.str_start_nia_test);
+                    TestFlowConfigFragment.this.mBtnStartDl.setOnClickListener(TestFlowConfigFragment.this.mRepeatByCountClickListener);
+                    TestFlowConfigFragment.this.mBtnStartDl.setText(R.string.str_start_nia_test);
                     break;
 
             }
@@ -188,13 +190,13 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    LGNIAFragment.this.mTxtViewNIAResult.append("\n*********************************\n");
-                    LGNIAFragment.this.mTxtViewNIAResult.append("AvgTput : " + DATA_POOL.avgTPut + " Mbps");
-                    LGNIAFragment.this.mTxtViewNIAResult.append("\n***********************************\n");
+                    TestFlowConfigFragment.this.mTxtViewNIAResult.append("\n*********************************\n");
+                    TestFlowConfigFragment.this.mTxtViewNIAResult.append("AvgTput : " + DATA_POOL.avgTPut + " Mbps");
+                    TestFlowConfigFragment.this.mTxtViewNIAResult.append("\n***********************************\n");
                 }
             });
 
-            LGNIAFragment.this.mTargetHandler.sendEmptyMessage(NIA_DL_FINISHED);
+            TestFlowConfigFragment.this.mTargetHandler.sendEmptyMessage(NIA_DL_FINISHED);
         }
 
         @Override
@@ -202,7 +204,7 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    LGNIAFragment.this.mTxtViewNIAResult.append("\nAvgTput : " + tput + " Mbps");
+                    TestFlowConfigFragment.this.mTxtViewNIAResult.append("\nAvgTput : " + tput + " Mbps");
                 }
             });
         }
@@ -211,7 +213,7 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "LGNIAFragment instance hashCode : " + this.hashCode());
+        Log.d(TAG, "TestFlowConfigFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
     }
 
@@ -292,7 +294,7 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
                     Log.d(TAG, "R.id.rdoBtn_test_type_repeat_by_count checked : " + isChecked);
                     this.mLinearLayoutTestTypeRepeatByDuration.setVisibility(View.GONE);
                     this.mLinearLayoutTestTypeRepeatByCount.setVisibility(View.VISIBLE);
-                    this.mBtnStartDl.setOnClickListener(LGNIAFragment.this.mRepeatByCountClickListener);
+                    this.mBtnStartDl.setOnClickListener(TestFlowConfigFragment.this.mRepeatByCountClickListener);
                     this.mTargetHandler = this.mRepeatByCountTestControlHandler;
                     break;
 
@@ -300,7 +302,7 @@ public class LGNIAFragment extends Fragment implements RadioButton.OnCheckedChan
                     Log.d(TAG, "R.id.rdoBtn_test_type_repeat_by_duration checked : " + isChecked);
                     this.mLinearLayoutTestTypeRepeatByDuration.setVisibility(View.VISIBLE);
                     this.mLinearLayoutTestTypeRepeatByCount.setVisibility(View.GONE);
-                    this.mBtnStartDl.setOnClickListener(LGNIAFragment.this.mRepeatByDurationClickListener);
+                    this.mBtnStartDl.setOnClickListener(TestFlowConfigFragment.this.mRepeatByDurationClickListener);
                     this.mTargetHandler = this.mRepeatByDurationTestControlHandler;
                     break;
             }

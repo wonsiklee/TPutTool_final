@@ -101,10 +101,10 @@ public class IDeviceStatsInfoStorageManager implements IDeviceMonitoringStateCha
         Log.d(TAG, "sUnitTime : " + sUnitTime + " ms");
         long sSize = 0;
         if (first.getDirection() == TEST_TYPE.DL_TEST) {
-            Log.d(TAG, "TestType is DL");
+            Log.d(TAG, "ClientType is DL");
             sSize = second.getRxBytes();
         } else {
-            Log.d(TAG, "TestType is UL");
+            Log.d(TAG, "ClientType is UL");
             sSize = second.getTxBytes();
         }
 

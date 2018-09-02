@@ -1,6 +1,6 @@
 package com.android.LGSetupWizard;
 
-public interface ITestController {
+public interface ITestFlowController {
 
 
     // This will be invoked prior to launch().
@@ -10,5 +10,5 @@ public interface ITestController {
 
     // this will be invoked after prepareToLaunch(),
     // actual test codes should be implemented in this.
-    public boolean launch();
+    public boolean launch();;
 }

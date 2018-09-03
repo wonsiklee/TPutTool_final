@@ -28,8 +28,12 @@ public class LGTestFlowManager extends Handler {
 
     public static final int RESPONSE_MSG_PREPARATION_FINISHED = 0x05;
     public static final int RESPONSE_MSG_TEST_STARTED = 0x06;
-    public static final int RESPONSE_MSG_ABORT_FINISHED = 0x07;
-    public static final int RESPONSE_MSG_PUBLISH_PROGRESS = 0x08;
+    public static final int RESPONSE_MSG_TEST_COMPLETED = 0x07;
+    public static final int RESPONSE_MSG_ABORT_FINISHED = 0x08;
+    public static final int RESPONSE_MSG_PUBLISH_PROGRESS = 0x09;
+
+    private static final int INTERNAL_CONTROL_MSG_LAUNCH = 0x100;
+    private static final int INTERNAL_CONTROL_MSG_TERMINATE = 0x101;
 
     public enum ClientType {
         TEST_FTP,
@@ -55,6 +59,7 @@ public class LGTestFlowManager extends Handler {
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE:
+                ((ILGTestFlowController)(msg.obj)).prepareToLaunch();
                 break;
             case CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST:
                 break;
@@ -64,8 +69,11 @@ public class LGTestFlowManager extends Handler {
                 break;
 
             case RESPONSE_MSG_PREPARATION_FINISHED:
+                ((ILGTestFlowController)(msg.obj)).launch();
                 break;
             case RESPONSE_MSG_TEST_STARTED:
+                break;
+            case RESPONSE_MSG_TEST_COMPLETED:
                 break;
             case RESPONSE_MSG_ABORT_FINISHED:
                 break;
@@ -73,6 +81,8 @@ public class LGTestFlowManager extends Handler {
                 break;
         }
     }
+
+
 
     private LGTestFlowManager(Context context) {
         this.mContext = context;
@@ -91,8 +101,9 @@ public class LGTestFlowManager extends Handler {
         for (ClientType clientType : ClientType.values()) {
             ILGTestFlowController sTestController = this.mTestTriggerMap.get(clientType);
             if (sTestController != null && this.mShouldKeepGoing) {
-                sTestController.prepareToLaunch();
-                sTestController.launch();
+                Message msg = this.obtainMessage(CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE);
+                msg.obj = (Object)sTestController;
+                this.sendMessage(msg);
             }
         }
     }

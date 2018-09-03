@@ -1,6 +1,7 @@
 package com.android.LGSetupWizard.ui.fragments;
 
 import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.clients.LGTestFlowManager;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class LGTestFlowConfigFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LGTestFlowConfigFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
+
+        LGTestFlowManager.getInstance(this.getContext()).obtainMessage(LGTestFlowManager.RESPONSE_MSG_ABORT_FINISHED);
     }
 
     @Override

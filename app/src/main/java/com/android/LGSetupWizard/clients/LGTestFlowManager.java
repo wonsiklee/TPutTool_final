@@ -1,6 +1,5 @@
 package com.android.LGSetupWizard.clients;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
@@ -22,15 +21,15 @@ public class LGTestFlowManager extends Handler {
 
     private boolean mShouldKeepGoing;
 
-    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE = 0x01;
-    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST = 0x02;
-    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_IMMEDIATE_ABORT = 0x03;
-    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PUBLISH_PROGRESS = 0x04;
+    private static final int CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE = 0x01;
+    private static final int CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST = 0x02;
+    private static final int CONTROL_MSG_NOTIFY_CLIENT_TO_IMMEDIATE_ABORT = 0x03;
+    private static final int CONTROL_MSG_NOTIFY_CLIENT_TO_PUBLISH_PROGRESS = 0x04;
 
-    public static final int TEST_RESPONSE_MSG_PREPARATION_FINISHED = 0x05;
-    public static final int TEST_RESPONSE_MSG_TEST_STARTED = 0x06;
-    public static final int TEST_RESPONSE_MSG_ABORT_FINISHED = 0x07;
-    public static final int TEST_RESPONSE_MSG_PUBLISH_PROGRESS = 0x08;
+    public static final int RESPONSE_MSG_PREPARATION_FINISHED = 0x05;
+    public static final int RESPONSE_MSG_TEST_STARTED = 0x06;
+    public static final int RESPONSE_MSG_ABORT_FINISHED = 0x07;
+    public static final int RESPONSE_MSG_PUBLISH_PROGRESS = 0x08;
 
     public enum ClientType {
         TEST_FTP,
@@ -55,22 +54,22 @@ public class LGTestFlowManager extends Handler {
     @Override
     public void handleMessage(Message msg) {
         switch (msg.what) {
-            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE:
+            case CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE:
                 break;
-            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST:
+            case CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST:
                 break;
-            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_IMMEDIATE_ABORT:
+            case CONTROL_MSG_NOTIFY_CLIENT_TO_IMMEDIATE_ABORT:
                 break;
-            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PUBLISH_PROGRESS:
+            case CONTROL_MSG_NOTIFY_CLIENT_TO_PUBLISH_PROGRESS:
                 break;
 
-            case TEST_RESPONSE_MSG_PREPARATION_FINISHED:
+            case RESPONSE_MSG_PREPARATION_FINISHED:
                 break;
-            case TEST_RESPONSE_MSG_TEST_STARTED:
+            case RESPONSE_MSG_TEST_STARTED:
                 break;
-            case TEST_RESPONSE_MSG_ABORT_FINISHED:
+            case RESPONSE_MSG_ABORT_FINISHED:
                 break;
-            case TEST_RESPONSE_MSG_PUBLISH_PROGRESS:
+            case RESPONSE_MSG_PUBLISH_PROGRESS:
                 break;
         }
     }

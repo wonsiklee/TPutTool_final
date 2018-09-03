@@ -6,17 +6,16 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.util.HashMap;
-import java.util.logging.LogRecord;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
-public class TestFlowManager {
-    private static String TAG = TestFlowManager.class.getSimpleName();
+public class LGTestFlowManager {
+    private static String TAG = LGTestFlowManager.class.getSimpleName();
 
-    private static TestFlowManager mInstance;
+    private static LGTestFlowManager mInstance;
     private static Context mContext;
     private HashMap<ClientType, ITestFlowController> mTestTriggerMap;
 
@@ -26,7 +25,7 @@ public class TestFlowManager {
         TEST_FTP,
         TEST_IPERF,
         TEST_HTTP
-    };
+    }
 
     // FTP config values;
     @Getter @Setter private boolean mUsingFTPFileIO;
@@ -50,20 +49,18 @@ public class TestFlowManager {
         }
     };
 
-    private TestFlowManager(Context context) {
+    private LGTestFlowManager(Context context) {
         this.mTestTriggerMap = new HashMap<>();
         this.mShouldKeepGoing = true;
     }
 
-    public static TestFlowManager getInstance(Context context) {
+    public static LGTestFlowManager getInstance(Context context) {
         mContext = context;
         if (mInstance != null) {
-            mInstance = new TestFlowManager(context);
+            mInstance = new LGTestFlowManager(context);
         }
         return mInstance;
     }
-
-
 
     public void launch() {
         for (ClientType clientType : ClientType.values()) {

@@ -8,7 +8,7 @@ import com.android.LGSetupWizard.ui.fragments.ConfigurationFragment;
 import com.android.LGSetupWizard.ui.fragments.LGFTPFragment;
 import com.android.LGSetupWizard.ui.fragments.LGHTTPFragment;
 import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
-import com.android.LGSetupWizard.ui.fragments.TestFlowConfigFragment;
+import com.android.LGSetupWizard.ui.fragments.LGTestFlowConfigFragment;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
 
         this.mFragmentArrayList = new ArrayList<>();
         this.mFragmentArrayList.add(new ConfigurationFragment());
-        this.mFragmentArrayList.add(new TestFlowConfigFragment());
+        this.mFragmentArrayList.add(new LGTestFlowConfigFragment());
         this.mFragmentArrayList.add(new LGFTPFragment());
         this.mFragmentArrayList.add(new LGIperfFragment());
         this.mFragmentArrayList.add(new LGHTTPFragment());

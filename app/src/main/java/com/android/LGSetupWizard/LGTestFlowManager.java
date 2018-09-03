@@ -17,7 +17,7 @@ public class LGTestFlowManager {
 
     private static LGTestFlowManager mInstance;
     private static Context mContext;
-    private HashMap<ClientType, ITestFlowController> mTestTriggerMap;
+    private HashMap<ClientType, ILGTestFlowController> mTestTriggerMap;
 
     private boolean mShouldKeepGoing;
 
@@ -64,7 +64,7 @@ public class LGTestFlowManager {
 
     public void launch() {
         for (ClientType clientType : ClientType.values()) {
-            ITestFlowController sTestController = this.mTestTriggerMap.get(clientType);
+            ILGTestFlowController sTestController = this.mTestTriggerMap.get(clientType);
             if (sTestController != null && this.mShouldKeepGoing) {
                 sTestController.prepareToLaunch();
                 sTestController.launch();
@@ -83,7 +83,7 @@ public class LGTestFlowManager {
      * register test flow controller.
      * Client's own implementation will be executed.
      */
-    public void registerTestController(ClientType clientType, ITestFlowController testFlowController) {
+    public void registerTestController(ClientType clientType, ILGTestFlowController testFlowController) {
         this.mTestTriggerMap.put(clientType, testFlowController);
     }
 

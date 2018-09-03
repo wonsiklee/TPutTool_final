@@ -1,6 +1,6 @@
 package com.android.LGSetupWizard;
 
-public interface ITestFlowController {
+public interface ILGTestFlowController {
 
 
     // This will be invoked prior to launch().

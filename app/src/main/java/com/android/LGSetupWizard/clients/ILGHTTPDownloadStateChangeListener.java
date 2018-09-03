@@ -4,7 +4,7 @@ package com.android.LGSetupWizard.clients;
  * Created by yunsik.lee on 2018-05-03.
  */
 
-public interface LGHTTPDownloadStateChangeListener {
+public interface ILGHTTPDownloadStateChangeListener {
     void onDownloadStarted();
     void onDownloadFinished(long totalSize, long totalDuration);
     void onError(String error);

@@ -23,10 +23,10 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGApacheHTTPClient implements LGHTTPClient {
+public class LGApacheHTTPClient implements ILGHTTPClient {
     private static String TAG = LGApacheHTTPClient.class.getSimpleName();
 
-    private LGHTTPDownloadStateChangeListener mStateListener;
+    private ILGHTTPDownloadStateChangeListener mStateListener;
     private DownloadRunnable mDownloadRunnable;
     private boolean mIsOkToGo = true;
     private String mFileURL;
@@ -53,7 +53,7 @@ public class LGApacheHTTPClient implements LGHTTPClient {
         this.mDownloadRunnable.publishCurrentTPut();
     }
 
-    public void setOnStateChangedListener(LGHTTPDownloadStateChangeListener listener) {
+    public void setOnStateChangedListener(ILGHTTPDownloadStateChangeListener listener) {
         this.mStateListener = listener;
     }
 

@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard;
+package com.android.LGSetupWizard.clients;
 
 public interface ILGTestFlowController {
 

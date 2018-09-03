@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard;
+package com.android.LGSetupWizard.clients;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,14 +12,25 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
-public class LGTestFlowManager {
+public class LGTestFlowManager extends Handler {
     private static String TAG = LGTestFlowManager.class.getSimpleName();
 
     private static LGTestFlowManager mInstance;
-    private static Context mContext;
+
+    private Context mContext;
     private HashMap<ClientType, ILGTestFlowController> mTestTriggerMap;
 
     private boolean mShouldKeepGoing;
+
+    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE = 0x01;
+    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST = 0x02;
+    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_IMMEDIATE_ABORT = 0x03;
+    private static final int TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PUBLISH_PROGRESS = 0x04;
+
+    public static final int TEST_RESPONSE_MSG_PREPARATION_FINISHED = 0x05;
+    public static final int TEST_RESPONSE_MSG_TEST_STARTED = 0x06;
+    public static final int TEST_RESPONSE_MSG_ABORT_FINISHED = 0x07;
+    public static final int TEST_RESPONSE_MSG_PUBLISH_PROGRESS = 0x08;
 
     public enum ClientType {
         TEST_FTP,
@@ -41,21 +52,36 @@ public class LGTestFlowManager {
     // HTTP config values
     // TODO : please add necessary configuration values for auto test
 
-    @SuppressLint("HandlerLeak")
-    private Handler mUIHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
+    @Override
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
+            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE:
+                break;
+            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_START_TEST:
+                break;
+            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_IMMEDIATE_ABORT:
+                break;
+            case TEST_CONTROL_MSG_NOTIFY_CLIENT_TO_PUBLISH_PROGRESS:
+                break;
+
+            case TEST_RESPONSE_MSG_PREPARATION_FINISHED:
+                break;
+            case TEST_RESPONSE_MSG_TEST_STARTED:
+                break;
+            case TEST_RESPONSE_MSG_ABORT_FINISHED:
+                break;
+            case TEST_RESPONSE_MSG_PUBLISH_PROGRESS:
+                break;
         }
-    };
+    }
 
     private LGTestFlowManager(Context context) {
+        this.mContext = context;
         this.mTestTriggerMap = new HashMap<>();
         this.mShouldKeepGoing = true;
     }
 
     public static LGTestFlowManager getInstance(Context context) {
-        mContext = context;
         if (mInstance != null) {
             mInstance = new LGTestFlowManager(context);
         }

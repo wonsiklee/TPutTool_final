@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard.ui.fragments;
+package com.android.LGSetupWizard.ui.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

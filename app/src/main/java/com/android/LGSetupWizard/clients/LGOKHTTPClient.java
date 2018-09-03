@@ -18,10 +18,10 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGOKHTTPClient implements LGHTTPClient {
+public class LGOKHTTPClient implements ILGHTTPClient {
     private static String TAG = LGOKHTTPClient.class.getSimpleName();
 
-    private LGHTTPDownloadStateChangeListener mStateListener;
+    private ILGHTTPDownloadStateChangeListener mStateListener;
     private DownloadRunnable mDownloadRunnable;
     private boolean mIsOkToGo = true;
     private String mFileURL;
@@ -48,7 +48,7 @@ public class LGOKHTTPClient implements LGHTTPClient {
         this.mDownloadRunnable.publishCurrentTPut();
     }
 
-    public void setOnStateChangedListener(LGHTTPDownloadStateChangeListener listener) {
+    public void setOnStateChangedListener(ILGHTTPDownloadStateChangeListener listener) {
         this.mStateListener = listener;
     }
 

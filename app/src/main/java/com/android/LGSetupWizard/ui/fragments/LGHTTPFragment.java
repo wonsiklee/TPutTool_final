@@ -29,8 +29,8 @@ import android.widget.Toast;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
-import com.android.LGSetupWizard.clients.LGHTTPClient;
-import com.android.LGSetupWizard.clients.LGHTTPDownloadStateChangeListener;
+import com.android.LGSetupWizard.clients.ILGHTTPClient;
+import com.android.LGSetupWizard.clients.ILGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
@@ -71,7 +71,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     private ImageButton mImageButtonClearAddr;
 
     // listeners and HTTP Client
-    private LGHTTPClient mLGHTTPClient;
+    private ILGHTTPClient mILGHTTPClient;
     private int mRepeatCount;
     private int mMaxCount;
     private int mRepeatInterval = 5000;
@@ -119,7 +119,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         public void onClick(View view) {
             Log.d(TAG, "mSaveResultClickListener.onClick()");
             TestResultDBManager.TestCategory sCategory;
-            if (LGHTTPFragment.this.mLGHTTPClient instanceof LGOKHTTPClient) {
+            if (LGHTTPFragment.this.mILGHTTPClient instanceof LGOKHTTPClient) {
                 if (LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked()) {
                     sCategory = TestResultDBManager.TestCategory.HTTP_OK_WITH_FILE_IO;
                 } else {
@@ -159,7 +159,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (mIsInProgress) {
-                mLGHTTPClient.publishCurrentTPut();
+                mILGHTTPClient.publishCurrentTPut();
                 this.sendEmptyMessageDelayed(0, 2000);
             }
         }
@@ -184,7 +184,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     Log.d(TAG, "HTTP_DL_START - Remaining count : " + mRepeatCount);
                     String fileAddr = LGHTTPFragment.this.mEditTxtFileAddr.getText().toString();
                     LGHTTPFragment.this.mEnableFileIO = LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked();
-                    mLGHTTPClient.startHTTPDownload(fileAddr, LGHTTPFragment.this.mEnableFileIO);
+                    mILGHTTPClient.startHTTPDownload(fileAddr, LGHTTPFragment.this.mEnableFileIO);
                     mIsInProgress = true;
                     mGrepAvgTPutHandler.sendEmptyMessageDelayed(0, 2000);
                     break;
@@ -206,7 +206,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
                 case END_TEST:
                     Log.d(TAG, "END_TEST");
-                    mLGHTTPClient.stopDownload();
+                    mILGHTTPClient.stopDownload();
                     this.removeMessages(START_TEST);
                     this.removeMessages(HTTP_DL_START);
                     mGrepAvgTPutHandler.removeMessages(0);
@@ -222,7 +222,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     };
 
 
-    private LGHTTPDownloadStateChangeListener mHTTPDownloadStateChangeListener = new LGHTTPDownloadStateChangeListener() {
+    private ILGHTTPDownloadStateChangeListener mHTTPDownloadStateChangeListener = new ILGHTTPDownloadStateChangeListener() {
         @Override
         public void onDownloadStarted() {
             Log.d(TAG, "onDownloadStarted()");
@@ -257,7 +257,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(HTTP_DL_FINISHED);
             LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(100);
             TestResultDBManager.TestCategory sCategory;
-            if (LGHTTPFragment.this.mLGHTTPClient instanceof LGOKHTTPClient) {
+            if (LGHTTPFragment.this.mILGHTTPClient instanceof LGOKHTTPClient) {
                 if (LGHTTPFragment.this.mEnableFileIO) {
                     sCategory = TestResultDBManager.TestCategory.HTTP_OK_WITH_FILE_IO;
                 } else {
@@ -306,7 +306,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     @Override
     public void onPause() {
         Log.d(TAG, "onPuase()");
-        this.mLGHTTPClient.setOnStateChangedListener(null);
+        this.mILGHTTPClient.setOnStateChangedListener(null);
         super.onPause();
     }
 
@@ -314,7 +314,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
-        this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
+        this.mILGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
         this.mTestResultPopupWindow = new TestResultPopupWindow(this.getContext());
     }
 
@@ -326,8 +326,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             this.mView = inflater.inflate(R.layout.fragment_http, container, false);
             this.initUIControls();
 
-            this.mLGHTTPClient = new LGOKHTTPClient();
-            this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
+            this.mILGHTTPClient = new LGOKHTTPClient();
+            this.mILGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
             this.mTargetHandler = this.mHttpTestControlHandler;
 
             mInputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -454,14 +454,14 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             switch (compoundButton.getId()) {
                 case R.id.rdoBtn_http_stack_okhttp:
                     Log.d(TAG, "R.id.rdoBtn_http_stack_okhttp checked : " + isChecked);
-                    this.mLGHTTPClient = new LGOKHTTPClient();
-                    this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
+                    this.mILGHTTPClient = new LGOKHTTPClient();
+                    this.mILGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
                     break;
 
                 case R.id.rdoBtn_http_stack_apache:
                     Log.d(TAG, "R.id.rdoBtn_http_stack_apache checked : " + isChecked);
-                    this.mLGHTTPClient = new LGApacheHTTPClient();
-                    this.mLGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
+                    this.mILGHTTPClient = new LGApacheHTTPClient();
+                    this.mILGHTTPClient.setOnStateChangedListener(this.mHTTPDownloadStateChangeListener);
                     break;
             }
         }

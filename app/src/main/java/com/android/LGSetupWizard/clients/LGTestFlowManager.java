@@ -3,6 +3,7 @@ package com.android.LGSetupWizard.clients;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -15,6 +16,8 @@ public class LGTestFlowManager extends Handler {
     private static String TAG = LGTestFlowManager.class.getSimpleName();
 
     private static LGTestFlowManager mInstance;
+
+    private static Object lockObject;
 
     private Context mContext;
     private HashMap<ClientType, ILGTestFlowController> mTestTriggerMap;
@@ -57,6 +60,7 @@ public class LGTestFlowManager extends Handler {
 
     @Override
     public void handleMessage(Message msg) {
+        Log.d(TAG, "msg : " + msg.toString());
         switch (msg.what) {
             case CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE:
                 ((ILGTestFlowController)(msg.obj)).prepareToLaunch();
@@ -82,8 +86,6 @@ public class LGTestFlowManager extends Handler {
         }
     }
 
-
-
     private LGTestFlowManager(Context context) {
         this.mContext = context;
         this.mTestTriggerMap = new HashMap<>();
@@ -91,7 +93,7 @@ public class LGTestFlowManager extends Handler {
     }
 
     public static LGTestFlowManager getInstance(Context context) {
-        if (mInstance != null) {
+        if (mInstance == null) {
             mInstance = new LGTestFlowManager(context);
         }
         return mInstance;
@@ -102,7 +104,7 @@ public class LGTestFlowManager extends Handler {
             ILGTestFlowController sTestController = this.mTestTriggerMap.get(clientType);
             if (sTestController != null && this.mShouldKeepGoing) {
                 Message msg = this.obtainMessage(CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE);
-                msg.obj = (Object)sTestController;
+                msg.obj = sTestController;
                 this.sendMessage(msg);
             }
         }

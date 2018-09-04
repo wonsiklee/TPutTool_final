@@ -53,7 +53,7 @@ public class LGFTPClient {
     @Getter private String mCurrentWorkingDirectory = "/";
 
     private FTPClient mFTPClient;
-    //private boolean mIsForcedAbort;
+
     private ILGFTPOperationListener mOperationListener;
     private InputStream mInputStream = null;
     private int mBufferSize;

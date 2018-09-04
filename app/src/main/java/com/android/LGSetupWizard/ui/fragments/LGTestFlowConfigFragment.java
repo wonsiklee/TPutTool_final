@@ -5,7 +5,6 @@ import com.android.LGSetupWizard.clients.LGTestFlowManager;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,8 +18,6 @@ import android.view.ViewGroup;
 
 public class LGTestFlowConfigFragment extends Fragment {
     private static final String TAG = LGTestFlowConfigFragment.class.getSimpleName();
-
-    private Handler mFullTestControlHandler;
 
     private static final int START_TEST = 0x00;
     private static final int NIA_DL_START = 0x01;
@@ -36,7 +33,8 @@ public class LGTestFlowConfigFragment extends Fragment {
         Log.d(TAG, "LGTestFlowConfigFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
 
-        LGTestFlowManager.getInstance(this.getContext()).obtainMessage(LGTestFlowManager.RESPONSE_MSG_ABORT_FINISHED);
+        LGTestFlowManager tmp = LGTestFlowManager.getInstance(this.getContext());
+        tmp.obtainMessage(LGTestFlowManager.RESPONSE_MSG_ABORT_FINISHED);
     }
 
     @Override

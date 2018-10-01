@@ -41,7 +41,7 @@ import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
  * Created by wonsik.lee on 2018-01-01.
  */
 @Accessors(prefix = "m")
-public class LGFTPClient {
+public class LGFTPClient implements ILGTestFlowController {
     static final private String TAG = LGFTPClient.class.getSimpleName();
 
     final static private int MSG_START_TPUT_CALCULATION_LOOP = 0x00;
@@ -936,5 +936,24 @@ public class LGFTPClient {
             Log.d(TAG, "setUseEPSVwithIPv4 false");
             mFTPClient.setUseEPSVwithIPv4(false);
         }
+    }
+
+
+
+    // implements ILGTestFlowController methods
+
+    @Override
+    public void prepareToLaunch() {
+
+    }
+
+    @Override
+    public void launch() {
+
+    }
+
+    @Override
+    public void publishProgress(float progress, float instantaneousTPut, float avgTPut) {
+
     }
 }

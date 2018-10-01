@@ -2,13 +2,15 @@ package com.android.LGSetupWizard.clients;
 
 public interface ILGTestFlowController {
 
-
     // This will be invoked prior to launch().
     // So, all the preperation codes should be implemented.
-    public void prepareToLaunch();
-
+    void prepareToLaunch();
 
     // this will be invoked after prepareToLaunch(),
     // actual test codes should be implemented in this.
-    public boolean launch();;
+    void launch();
+
+    void abort();
+
+    void requestToPublishProgress();
 }

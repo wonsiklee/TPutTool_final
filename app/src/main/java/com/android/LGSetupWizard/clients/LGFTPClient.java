@@ -953,7 +953,12 @@ public class LGFTPClient implements ILGTestFlowController {
     }
 
     @Override
-    public void publishProgress(float progress, float instantaneousTPut, float avgTPut) {
+    public void abort() {
+
+    }
+
+    @Override
+    public void getProgress() {
 
     }
 }

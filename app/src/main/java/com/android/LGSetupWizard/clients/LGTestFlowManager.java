@@ -40,7 +40,7 @@ public class LGTestFlowManager extends Handler {
     // HTTP config values
     // TODO : please add necessary configuration values for auto test
 
-
+// RESPONSE_MSG_ABORT_FINISHED
     private static final int PROGRESS_PUBLISH_INTERVAL = 1000;
 
     private static final int CONTROL_MSG_NOTIFY_CLIENT_TO_PREPARE = 0x00;

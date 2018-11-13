@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.2'
     signingConfigs {
         debug {
-            storeFile file("/Users/wonsiklee/StudioProjects/TPutTool_final/app/src/main/res/raw/platform.jks")
+            storeFile file("C:\\Users\\user\\Desktop\\Task 2017\\TPutTool_final\\app\\src\\main\\res\\raw\\platform.jks")
         }
     }
     defaultConfig {

@@ -33,8 +33,8 @@ public class LGTestFlowConfigFragment extends Fragment {
         Log.d(TAG, "LGTestFlowConfigFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
 
-        LGTestFlowManager tmp = LGTestFlowManager.getInstance(this.getContext());
-        tmp.obtainMessage(LGTestFlowManager.RESPONSE_MSG_ABORT_FINISHED);
+        /*LGTestFlowManager tmp = LGTestFlowManager.getInstance();
+        tmp.obtainMessage(LGTestFlowManager.RESPONSE_MSG_ABORT_FINISHED);*/
     }
 
     @Override

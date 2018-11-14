@@ -70,11 +70,12 @@ public class LGFTPClient implements ILGTestFlowController {
     private String mPassword;
     private boolean mUsePassive;
 
+    private boolean mIsForcibleTerminate = false;
+
     public LGFTPClient(ILGFTPOperationListener operationListener) {
         this.mOperationListener = operationListener;
     }
 
-    private boolean mIsForcibleTerminate = false;
     private ProtocolCommandListener mFTPProtocolListener = new ProtocolCommandListener() {
         @Override
         public void protocolCommandSent(ProtocolCommandEvent event) {
@@ -177,6 +178,7 @@ public class LGFTPClient implements ILGTestFlowController {
             e.printStackTrace();
         }
     }
+
     public void disconnectFromServer() {
         Log.d(TAG, "disconnectFromServer()");
         mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
@@ -958,7 +960,8 @@ public class LGFTPClient implements ILGTestFlowController {
     }
 
     @Override
-    public void getProgress() {
-
+    public TestFlowProgressInfo getProgress() {
+        Log.d(TAG, "getProgress() called.");
+        return new TestFlowProgressInfo();
     }
 }

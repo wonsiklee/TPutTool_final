@@ -65,6 +65,7 @@ public class LGTestFlowManager extends Handler {
         this.removeMessages(REPORT_MSG_TEST_FINISHED);
         this.removeMessages(CONTROL_MSG_READ_PROGRESS);
     }
+
     @Override
     public void handleMessage(Message msg) {
         Log.d(TAG, "msg : " + msg.toString());

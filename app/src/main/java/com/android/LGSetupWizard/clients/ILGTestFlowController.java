@@ -12,5 +12,5 @@ public interface ILGTestFlowController {
 
     void abort();
 
-    void getProgress();
+    TestFlowProgressInfo getProgress();
 }

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,13 +40,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.LGSetupWizard.clients.LGFTPOperationListener;
+import com.android.LGSetupWizard.data.MediaScanning;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
-import com.android.LGSetupWizard.data.MediaScanning;
 import com.android.LGSetupWizard.ui.dialog.LGFTPFileDownloadProgressDialog;
 import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
@@ -56,6 +56,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
 /**
@@ -330,10 +331,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             return "";
         }
     };
-
-    private boolean mIsNetworkRequested = false;
-    private PendingIntent mPendingIntent;
-    ConnectivityManager.NetworkCallback ncb;
 
     @SuppressLint("ClickableViewAccessibility")
     private void initLoggedInViews() {
@@ -657,75 +654,77 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         Log.d(TAG, "************* debug_printCurrentFileList() ENDS ***************");
     }
 
+    // ILGFTPOperationListener mILGFTPOperationListener = new LGFTPOperationListener(this);
     ILGFTPOperationListener mILGFTPOperationListener = new ILGFTPOperationListener() {
+
         @Override
         public void onConnectToServerFinished(boolean result, ArrayList<LGFTPFile> fileList) {
-            Log.d(TAG, "onConnectToServerFinished(boolean, ArrayList<FTPFile>) : " + result);
-            Message msg = mUIControlHandler.obtainMessage(MSG_CONNECT_TO_SERVER_FINISHED);
+            Log.d(LGFTPFragment.TAG, "onConnectToServerFinished(boolean, ArrayList<FTPFile>) : " + result);
+            Message msg = mUIControlHandler.obtainMessage(LGFTPFragment.MSG_CONNECT_TO_SERVER_FINISHED);
             Bundle b = new Bundle();
-            b.putBoolean(KEY_LOGIN_RESULT, result);
+            b.putBoolean(LGFTPFragment.KEY_LOGIN_RESULT, result);
             msg.setData(b);
             if (result) {
                 if (fileList == null) {
-                    Log.d(TAG, "no File list retrieved.");
+                    Log.d(LGFTPFragment.TAG, "no File list retrieved.");
                 } else {
-                    LGFTPFragment.this.mFileList = fileList;
-                    Log.d(TAG, "fileList length : " + mFileList.size());
+                    mFileList = fileList;
+                    Log.d(LGFTPFragment.TAG, "fileList length : " + mFileList.size());
                 }
             }
-            LGFTPFragment.this.mUIControlHandler.sendMessage(msg);
+            mUIControlHandler.sendMessage(msg);
         }
 
         @Override
         public void onChangeWorkingDirectoryFinished(ArrayList<LGFTPFile> fileList) {
-            Log.d(TAG, "onChangeWorkingDirectoryFinished()");
-            LGFTPFragment.this.mFileList = fileList;
-            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_CHANGE_WORKING_DIRECTORY_FINISHED);
+            Log.d(LGFTPFragment.TAG, "onChangeWorkingDirectoryFinished()");
+            mFileList = fileList;
+            mUIControlHandler.sendEmptyMessage(LGFTPFragment.MSG_CHANGE_WORKING_DIRECTORY_FINISHED);
         }
 
         @Override
         public void onDisconnectToServerFinished() {
-            Log.d(TAG, "onDisconnectToServerFinished()");
-            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_DISCONNECT_FROM_SERVER_FINISHED);
+            Log.d(LGFTPFragment.TAG, "onDisconnectToServerFinished()");
+            mUIControlHandler.sendEmptyMessage(LGFTPFragment.MSG_DISCONNECT_FROM_SERVER_FINISHED);
         }
 
         @Override
         public void onDownloadProgressPublished(float tputValue, long downloadedBytes) {
             //Log.d(TAG, "onDownloadProgressPublished(float tputValue, long downloadedBytes) : " + tputValue + ", " + downloadedBytes + " bytes");
-            LGFTPFragment.this.mLGFTPFileDownloadProgressDialog.updateProgressValue(((float) downloadedBytes / mDownloadingFileSize) * 100, downloadedBytes, tputValue);
+            mLGFTPFileDownloadProgressDialog.updateProgressValue(((float) downloadedBytes / mDownloadingFileSize) * 100, downloadedBytes, tputValue);
         }
 
         @Override
         public void onDownloadStarted(LGFTPFile file) {
-            Log.d(TAG, "onDownloadStarted() : " + file.getName() + ", size : " + file.getSize());
-            LGFTPFragment.this.mDownloadingFileName = file.getName();
-            LGFTPFragment.this.mDownloadingFileSize = file.getSize();
+            Log.d(LGFTPFragment.TAG, "onDownloadStarted() : " + file.getName() + ", size : " + file.getSize());
+            mDownloadingFileName = file.getName();
+            mDownloadingFileSize = file.getSize();
         }
 
         @Override
         public void onDownloadFinished(boolean result, File file, float avgTPut) {
-            Log.d(TAG, "onDownloadFinished() " + result + ", " + file.toString());
+            Log.d(LGFTPFragment.TAG, "onDownloadFinished() " + result + ", " + file.toString());
             if (result) {
-                if (LGFTPFragment.this.mCheckBoxUseFileIO.isChecked()) {
-                    new MediaScanning(LGFTPFragment.this.getContext(), file);
+                if (mCheckBoxUseFileIO.isChecked()) {
+                    new MediaScanning(getContext(), file);
                 }
-                LGFTPFragment.this.mFTPFileListVIewAdapter.getSelectedFilePositionList().remove(0);
+                mFTPFileListVIewAdapter.getSelectedFilePositionList().remove(0);
             }
 
-            TestResultDBManager.getInstance(LGFTPFragment.this.getContext()).insert(mCheckBoxUseFileIO.isChecked()? TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO, avgTPut, file.getName());
+            TestResultDBManager.getInstance(getContext()).insert(mCheckBoxUseFileIO.isChecked()? TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO, avgTPut, file.getName());
 
-            Message msg = LGFTPFragment.this.mUIControlHandler.obtainMessage(MSG_FILE_DOWNLOAD_FINISHED);
+            Message msg = mUIControlHandler.obtainMessage(LGFTPFragment.MSG_FILE_DOWNLOAD_FINISHED);
             Bundle b = new Bundle();
-            b.putBoolean(KEY_DOWNLOAD_RESULT, result);
-            b.putString(KEY_DOWNLOAD_FILE_NAME, file.getName());
-            b.putFloat(KEY_AVG_TPUT, avgTPut);
+            b.putBoolean(LGFTPFragment.KEY_DOWNLOAD_RESULT, result);
+            b.putString(LGFTPFragment.KEY_DOWNLOAD_FILE_NAME, file.getName());
+            b.putFloat(LGFTPFragment.KEY_AVG_TPUT, avgTPut);
             msg.setData(b);
 
-            LGFTPFragment.this.mUIControlHandler.sendMessage(msg);
-            LGFTPFragment.this.mUIControlHandler.sendEmptyMessage(MSG_REFRESH_ALL_UI);
+            mUIControlHandler.sendMessage(msg);
+            mUIControlHandler.sendEmptyMessage(LGFTPFragment.MSG_REFRESH_ALL_UI);
         }
     };
-
+    
     final static int MSG_CONNECT_TO_SERVER_FINISHED = 0x01;
     final static int MSG_DISCONNECT_FROM_SERVER_FINISHED  = 0x02;
     final static int MSG_CHANGE_WORKING_DIRECTORY_FINISHED = 0x03;
@@ -741,6 +740,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
 
     // UI Control handler
+    @Getter
     @SuppressLint("HandlerLeak")
     private Handler mUIControlHandler = new Handler() {
 
@@ -1094,4 +1094,5 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             hideSoftKeyboard();
         }
     }
+
 }

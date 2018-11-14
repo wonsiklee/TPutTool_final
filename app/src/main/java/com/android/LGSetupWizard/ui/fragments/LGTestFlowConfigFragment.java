@@ -1,16 +1,23 @@
 package com.android.LGSetupWizard.ui.fragments;
 
 import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
+import com.android.LGSetupWizard.clients.LGFTPClient;
 import com.android.LGSetupWizard.clients.LGTestFlowManager;
+import com.android.LGSetupWizard.data.LGFTPFile;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by wonsik.lee on 2017-06-13.
@@ -19,13 +26,11 @@ import android.view.ViewGroup;
 public class LGTestFlowConfigFragment extends Fragment {
     private static final String TAG = LGTestFlowConfigFragment.class.getSimpleName();
 
-    private static final int START_TEST = 0x00;
-    private static final int NIA_DL_START = 0x01;
-    private static final int NIA_DL_FINISHED = 0x02;
-    private static final int END_TEST = 0x03;
-
     // parent View
     private View mView;
+
+    LGTestFlowManager mLGTestFlowManager;
+    //ILGFTPOperationListener m
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,8 +38,39 @@ public class LGTestFlowConfigFragment extends Fragment {
         Log.d(TAG, "LGTestFlowConfigFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
 
-        /*LGTestFlowManager tmp = LGTestFlowManager.getInstance();
-        tmp.obtainMessage(LGTestFlowManager.RESPONSE_MSG_ABORT_FINISHED);*/
+        this.mLGTestFlowManager = LGTestFlowManager.getInstance();
+        this.mLGTestFlowManager.registerTestController(new LGFTPClient(new ILGFTPOperationListener() {
+            @Override
+            public void onConnectToServerFinished(boolean result, @Nullable ArrayList<LGFTPFile> fileNames) {
+
+            }
+
+            @Override
+            public void onDisconnectToServerFinished() {
+
+            }
+
+            @Override
+            public void onDownloadProgressPublished(float tputValue, long downloadedBytes) {
+
+            }
+
+            @Override
+            public void onDownloadStarted(LGFTPFile fileName) {
+
+            }
+
+            @Override
+            public void onDownloadFinished(boolean wasSuccessful, @NonNull File file, float avgTPut) {
+
+            }
+
+            @Override
+            public void onChangeWorkingDirectoryFinished(ArrayList<LGFTPFile> fileList) {
+
+            }
+        }));
+        //tmp.obtainMessage(LGTestFlowManager.);
     }
 
     @Override
@@ -47,6 +83,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     @Override
     public void onResume() {
         Log.d(TAG, "onResume()");
+
         super.onResume();
     }
 

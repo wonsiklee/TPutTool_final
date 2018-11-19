@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     signingConfigs {
         debug {
             storeFile file("C:\\Users\\user\\Desktop\\Task 2017\\TPutTool_final\\app\\src\\main\\res\\raw\\platform.jks")

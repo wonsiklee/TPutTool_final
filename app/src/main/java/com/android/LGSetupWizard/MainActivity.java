@@ -20,6 +20,7 @@ import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
 
 public class MainActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
+    private static final String deleteMeString = "deleteMe";
     private static final String TAG = MainActivity.class.getSimpleName() + " tput";
 
     private ViewPager mViewPager;

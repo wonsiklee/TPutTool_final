@@ -20,7 +20,7 @@
                 android:id="@+id/ll_logged_out_view_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
+                android:visibility="visible"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -125,9 +125,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-
+                android:visibility="invisible"
                 android:focusable="true">
-                <!--android:visibility="invisible"-->
                 <RelativeLayout
                     android:id="@+id/rl_tmp"
                     android:layout_width="match_parent"

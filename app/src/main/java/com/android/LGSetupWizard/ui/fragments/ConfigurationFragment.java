@@ -256,7 +256,7 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
                 sSum = true;
             }
 
-            Log.d(TAG, "vts zone number : " );
+            Log.d(TAG, "vts zone number : ");
             /*if (e.isExceptionIncluded(UIValidationResult.UIException.CPUThermalPathInvalid)) {
                 sb.append("CPU Thermal 경로가 올바르지 않습니다.");
                 sSum = true;
@@ -361,7 +361,7 @@ public class ConfigurationFragment extends Fragment implements CompoundButton.On
             mDirection = mRdoBtnDL.isChecked() ? DeviceMonitoringService.SHARED_PREFERENCES_DL_DIRECTION : DeviceMonitoringService.SHARED_PREFERENCES_UL_DIRECTION;
             mThermalType = DeviceMonitoringService.THERMAL_VTS;
             try {
-                ConfigurationFragment.this.mDeviceLoggingService.fireUpForcedRecordingLoop(sPackageName, sInterval, sCpuClockFilePath, sCpuThermalFilePath, mDirection, mThermalType, 0.1f );
+                ConfigurationFragment.this.mDeviceLoggingService.fireUpForcedRecordingLoop(sPackageName, sInterval, sCpuClockFilePath, sCpuThermalFilePath, mDirection, mThermalType, 0.1f);
             } catch (RemoteException e1) {
                 e1.printStackTrace();
             }

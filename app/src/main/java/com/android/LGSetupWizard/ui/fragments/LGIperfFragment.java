@@ -60,7 +60,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 public class LGIperfFragment extends Fragment
-        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnSetDialogListener {
+        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnSetDialogListener, ILGTestFlowFragment  {
 
     private static final String TAG = LGIperfFragment.class.getSimpleName();
 
@@ -832,4 +832,10 @@ public class LGIperfFragment extends Fragment
             }
         }
     };
+
+    @Override
+    public void reportBackToTestFlowConfigurationFragment() {
+        Log.d(TAG, "LGIPerfFragment reportBackToTestFlowConfigurationFragment()");
+        // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
+    }
 }

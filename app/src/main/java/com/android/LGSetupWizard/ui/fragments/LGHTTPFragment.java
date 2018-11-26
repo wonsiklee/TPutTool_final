@@ -43,7 +43,7 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener {
+public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener , ILGTestFlowFragment {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
 
     private String testAddr = "http://192.168.1.2/1G";
@@ -474,5 +474,11 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             Log.d(TAG, "hiding softKeyboard");
             hideKeyboard();
         }
+    }
+
+    @Override
+    public void reportBackToTestFlowConfigurationFragment() {
+        Log.d(TAG, "LGHTTPFragment reportBackToTestFlowConfigurationFragment()");
+        // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
     }
 }

@@ -63,7 +63,7 @@ import lombok.experimental.Accessors;
  * Created by wonsik.lee on 2017-06-13.
  */
 @Accessors(prefix = "m")
-public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener, View.OnFocusChangeListener {
+public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener, View.OnFocusChangeListener, ILGTestFlowFragment {
     private static boolean DEBUG = false;
     private static final String TAG = LGFTPFragment.class.getSimpleName();
 
@@ -172,8 +172,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
             }
         }.start();
     }
-
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -1095,4 +1093,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         }
     }
 
+    @Override
+    public void reportBackToTestFlowConfigurationFragment() {
+        Log.d(TAG, "LGFTPFragment reportBackToTestFlowConfigurationFragment()");
+        // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
+    }
 }

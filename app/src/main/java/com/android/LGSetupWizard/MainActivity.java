@@ -8,25 +8,34 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
 import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
 
+import lombok.Getter;
+import lombok.experimental.Accessors;
+
+@Accessors(prefix = "m")
 public class MainActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
     private static final String deleteMeString = "phase 2 confirm string";
     private static final String TAG = MainActivity.class.getSimpleName() + " tput";
 
-    private ViewPager mViewPager;
-    private FragmentPagerAdapter mFragmentPagerAdapter;
+    @Getter private ViewPager mViewPager;
+    @Getter private FragmentPagerAdapter mFragmentPagerAdapter;
 
     private BottomNavigationView mNavigation;
+
+    @Getter
+    private FloatingActionButton mFabFetchInfo;
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -110,6 +119,9 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
         this.mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
         this.mNavigation.setOnNavigationItemSelectedListener(this);
+
+        this.mFabFetchInfo = findViewById(R.id.fab_reportResult);
+        this.mFabFetchInfo.setVisibility(View.INVISIBLE);
 
         WAKE_LOCK = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
         WAKE_LOCK.acquire();

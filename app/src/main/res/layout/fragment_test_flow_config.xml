@@ -5,6 +5,12 @@
     android:orientation="vertical"
     android:scrollbars="vertical">
 
+    <Button
+        android:id="@+id/btn_start_test_flow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="start test flow" />
+
     <LinearLayout
         android:id="@+id/ll_ftp_configuration"
         android:layout_width="match_parent"
@@ -30,10 +36,10 @@
             android:layout_weight="10">
 
             <Button
-                android:id="@+id/btn_test"
+                android:id="@+id/btn_open_ftp_config"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Test" />
+                android:text="Open LG FTP Config" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -72,6 +78,11 @@
             android:layout_weight="10">
             <!--TODO : form iperf configuration UI here-->
 
+            <Button
+                android:id="@+id/btn_open_iperf_config"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Open LG iPerf Config" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,6 +118,11 @@
             android:orientation="vertical"
             android:layout_weight="10">
             <!--TODO : form HTTP configuration UI here-->
+            <Button
+                android:id="@+id/btn_open_http_config"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Open LG Http Config" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

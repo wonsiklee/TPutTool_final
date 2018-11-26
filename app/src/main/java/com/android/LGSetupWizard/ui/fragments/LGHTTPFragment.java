@@ -477,8 +477,9 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     }
 
     @Override
-    public void reportBackToTestFlowConfigurationFragment() {
+    public Object reportBackToTestFlowConfigurationFragment() {
         Log.d(TAG, "LGHTTPFragment reportBackToTestFlowConfigurationFragment()");
         // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
+        return null;
     }
 }

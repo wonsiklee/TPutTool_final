@@ -834,8 +834,9 @@ public class LGIperfFragment extends Fragment
     };
 
     @Override
-    public void reportBackToTestFlowConfigurationFragment() {
+    public Object reportBackToTestFlowConfigurationFragment() {
         Log.d(TAG, "LGIPerfFragment reportBackToTestFlowConfigurationFragment()");
         // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
+        return null;
     }
 }

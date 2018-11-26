@@ -1094,8 +1094,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     @Override
-    public void reportBackToTestFlowConfigurationFragment() {
+    public Object reportBackToTestFlowConfigurationFragment() {
         Log.d(TAG, "LGFTPFragment reportBackToTestFlowConfigurationFragment()");
         // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
+        return null;
     }
 }

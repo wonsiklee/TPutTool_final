@@ -160,13 +160,13 @@ public class LGTestFlowConfigFragment extends Fragment {
             LGTestFlowConfigFragment.TEST_CONFIGURATION_INFO.setFTPRepeatInterval(sFtpTestConfig.getFTPRepeatInterval());
             LGTestFlowConfigFragment.TEST_CONFIGURATION_INFO.setUsingFTPFileIO(sFtpTestConfig.isUsingFTPFileIO());
             LGTestFlowConfigFragment.TEST_CONFIGURATION_INFO.setUsingFTPPSV(sFtpTestConfig.isUsingFTPPSV());
-            LGTestFlowConfigFragment.TEST_CONFIGURATION_INFO.setUsingPv4EPSV(sFtpTestConfig.isUsingPv4EPSV());
+            LGTestFlowConfigFragment.TEST_CONFIGURATION_INFO.setUsingIPv4EPSV(sFtpTestConfig.isUsingIPv4EPSV());
             LGTestFlowConfigFragment.TEST_CONFIGURATION_INFO.setFileListCount(sFtpTestConfig.getFileCount());
 
             this.mTxtViewFTPUseFileIO.setText(sFtpTestConfig.isUsingFTPFileIO() ? "True" : "False");
             this.mTxtViewFTPTCPWMem.setText(sFtpTestConfig.getFTPBufferSize() + "");
             this.mTxtViewFTPPsv.setText(sFtpTestConfig.isUsingFTPPSV() ? "True" : "False");
-            this.mTxtViewFTPUseEPSV.setText(sFtpTestConfig.isUsingPv4EPSV() ? "True" : "False");
+            this.mTxtViewFTPUseEPSV.setText(sFtpTestConfig.isUsingIPv4EPSV() ? "True" : "False");
             this.mTxtViewFTPRepeatCount.setText(sFtpTestConfig.getFTPRepeatCount() + "");
             this.mTxtViewFTPRepeatInterval.setText(sFtpTestConfig.getFTPRepeatInterval() + "");
             this.mTxtViewFTPFileCount.setText(sFtpTestConfig.getFileCount() + "");
@@ -188,7 +188,7 @@ public class LGTestFlowConfigFragment extends Fragment {
         @Getter @Setter private int mFTPRepeatCount;
         @Getter @Setter private int mFTPRepeatInterval;
         @Getter @Setter private boolean mUsingFTPPSV;
-        @Getter @Setter private boolean mUsingPv4EPSV;
+        @Getter @Setter private boolean mUsingIPv4EPSV;
 
         // for LGiPerf
 

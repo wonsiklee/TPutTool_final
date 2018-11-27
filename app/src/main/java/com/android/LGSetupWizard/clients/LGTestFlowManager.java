@@ -32,7 +32,7 @@ public class LGTestFlowManager extends Handler {
     @Getter @Setter private int mFTPRepeatCount;
     @Getter @Setter private int mFTPRepeatInterval;
     @Getter @Setter private boolean mUsingFTPPSV;
-    @Getter @Setter private boolean mUsingPv4EPSV;
+    @Getter @Setter private boolean mUsingIPv4EPSV;
 
     // iPerf config values
     // TODO : please add necessary configuration values for auto test

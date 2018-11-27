@@ -1111,7 +1111,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Getter @Setter private int mFTPRepeatCount;
         @Getter @Setter private int mFTPRepeatInterval;
         @Getter @Setter private boolean mUsingFTPPSV;
-        @Getter @Setter private boolean mUsingPv4EPSV;
+        @Getter @Setter private boolean mUsingIPv4EPSV;
         @Getter @Setter private int mFileCount;
     }
 }

@@ -41,14 +41,143 @@
                 android:layout_height="wrap_content"
                 android:text="Open LG FTP Config" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1234"/>
-            <TextView
-                android:layout_width="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/txtView_config_use_file_IO_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="Use file I/O:"/>
+                <TextView
+                    android:id="@+id/txtView_config_ftp_use_file_IO_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/txtView_config_use_file_IO_title"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="True"/>
+                <TextView
+                    android:id="@+id/txtView_config_tcp_buffer_size_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_toLeftOf="@+id/txtView_config_ftp_tcp_buffer_size_value"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="tcp_wmem:"/>
+                <TextView
+                    android:id="@+id/txtView_config_ftp_tcp_buffer_size_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="20971520"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="5678"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/txtView_config_use_ftp_PSV_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="Use FTP PSV:"/>
+                <TextView
+                    android:id="@+id/txtView_config_ftp_use_PSV_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/txtView_config_use_ftp_PSV_title"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="True"/>
+                <TextView
+                    android:id="@+id/txtView_config_use_IPv4_epsv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_toLeftOf="@+id/txtView_config_ftp_use_IPv4_epsv_value"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="use EPSV:"/>
+                <TextView
+                    android:id="@+id/txtView_config_ftp_use_IPv4_epsv_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="False"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/txtView_config_repeat_count_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="Repeat count:"/>
+                <TextView
+                    android:id="@+id/txtView_config_ftp_repeat_count_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/txtView_config_repeat_count_title"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="1"/>
+                <TextView
+                    android:id="@+id/txtView_config_repeat_interval_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_toLeftOf="@+id/txtView_config_ftp_repeat_interval_value"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="Repeat interval:"/>
+                <TextView
+                    android:id="@+id/txtView_config_ftp_repeat_interval_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="4"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/txtView_config_file_count_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="File Count:"/>
+
+                <TextView
+                    android:id="@+id/txtView_config_ftp_file_count_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/txtView_config_file_count_title"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="0"/>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
 

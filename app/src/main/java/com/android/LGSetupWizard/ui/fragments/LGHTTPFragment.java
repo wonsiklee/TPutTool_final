@@ -32,6 +32,7 @@ import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
+import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
@@ -477,9 +478,14 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     }
 
     @Override
-    public Object reportBackToTestFlowConfigurationFragment() {
+    public LGHTTPTestFlowConfigurationInfo reportBackToTestFlowConfigurationFragment() {
         Log.d(TAG, "LGHTTPFragment reportBackToTestFlowConfigurationFragment()");
-        // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
-        return null;
+        LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo();
+        // TODO : need to implement to put all the info into 'info'
+        return info;
+    }
+
+    public class LGHTTPTestFlowConfigurationInfo implements ILGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
     }
 }

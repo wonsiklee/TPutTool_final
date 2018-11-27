@@ -36,6 +36,7 @@ import android.widget.ToggleButton;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGIperfMenuListAdapter;
+import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.data.LGIperfCommand;
 import com.android.LGSetupWizard.data.LGIperfConstants;
 import com.android.LGSetupWizard.data.LGIperfPackageManager;
@@ -834,9 +835,14 @@ public class LGIperfFragment extends Fragment
     };
 
     @Override
-    public Object reportBackToTestFlowConfigurationFragment() {
+    public LGIperfTestFlowConfiguration reportBackToTestFlowConfigurationFragment() {
         Log.d(TAG, "LGIPerfFragment reportBackToTestFlowConfigurationFragment()");
-        // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
-        return null;
+        LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration();
+        // TODO : need to implement to put all the info into 'info'
+        return info;
+    }
+
+    public class LGIperfTestFlowConfiguration implements ILGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
     }
 }

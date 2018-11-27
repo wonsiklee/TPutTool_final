@@ -41,6 +41,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.clients.LGFTPOperationListener;
+import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.data.MediaScanning;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
@@ -1094,9 +1096,22 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     @Override
-    public Object reportBackToTestFlowConfigurationFragment() {
+    public LGFTPTestFlowConfigurationInfo reportBackToTestFlowConfigurationFragment() {
         Log.d(TAG, "LGFTPFragment reportBackToTestFlowConfigurationFragment()");
-        // TODO : need to store needed information on a centralized storage class, which I will implement soon. - by wonsik
-        return null;
+        LGFTPTestFlowConfigurationInfo info = new LGFTPTestFlowConfigurationInfo();
+        // TODO : need to implement to put all the info into 'info'
+        info.setFileCount(10);
+        return info;
+    }
+
+    public class LGFTPTestFlowConfigurationInfo implements ILGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
+        @Getter @Setter private boolean mUsingFTPFileIO;
+        @Getter @Setter private int mFTPBufferSize;
+        @Getter @Setter private int mFTPRepeatCount;
+        @Getter @Setter private int mFTPRepeatInterval;
+        @Getter @Setter private boolean mUsingFTPPSV;
+        @Getter @Setter private boolean mUsingPv4EPSV;
+        @Getter @Setter private int mFileCount;
     }
 }

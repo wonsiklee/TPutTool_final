@@ -835,8 +835,8 @@ public class LGIperfFragment extends Fragment
     };
 
     @Override
-    public LGIperfTestFlowConfiguration reportBackToTestFlowConfigurationFragment() {
-        Log.d(TAG, "LGIPerfFragment reportBackToTestFlowConfigurationFragment()");
+    public LGIperfTestFlowConfiguration getTestConfigurationInfo() {
+        Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
         LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration();
         // TODO : need to implement to put all the info into 'info'
         return info;

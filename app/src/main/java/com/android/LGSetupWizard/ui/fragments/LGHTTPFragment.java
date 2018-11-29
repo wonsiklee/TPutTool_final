@@ -478,8 +478,8 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     }
 
     @Override
-    public LGHTTPTestFlowConfigurationInfo reportBackToTestFlowConfigurationFragment() {
-        Log.d(TAG, "LGHTTPFragment reportBackToTestFlowConfigurationFragment()");
+    public LGHTTPTestFlowConfigurationInfo getTestConfigurationInfo() {
+        Log.d(TAG, "LGHTTPFragment getTestConfigurationInfo()");
         LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo();
         // TODO : need to implement to put all the info into 'info'
         return info;

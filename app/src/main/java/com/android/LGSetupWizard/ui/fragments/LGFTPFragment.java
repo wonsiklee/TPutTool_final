@@ -1096,8 +1096,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     @Override
-    public LGFTPTestFlowConfigurationInfo reportBackToTestFlowConfigurationFragment() {
-        Log.d(TAG, "LGFTPFragment reportBackToTestFlowConfigurationFragment()");
+    public LGFTPTestFlowConfigurationInfo getTestConfigurationInfo() {
+        Log.d(TAG, "LGFTPFragment getTestConfigurationInfo()");
         LGFTPTestFlowConfigurationInfo info = new LGFTPTestFlowConfigurationInfo();
         // TODO : need to implement to put all the info into 'info'
         info.setFileCount(10);

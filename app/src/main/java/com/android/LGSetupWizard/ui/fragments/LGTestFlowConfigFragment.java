@@ -94,8 +94,8 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mParentActivity = ((MainActivity)(LGTestFlowConfigFragment.this.getActivity()));
             this.mFabFetchFromFragment = this.mParentActivity.getFabFetchInfo();
             this.mFabFetchFromFragment.setOnClickListener(v -> {
-                ILGTestFlowConfigurationInfo obj = ((ILGTestFlowFragment) mParentActivity.getFragmentPagerAdapter().getItem(mViewPager.getCurrentItem())).reportBackToTestFlowConfigurationFragment();
-                processConfigurationInfo(obj);
+                ILGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestFlowFragment) mParentActivity.getFragmentPagerAdapter().getItem(mViewPager.getCurrentItem())).getTestConfigurationInfo();
+                processConfigurationInfo(testConfigurationInfo);
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
                 mViewPager.setCurrentItem(1);
             });

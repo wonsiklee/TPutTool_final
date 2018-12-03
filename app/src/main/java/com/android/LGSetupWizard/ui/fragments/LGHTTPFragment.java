@@ -44,7 +44,7 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener , ILGTestFlowFragment {
+public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener , ILGTestTestFragment {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
 
     private String testAddr = "http://192.168.1.2/1G";
@@ -485,10 +485,21 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         return info;
     }
 
+    @Override
+    public void runTest() {
+
+    }
+
+    @Override
+    public void stopTest() {
+
+    }
+
     public class LGHTTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
+
         public LGHTTPTestFlowConfigurationInfo(Fragment fragmentInstance) {
             super(fragmentInstance);
         }
-        // TODO : need to implement class that can hold all the info.
     }
 }

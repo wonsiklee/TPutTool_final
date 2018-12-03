@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 @Accessors(prefix = "m")
 public class LGTestFlowConfigurationInfo {
     @Getter @Setter Fragment mFragmentInstance;
+    @Getter @Setter boolean mIsGoodToGo = false;
 
     public LGTestFlowConfigurationInfo(Fragment fragmentInstance) {
         this.mFragmentInstance = fragmentInstance;

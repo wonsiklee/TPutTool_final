@@ -2,13 +2,15 @@ package com.android.LGSetupWizard.ui.fragments;
 
 import com.android.LGSetupWizard.MainActivity;
 import com.android.LGSetupWizard.R;
-import com.android.LGSetupWizard.clients.LGTestFlowManager;
 import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.utils.Utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -20,7 +22,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import lombok.experimental.Accessors;
 
@@ -34,7 +39,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     // parent View
     private View mView;
 
-    private LGTestFlowManager mLGTestFlowManager;
+    //private LGTestFlowManager mLGTestFlowManager;
     private Context mContext;
 
     private Button mBtnStartTestFlow;
@@ -47,6 +52,22 @@ public class LGTestFlowConfigFragment extends Fragment {
     private ViewPager mParentViewPager;
 
     private HashMap<Fragment, Boolean> mTestTargetMap;
+    ArrayList<ILGTestTestFragment> mTestTargetFragmentList;
+    ILGTestTestFragment mCurrentTarget;
+    ILGTestFlowStateListener mTestStateListener = new ILGTestFlowStateListener() {
+        @Override
+        public void onTestStarted() {
+            Log.d(TAG, "onTestStarted()");
+        }
+
+        @Override
+        public void onTestFinished() {
+            Log.d(TAG, "onTestFinished()");
+            if (mTestTargetFragmentList.size() > 0) {
+                mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH);
+            }
+        }
+    };
 
     private Button mBtnOpenFTPConf;
     private Button mBtnOpeniPerfConf;
@@ -59,6 +80,58 @@ public class LGTestFlowConfigFragment extends Fragment {
     private TextView mTxtViewFTPRepeatCount;
     private TextView mTxtViewFTPRepeatInterval;
     private TextView mTxtViewFTPFileCount;
+
+    static final int TEST_FLOW_CTRL_MSG_START_FLOW = 0x00;
+    static final int TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH = 0x01;
+    static final int TEST_FLOW_CTRL_MSG_ABORT = 0x10;
+
+    @SuppressLint("HandlerLeak")
+    private Handler mTestFlowHandler = new Handler() {
+
+
+        @Override
+        public void handleMessage(Message msg) {
+
+            switch (msg.what) {
+                case TEST_FLOW_CTRL_MSG_START_FLOW:
+                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_START_FLOW");
+                    Set<Fragment> elementSet = mTestTargetMap.keySet();
+                    Iterator iter = elementSet.iterator();
+                    while(iter.hasNext()) {
+                        Fragment fragment = (Fragment)iter.next();
+                        Log.d(TAG, "fragment.hashCode() " + fragment.hashCode());
+                        if (mTestTargetMap.get(fragment)) {
+                            mTestTargetFragmentList.add((ILGTestTestFragment) fragment);
+                        } else {
+                            Log.d(TAG, fragment.getClass().getName());
+                        }
+                    }
+                    Log.d(TAG, "Test size = " + mTestTargetFragmentList.size());
+                    sendEmptyMessage(TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH);
+                    break;
+
+                case TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH:
+                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH");
+                    mCurrentTarget = mTestTargetFragmentList.remove(0);
+                    mCurrentTarget.setOnStateChangeListener(mTestStateListener);
+
+                    mCurrentTarget.runTest();
+
+                    sendEmptyMessage(TEST_FLOW_CTRL_MSG_ABORT);
+                    break;
+
+                case TEST_FLOW_CTRL_MSG_ABORT:
+                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_ABORT");
+                    mCurrentTarget.stopTest();
+                    mTestTargetMap.clear();
+                    mTestTargetFragmentList.clear();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,6 +149,7 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mBtnStartTestFlow = this.mView.findViewById(R.id.btn_start_test_flow);
             this.mBtnStartTestFlow.setOnClickListener(v -> {
                 Log.d(TAG, "start test flow.");
+                mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_START_FLOW);
             });
             this.mBtnOpenFTPConf = this.mView.findViewById(R.id.btn_open_ftp_config);
             this.mBtnOpenFTPConf.setOnClickListener(v -> {
@@ -96,19 +170,20 @@ public class LGTestFlowConfigFragment extends Fragment {
             });
 
             this.mContext = LGTestFlowConfigFragment.this.getContext();
-            this.mLGTestFlowManager = LGTestFlowManager.getInstance();
-            this.mLGTestFlowManager.startTestFlow();
+           /* this.mLGTestFlowManager = LGTestFlowManager.getInstance();
+            this.mLGTestFlowManager.startTestFlow();*/
 
             this.mParentActivity = ((MainActivity)(LGTestFlowConfigFragment.this.getActivity()));
             this.mFabFetchFromFragment = this.mParentActivity.getFabFetchInfo();
             this.mFabFetchFromFragment.setOnClickListener(v -> {
-                LGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestFlowFragment) mParentActivity.getFragmentPagerAdapter().getItem(mParentViewPager.getCurrentItem())).getTestConfigurationInfo();
+                LGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestTestFragment) mParentActivity.getFragmentPagerAdapter().getItem(mParentViewPager.getCurrentItem())).getTestConfigurationInfo();
                 processConfigurationInfo(testConfigurationInfo);
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
                 mParentViewPager.setCurrentItem(1);
             });
             this.mParentViewPager = mParentActivity.getViewPager();
             this.mTestTargetMap = new HashMap<>();
+            this.mTestTargetFragmentList = new ArrayList<>();
 
             this.mTxtViewFTPUseFileIO = this.mView.findViewById(R.id.txtView_config_ftp_use_file_IO_value);
             this.mTxtViewFTPTCPWMem = this.mView.findViewById(R.id.txtView_config_ftp_tcp_buffer_size_value);
@@ -145,7 +220,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     }
 
     private void processConfigurationInfo(LGTestFlowConfigurationInfo info) {
-        Fragment fragment = info.getFragmentInstance();
+
         if (info instanceof LGFTPFragment.LGFTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGFTPTestFlowConfigurationInfo returned");
             LGFTPFragment.LGFTPTestFlowConfigurationInfo sFtpTestConfig = (LGFTPFragment.LGFTPTestFlowConfigurationInfo) info;
@@ -156,6 +231,7 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mTxtViewFTPRepeatCount.setText(sFtpTestConfig.getFTPRepeatCount() + "");
             this.mTxtViewFTPRepeatInterval.setText(sFtpTestConfig.getFTPRepeatInterval() + "");
             this.mTxtViewFTPFileCount.setText(sFtpTestConfig.getFileCount() + "");
+
         } else if (info instanceof LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGHTTPTestFlowConfigurationInfo returned");
             // TODO : add codes here - yunsik.lee
@@ -166,6 +242,7 @@ public class LGTestFlowConfigFragment extends Fragment {
 
         }
 
-        this.mTestTargetMap.put(fragment, true);
+        Log.d(TAG, info.getFragmentInstance().hashCode() + ", " + info.isGoodToGo());
+        this.mTestTargetMap.put(info.getFragmentInstance(), info.isGoodToGo());
     }
 }

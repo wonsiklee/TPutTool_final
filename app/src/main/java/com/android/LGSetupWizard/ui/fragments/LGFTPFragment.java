@@ -64,7 +64,7 @@ import lombok.experimental.Accessors;
  * Created by wonsik.lee on 2017-06-13.
  */
 @Accessors(prefix = "m")
-public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener, View.OnFocusChangeListener, ILGTestFlowFragment {
+public class LGFTPFragment extends Fragment implements View.OnKeyListener, AdapterView.OnItemClickListener, Dialog.OnDismissListener, View.OnFocusChangeListener, ILGTestTestFragment {
     private static boolean DEBUG = false;
     private static final String TAG = LGFTPFragment.class.getSimpleName();
 
@@ -119,6 +119,8 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static private String KEY_AVG_TPUT = "avg_tput";
     final static private String KEY_LOGIN_RESULT = "login_result";
     private EditText mEditTextBufferSize;
+
+    private ILGTestFlowStateListener mTestStateListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -1099,8 +1101,29 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         Log.d(TAG, "LGFTPFragment getTestConfigurationInfo()");
         LGFTPTestFlowConfigurationInfo info = new LGFTPTestFlowConfigurationInfo(this);
         // TODO : need to implement to put all the info into 'info'
+        // if all set then set 'mIsGoodToGo' to true, otherwise false
+        info.setGoodToGo(true);
         info.setFileCount(10);
         return info;
+    }
+
+    @Override
+    public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
+        this.mTestStateListener = stateChangeListener;
+    }
+
+    @Override
+    public void runTest() {
+        // TODO : need to implement
+
+        this.mTestStateListener.onTestStarted();
+    }
+
+    @Override
+    public void stopTest() {
+        // TODO : need to implement
+
+        this.mTestStateListener.onTestFinished();
     }
 
     public class LGFTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {

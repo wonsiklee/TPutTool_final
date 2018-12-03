@@ -61,7 +61,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 public class LGIperfFragment extends Fragment
-        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnSetDialogListener, ILGTestFlowFragment  {
+        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnSetDialogListener, ILGTestTestFragment {
 
     private static final String TAG = LGIperfFragment.class.getSimpleName();
 
@@ -842,10 +842,21 @@ public class LGIperfFragment extends Fragment
         return info;
     }
 
+    @Override
+    public void runTest() {
+
+    }
+
+    @Override
+    public void stopTest() {
+
+    }
+
     public class LGIperfTestFlowConfiguration extends LGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
+
         public LGIperfTestFlowConfiguration(Fragment fragmentInstance) {
             super(fragmentInstance);
         }
-        // TODO : need to implement class that can hold all the info.
     }
 }

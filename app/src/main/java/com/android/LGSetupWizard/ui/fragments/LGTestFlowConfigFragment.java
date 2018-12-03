@@ -3,7 +3,7 @@ package com.android.LGSetupWizard.ui.fragments;
 import com.android.LGSetupWizard.MainActivity;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.clients.LGTestFlowManager;
-import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.utils.Utils;
 
 import android.content.Context;
@@ -19,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.HashMap;
 
 import lombok.experimental.Accessors;
 
@@ -39,8 +41,12 @@ public class LGTestFlowConfigFragment extends Fragment {
 
 
     private MainActivity mParentActivity;
+
     private FloatingActionButton mFabFetchFromFragment;
-    private ViewPager mViewPager;
+
+    private ViewPager mParentViewPager;
+
+    private HashMap<Fragment, Boolean> mTestTargetMap;
 
     private Button mBtnOpenFTPConf;
     private Button mBtnOpeniPerfConf;
@@ -91,15 +97,18 @@ public class LGTestFlowConfigFragment extends Fragment {
 
             this.mContext = LGTestFlowConfigFragment.this.getContext();
             this.mLGTestFlowManager = LGTestFlowManager.getInstance();
+            this.mLGTestFlowManager.startTestFlow();
+
             this.mParentActivity = ((MainActivity)(LGTestFlowConfigFragment.this.getActivity()));
             this.mFabFetchFromFragment = this.mParentActivity.getFabFetchInfo();
             this.mFabFetchFromFragment.setOnClickListener(v -> {
-                ILGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestFlowFragment) mParentActivity.getFragmentPagerAdapter().getItem(mViewPager.getCurrentItem())).getTestConfigurationInfo();
+                LGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestFlowFragment) mParentActivity.getFragmentPagerAdapter().getItem(mParentViewPager.getCurrentItem())).getTestConfigurationInfo();
                 processConfigurationInfo(testConfigurationInfo);
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
-                mViewPager.setCurrentItem(1);
+                mParentViewPager.setCurrentItem(1);
             });
-            this.mViewPager = mParentActivity.getViewPager();
+            this.mParentViewPager = mParentActivity.getViewPager();
+            this.mTestTargetMap = new HashMap<>();
 
             this.mTxtViewFTPUseFileIO = this.mView.findViewById(R.id.txtView_config_ftp_use_file_IO_value);
             this.mTxtViewFTPTCPWMem = this.mView.findViewById(R.id.txtView_config_ftp_tcp_buffer_size_value);
@@ -119,7 +128,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     }
 
     private void setFragmentToShow(int position) {
-        this.mViewPager.setCurrentItem(position);
+        this.mParentViewPager.setCurrentItem(position);
     }
 
     private void showFetchFabBtn() {
@@ -135,7 +144,8 @@ public class LGTestFlowConfigFragment extends Fragment {
         params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, sNavigationBarHeight + 100);
     }
 
-    private void processConfigurationInfo(ILGTestFlowConfigurationInfo info) {
+    private void processConfigurationInfo(LGTestFlowConfigurationInfo info) {
+        Fragment fragment = info.getFragmentInstance();
         if (info instanceof LGFTPFragment.LGFTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGFTPTestFlowConfigurationInfo returned");
             LGFTPFragment.LGFTPTestFlowConfigurationInfo sFtpTestConfig = (LGFTPFragment.LGFTPTestFlowConfigurationInfo) info;
@@ -149,9 +159,13 @@ public class LGTestFlowConfigFragment extends Fragment {
         } else if (info instanceof LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGHTTPTestFlowConfigurationInfo returned");
             // TODO : add codes here - yunsik.lee
+
         } else if (info instanceof LGIperfFragment.LGIperfTestFlowConfiguration) {
             Log.d(TAG, "LGIperfTestFlowConfiguration returned");
             // TODO : add codes here - hyukbin.ko
+
         }
+
+        this.mTestTargetMap.put(fragment, true);
     }
 }

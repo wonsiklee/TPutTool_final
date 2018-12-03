@@ -36,7 +36,7 @@ import android.widget.ToggleButton;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGIperfMenuListAdapter;
-import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.data.LGIperfCommand;
 import com.android.LGSetupWizard.data.LGIperfConstants;
 import com.android.LGSetupWizard.data.LGIperfPackageManager;
@@ -837,12 +837,15 @@ public class LGIperfFragment extends Fragment
     @Override
     public LGIperfTestFlowConfiguration getTestConfigurationInfo() {
         Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
-        LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration();
+        LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
         // TODO : need to implement to put all the info into 'info'
         return info;
     }
 
-    public class LGIperfTestFlowConfiguration implements ILGTestFlowConfigurationInfo {
+    public class LGIperfTestFlowConfiguration extends LGTestFlowConfigurationInfo {
+        public LGIperfTestFlowConfiguration(Fragment fragmentInstance) {
+            super(fragmentInstance);
+        }
         // TODO : need to implement class that can hold all the info.
     }
 }

@@ -32,7 +32,7 @@ import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
-import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
@@ -480,12 +480,15 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     @Override
     public LGHTTPTestFlowConfigurationInfo getTestConfigurationInfo() {
         Log.d(TAG, "LGHTTPFragment getTestConfigurationInfo()");
-        LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo();
+        LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo(this);
         // TODO : need to implement to put all the info into 'info'
         return info;
     }
 
-    public class LGHTTPTestFlowConfigurationInfo implements ILGTestFlowConfigurationInfo {
+    public class LGHTTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {
+        public LGHTTPTestFlowConfigurationInfo(Fragment fragmentInstance) {
+            super(fragmentInstance);
+        }
         // TODO : need to implement class that can hold all the info.
     }
 }

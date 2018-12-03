@@ -40,8 +40,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.android.LGSetupWizard.clients.LGFTPOperationListener;
-import com.android.LGSetupWizard.data.ILGTestFlowConfigurationInfo;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.data.MediaScanning;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.data.LGFTPFile;
@@ -1098,14 +1097,14 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     @Override
     public LGFTPTestFlowConfigurationInfo getTestConfigurationInfo() {
         Log.d(TAG, "LGFTPFragment getTestConfigurationInfo()");
-        LGFTPTestFlowConfigurationInfo info = new LGFTPTestFlowConfigurationInfo();
+        LGFTPTestFlowConfigurationInfo info = new LGFTPTestFlowConfigurationInfo(this);
         // TODO : need to implement to put all the info into 'info'
         info.setFileCount(10);
         return info;
     }
 
-    public class LGFTPTestFlowConfigurationInfo implements ILGTestFlowConfigurationInfo {
-        // TODO : need to implement class that can hold all the info.
+    public class LGFTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info you need.
         @Getter @Setter private boolean mUsingFTPFileIO;
         @Getter @Setter private int mFTPBufferSize;
         @Getter @Setter private int mFTPRepeatCount;
@@ -1113,5 +1112,9 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         @Getter @Setter private boolean mUsingFTPPSV;
         @Getter @Setter private boolean mUsingIPv4EPSV;
         @Getter @Setter private int mFileCount;
+
+        public LGFTPTestFlowConfigurationInfo(Fragment fragmentInstance) {
+            super(fragmentInstance);
+        }
     }
 }

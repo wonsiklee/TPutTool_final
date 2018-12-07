@@ -835,6 +835,11 @@ public class LGIperfFragment extends Fragment
     };
 
     @Override
+    public void setPredefinedConfiguration(LGTestFlowConfigurationInfo info) {
+
+    }
+
+    @Override
     public LGIperfTestFlowConfiguration getTestConfigurationInfo() {
         Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
         LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
@@ -848,7 +853,7 @@ public class LGIperfFragment extends Fragment
     }
 
     @Override
-    public void runTest() {
+    public void runTest(LGTestFlowConfigurationInfo info) {
 
     }
 

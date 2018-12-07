@@ -1117,6 +1117,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         // TODO : need to implement
 
         this.mTestStateListener.onTestStarted();
+        this.mTestStateListener.onTestFinished();
     }
 
     @Override

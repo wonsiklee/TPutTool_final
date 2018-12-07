@@ -486,6 +486,11 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     }
 
     @Override
+    public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
+
+    }
+
+    @Override
     public void runTest() {
 
     }

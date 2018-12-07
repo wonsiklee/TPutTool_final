@@ -843,6 +843,11 @@ public class LGIperfFragment extends Fragment
     }
 
     @Override
+    public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
+
+    }
+
+    @Override
     public void runTest() {
 
     }

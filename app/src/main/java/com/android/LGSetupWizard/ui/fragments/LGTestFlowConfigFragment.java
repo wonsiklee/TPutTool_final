@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,7 +65,66 @@ public class LGTestFlowConfigFragment extends Fragment {
         public void onTestFinished() {
             Log.d(TAG, "onTestFinished()");
             if (mTestTargetFragmentList.size() > 0) {
+                Log.d(TAG, mTestTargetFragmentList.size() + " tests left");
                 mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH);
+            } else {
+                Log.d(TAG, "no test fragment left, clearing testTargetMap and fragmentList.");
+                mTestTargetMap.clear();
+                mTestTargetFragmentList.clear();
+            }
+        }
+    };
+
+    @SuppressLint("HandlerLeak")
+    private Handler mTestFlowHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+            switch (msg.what) {
+                case TEST_FLOW_CTRL_MSG_START_FLOW:
+                    // this is a preparation state.
+                    // first need to client fragments, and put them in a list.
+                    // this list is going to be the actual test target list.
+                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_START_FLOW");
+                    LGTestFlowConfigFragment.this.mTestTargetFragmentList = new ArrayList<>();
+                    Set<Fragment> elementSet = mTestTargetMap.keySet();
+                    Iterator iter = elementSet.iterator();
+                    while(iter.hasNext()) {
+                        Fragment fragment = (Fragment)iter.next();
+                        Log.d(TAG, "fragment.hashCode() " + fragment.hashCode());
+                        if (mTestTargetMap.get(fragment)) {
+                            mTestTargetFragmentList.add((ILGTestTestFragment) fragment);
+                        } else {
+                            Log.d(TAG, fragment.getClass().getName());
+                        }
+                    }
+                    Log.d(TAG, "Test size = " + mTestTargetFragmentList.size());
+                    if (mTestTargetFragmentList.size() > 0) {
+                        sendEmptyMessage(TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH);
+                    } else {
+                        Log.d(TAG, "No test tarrgeted fragment found");
+                        Toast.makeText(mContext, "설정된 테스트 항목이 없습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+
+                case TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH:
+                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH");
+                    if (mTestTargetFragmentList != null && mTestTargetFragmentList.size() > 0) {
+                        mCurrentTarget = mTestTargetFragmentList.remove(0);
+                        mCurrentTarget.setOnStateChangeListener(mTestStateListener);
+                        mCurrentTarget.runTest();
+                    }
+                    break;
+
+                case TEST_FLOW_CTRL_MSG_ABORT:
+                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_ABORT");
+                    mCurrentTarget.stopTest();
+                    mTestTargetMap.clear();
+                    mTestTargetFragmentList.clear();
+                    break;
+
+                default:
+                    break;
             }
         }
     };
@@ -84,54 +144,6 @@ public class LGTestFlowConfigFragment extends Fragment {
     static final int TEST_FLOW_CTRL_MSG_START_FLOW = 0x00;
     static final int TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH = 0x01;
     static final int TEST_FLOW_CTRL_MSG_ABORT = 0x10;
-
-    @SuppressLint("HandlerLeak")
-    private Handler mTestFlowHandler = new Handler() {
-
-
-        @Override
-        public void handleMessage(Message msg) {
-
-            switch (msg.what) {
-                case TEST_FLOW_CTRL_MSG_START_FLOW:
-                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_START_FLOW");
-                    Set<Fragment> elementSet = mTestTargetMap.keySet();
-                    Iterator iter = elementSet.iterator();
-                    while(iter.hasNext()) {
-                        Fragment fragment = (Fragment)iter.next();
-                        Log.d(TAG, "fragment.hashCode() " + fragment.hashCode());
-                        if (mTestTargetMap.get(fragment)) {
-                            mTestTargetFragmentList.add((ILGTestTestFragment) fragment);
-                        } else {
-                            Log.d(TAG, fragment.getClass().getName());
-                        }
-                    }
-                    Log.d(TAG, "Test size = " + mTestTargetFragmentList.size());
-                    sendEmptyMessage(TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH);
-                    break;
-
-                case TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH:
-                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH");
-                    mCurrentTarget = mTestTargetFragmentList.remove(0);
-                    mCurrentTarget.setOnStateChangeListener(mTestStateListener);
-
-                    mCurrentTarget.runTest();
-
-                    sendEmptyMessage(TEST_FLOW_CTRL_MSG_ABORT);
-                    break;
-
-                case TEST_FLOW_CTRL_MSG_ABORT:
-                    Log.d(TAG, "TEST_FLOW_CTRL_MSG_ABORT");
-                    mCurrentTarget.stopTest();
-                    mTestTargetMap.clear();
-                    mTestTargetFragmentList.clear();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -183,7 +195,6 @@ public class LGTestFlowConfigFragment extends Fragment {
             });
             this.mParentViewPager = mParentActivity.getViewPager();
             this.mTestTargetMap = new HashMap<>();
-            this.mTestTargetFragmentList = new ArrayList<>();
 
             this.mTxtViewFTPUseFileIO = this.mView.findViewById(R.id.txtView_config_ftp_use_file_IO_value);
             this.mTxtViewFTPTCPWMem = this.mView.findViewById(R.id.txtView_config_ftp_tcp_buffer_size_value);

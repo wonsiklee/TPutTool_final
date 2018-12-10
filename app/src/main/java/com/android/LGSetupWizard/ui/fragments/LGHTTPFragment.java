@@ -486,6 +486,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     public LGHTTPTestFlowConfigurationInfo getTestConfigurationInfo() {
         Log.d(TAG, "LGHTTPFragment getTestConfigurationInfo()");
         LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo(this);
+        info.setGoodToGo(isTestConfigurationFinished());
         // TODO : need to implement to put all the info into 'info'
         return info;
     }
@@ -503,6 +504,11 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     @Override
     public void stopTest() {
 
+    }
+
+    @Override
+    public boolean isTestConfigurationFinished() {
+        return false;
     }
 
     public class LGHTTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {

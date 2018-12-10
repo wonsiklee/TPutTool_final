@@ -843,6 +843,7 @@ public class LGIperfFragment extends Fragment
     public LGIperfTestFlowConfiguration getTestConfigurationInfo() {
         Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
         LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
+        info.setGoodToGo(isTestConfigurationFinished());
         // TODO : need to implement to put all the info into 'info'
         return info;
     }
@@ -860,6 +861,11 @@ public class LGIperfFragment extends Fragment
     @Override
     public void stopTest() {
 
+    }
+
+    @Override
+    public boolean isTestConfigurationFinished() {
+        return false;
     }
 
     public class LGIperfTestFlowConfiguration extends LGTestFlowConfigurationInfo {

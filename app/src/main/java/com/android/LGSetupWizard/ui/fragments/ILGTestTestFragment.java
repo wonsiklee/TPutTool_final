@@ -9,4 +9,5 @@ public interface ILGTestTestFragment {
 
     void runTest(LGTestFlowConfigurationInfo info);
     void stopTest();
+    boolean isTestConfigurationFinished();
 }

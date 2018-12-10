@@ -45,6 +45,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     static final int TEST_FLOW_CTRL_MSG_START_FLOW = 0x00;
     static final int TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH = 0x01;
     static final int TEST_FLOW_CTRL_MSG_SET_FRAGMENT_TO_CONFIGURATION = 0x02;
+    static final int TEST_FLOW_CTRL_MSG_DISABLE_START_FLOW_BTN = 0x03;
     static final int TEST_FLOW_CTRL_MSG_ABORT = 0x10;
 
     private Context mContext;
@@ -76,6 +77,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 Log.d(TAG, "no test fragment left, clearing testTargetMap and fragmentList.");
                 mTestTargetMap.clear();
                 mTestTargetFragmentList.clear();
+                mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_DISABLE_START_FLOW_BTN);
             }
         }
     };
@@ -89,6 +91,11 @@ public class LGTestFlowConfigFragment extends Fragment {
                 case TEST_FLOW_CTRL_MSG_SET_FRAGMENT_TO_CONFIGURATION:
                     setFragmentToShow(FRAGMENT_INDEX_TEST_FLOW);
                     break;
+
+                case TEST_FLOW_CTRL_MSG_DISABLE_START_FLOW_BTN:
+                    mBtnStartTestFlow.setEnabled(false);
+                    break;
+
                 case TEST_FLOW_CTRL_MSG_START_FLOW:
                     // this is a preparation state.
                     // first need to client fragments, and put them in a list.

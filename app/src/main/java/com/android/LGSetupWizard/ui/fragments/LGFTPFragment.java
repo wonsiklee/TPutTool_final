@@ -1138,14 +1138,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
         return info;
     }
 
-    private boolean isTestConfigurationFinished() {
-        if (!this.mLGFtpClient.isAvailable()) {
-            return false;
-        } else if (this.mFTPFileListVIewAdapter.getSelectedFileCount() <= 0) {
-            return false;
-        }
-        return true;
-    }
     @Override
     public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
         this.mTestStateListener = stateChangeListener;
@@ -1153,7 +1145,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     @Override
     public void runTest(LGTestFlowConfigurationInfo info) {
-        // TODO : need to implement
         Log.d(TAG, "runTest()");
         this.mTestStateListener.onTestStarted();
 
@@ -1200,6 +1191,16 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     @Override
     public void stopTest() {
         this.mTestStateListener.onTestFinished();
+    }
+
+    @Override
+    public boolean isTestConfigurationFinished() {
+        if (!this.mLGFtpClient.isAvailable()) {
+            return false;
+        } else if (this.mFTPFileListVIewAdapter.getSelectedFileCount() <= 0) {
+            return false;
+        }
+        return true;
     }
 
     public class LGFTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {

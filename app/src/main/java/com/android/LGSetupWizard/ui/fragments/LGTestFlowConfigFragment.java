@@ -44,6 +44,7 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     static final int TEST_FLOW_CTRL_MSG_START_FLOW = 0x00;
     static final int TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH = 0x01;
+    static final int TEST_FLOW_CTRL_MSG_SET_FRAGMENT_TO_CONFIGURATION = 0x02;
     static final int TEST_FLOW_CTRL_MSG_ABORT = 0x10;
 
     private Context mContext;
@@ -66,7 +67,8 @@ public class LGTestFlowConfigFragment extends Fragment {
         @Override
         public void onTestFinished() {
             Log.d(TAG, "onTestFinished()");
-            setFragmentToShow(FRAGMENT_INDEX_TEST_FLOW);
+
+            mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_SET_FRAGMENT_TO_CONFIGURATION);
             if (mTestTargetFragmentList.size() > 0) {
                 Log.d(TAG, mTestTargetFragmentList.size() + " tests left");
                 mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH);
@@ -84,6 +86,9 @@ public class LGTestFlowConfigFragment extends Fragment {
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
+                case TEST_FLOW_CTRL_MSG_SET_FRAGMENT_TO_CONFIGURATION:
+                    setFragmentToShow(FRAGMENT_INDEX_TEST_FLOW);
+                    break;
                 case TEST_FLOW_CTRL_MSG_START_FLOW:
                     // this is a preparation state.
                     // first need to client fragments, and put them in a list.

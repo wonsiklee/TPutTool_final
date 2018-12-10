@@ -181,7 +181,6 @@ public class LGFTPClient {
 
     public void disconnectFromServer() {
         Log.d(TAG, "disconnectFromServer()");
-        Log.d(TAG, "asdf");
         mConnectionKeepAliveHandler.sendEmptyMessage(MSG_STOP_KEEP_ALIVE_CONNECTION);
         logoutFromServer();
         mOperationListener.onDisconnectToServerFinished();

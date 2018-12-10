@@ -40,6 +40,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.LGSetupWizard.MainActivity;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGFTPFileListViewAdapter;
 import com.android.LGSetupWizard.clients.ILGFTPOperationListener;
@@ -124,6 +125,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LGFTPFragment instance hashCode : " + this.hashCode());
         Log.d(TAG, "onCreate()");
@@ -134,8 +136,15 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause()");
         super.onPause();
         hideSoftKeyboard();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
     }
 
     @Nullable
@@ -159,26 +168,28 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
         Log.d(TAG, "onAttache(Context)");
+        super.onAttach(context);
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy()");
         super.onDestroy();
-        new Thread() {
+        /*new Thread() {
             @Override
             public void run() {
                 if (LGFTPFragment.this.mLGFtpClient != null && LGFTPFragment.this.mLGFtpClient.isAvailable()) {
                     LGFTPFragment.this.mLGFtpClient.disconnectFromServer();
                 }
             }
-        }.start();
+        }.start();*/
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume()");
         super.onResume();
 
         if (this.mLGFtpClient == null) {
@@ -743,7 +754,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     final static int MSG_REFRESH_ALL_UI = 0x11;
     final static int MSG_SHOW_RESULT_POPUP_WINDOW = 0x12;
 
-
     // UI Control handler
     @Getter
     @SuppressLint("HandlerLeak")
@@ -926,7 +936,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
                     // TODO : need to fetch all the related data (where test category is about (FTP))from DB, and project it to the data.
                     mTestResultPopupWindow.show(LGFTPFragment.this.getView(), mCheckBoxUseFileIO.isChecked() ? TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO : TestResultDBManager.TestCategory.FTP_DL_WITHOUT_FILE_IO);
                     break;
-
                 default:
                     break;
             }
@@ -1190,13 +1199,10 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
 
     @Override
     public void stopTest() {
-        // TODO : need to implement
-
         this.mTestStateListener.onTestFinished();
     }
 
     public class LGFTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {
-        // TODO : need to implement class that can hold all the info you need.
         @Getter @Setter private boolean mUsingFTPFileIO;
         @Getter @Setter private int mFTPBufferSize;
         @Getter @Setter private int mFTPRepeatCount;

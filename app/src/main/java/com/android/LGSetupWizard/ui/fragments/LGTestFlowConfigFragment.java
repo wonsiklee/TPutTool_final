@@ -45,7 +45,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     static final int TEST_FLOW_CTRL_MSG_START_FLOW = 0x00;
     static final int TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH = 0x01;
     static final int TEST_FLOW_CTRL_MSG_SET_FRAGMENT_TO_CONFIGURATION = 0x02;
-    static final int TEST_FLOW_CTRL_MSG_DISABLE_START_FLOW_BTN = 0x03;
+    static final int TEST_FLOW_CTRL_MSG_RESET_ALL_CONFIGURATION = 0x03;
     static final int TEST_FLOW_CTRL_MSG_ABORT = 0x10;
 
     private Context mContext;
@@ -77,7 +77,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 Log.d(TAG, "no test fragment left, clearing testTargetMap and fragmentList.");
                 mTestTargetMap.clear();
                 mTestTargetFragmentList.clear();
-                mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_DISABLE_START_FLOW_BTN);
+                mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_RESET_ALL_CONFIGURATION);
             }
         }
     };
@@ -92,8 +92,8 @@ public class LGTestFlowConfigFragment extends Fragment {
                     setFragmentToShow(FRAGMENT_INDEX_TEST_FLOW);
                     break;
 
-                case TEST_FLOW_CTRL_MSG_DISABLE_START_FLOW_BTN:
-                    mBtnStartTestFlow.setEnabled(false);
+                case TEST_FLOW_CTRL_MSG_RESET_ALL_CONFIGURATION:
+                    resetAllConfigurationInfo();
                     break;
 
                 case TEST_FLOW_CTRL_MSG_START_FLOW:
@@ -241,8 +241,6 @@ public class LGTestFlowConfigFragment extends Fragment {
             // HTTP UI instance init.
             // TODO : yunsik.
 
-
-
             if (isThereAnyLegitimateTestTarget()) {
                 this.mBtnStartTestFlow.setEnabled(true);
             } else {
@@ -313,5 +311,24 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     private boolean isThereAnyLegitimateTestTarget() {
         return this.mTestTargetMap.values().contains(new Boolean(true)) ? true: false;
+    }
+
+    private void resetAllConfigurationInfo() {
+        mBtnStartTestFlow.setEnabled(false);
+
+        // FTP configuration reset
+        this.mTxtViewFTPUseFileIO.setText("N/A");
+        this.mTxtViewFTPTCPWMem.setText("N/A");
+        this.mTxtViewFTPPsv.setText("N/A");
+        this.mTxtViewFTPUseEPSV.setText("N/A");
+        this.mTxtViewFTPRepeatCount.setText("N/A");
+        this.mTxtViewFTPRepeatInterval.setText("N/A");
+        this.mTxtViewFTPFileCount.setText("N/A");
+
+        // iPerf configuration reset
+        // TODO : hyukbin.ko reset code goes here.
+
+        // Http configuration reset
+        // TODO : yunsik.lee reset code goes here.
     }
 }

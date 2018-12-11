@@ -1130,7 +1130,7 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     @Override
-    public void runTest(LGTestFlowConfigurationInfo info) {
+    public void runTest() {
         Log.d(TAG, "runTest()");
         this.mTestStateListener.onTestStarted();
 

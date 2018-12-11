@@ -7,7 +7,7 @@ public interface ILGTestTestFragment {
     LGTestFlowConfigurationInfo getTestConfigurationInfo();
     void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener);
 
-    void runTest(LGTestFlowConfigurationInfo info);
+    void runTest();
     void stopTest();
     boolean isTestConfigurationFinished();
 }

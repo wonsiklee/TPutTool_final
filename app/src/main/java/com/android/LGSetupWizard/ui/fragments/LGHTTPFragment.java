@@ -492,7 +492,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
     }
 
     @Override
-    public void runTest(LGTestFlowConfigurationInfo info) {
+    public void runTest() {
 
     }
 

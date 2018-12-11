@@ -849,7 +849,7 @@ public class LGIperfFragment extends Fragment
     }
 
     @Override
-    public void runTest(LGTestFlowConfigurationInfo info) {
+    public void runTest() {
 
     }
 

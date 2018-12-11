@@ -137,7 +137,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                         Log.d(TAG, "target index in the adapter is " + index);
                         setFragmentToShow(index);
                         mCurrentTarget.setOnStateChangeListener(mTestStateListener);
-                        mCurrentTarget.runTest(mTargetConfigurationMap.get(mCurrentTarget));
+                        mCurrentTarget.runTest();
                     }
                     break;
 

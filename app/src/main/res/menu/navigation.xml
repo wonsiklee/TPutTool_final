@@ -6,11 +6,11 @@
         android:id="@+id/navigation_configuration"
         android:title="@string/title_configuration"
         android:icon="@drawable/ic_settings" />
-<!--
+
     <item
         android:id="@+id/navigation_nia"
         android:title="@string/title_nia"
-        android:icon="@drawable/ic_n" />-->
+        android:icon="@drawable/ic_n" />
 
     <item
         android:id="@+id/navigation_ftp"

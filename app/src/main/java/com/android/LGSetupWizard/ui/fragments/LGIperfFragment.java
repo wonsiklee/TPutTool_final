@@ -36,6 +36,7 @@ import android.widget.ToggleButton;
 
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.LGIperfMenuListAdapter;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.data.LGIperfCommand;
 import com.android.LGSetupWizard.data.LGIperfConstants;
 import com.android.LGSetupWizard.data.LGIperfPackageManager;
@@ -60,7 +61,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 public class LGIperfFragment extends Fragment
-        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnSetDialogListener {
+        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnSetDialogListener, ILGTestTestFragment {
 
     private static final String TAG = LGIperfFragment.class.getSimpleName();
 
@@ -832,4 +833,41 @@ public class LGIperfFragment extends Fragment
             }
         }
     };
+
+    @Override
+    public LGIperfTestFlowConfiguration getTestConfigurationInfo() {
+        Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
+        LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
+        info.setGoodToGo(isTestConfigurationFinished());
+        // TODO : need to implement to put all the info into 'info'
+        return info;
+    }
+
+    @Override
+    public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
+
+    }
+
+    @Override
+    public void runTest() {
+
+    }
+
+    @Override
+    public void stopTest() {
+
+    }
+
+    @Override
+    public boolean isTestConfigurationFinished() {
+        return false;
+    }
+
+    public class LGIperfTestFlowConfiguration extends LGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
+
+        public LGIperfTestFlowConfiguration(Fragment fragmentInstance) {
+            super(fragmentInstance);
+        }
+    }
 }

@@ -32,6 +32,7 @@ import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPDownloadStateChangeListener;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
@@ -43,7 +44,7 @@ import lombok.experimental.Accessors;
  */
 
 @Accessors(prefix = "m")
-public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener {
+public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedChangeListener, View.OnFocusChangeListener , ILGTestTestFragment {
     private static final String TAG = LGHTTPFragment.class.getSimpleName();
 
     private String testAddr = "http://192.168.1.2/1G";
@@ -473,6 +474,43 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         if (mEditTxtRepeatCount.getId() == v.getId() || mEditTxtIntervalTime.getId() == v.getId()){
             Log.d(TAG, "hiding softKeyboard");
             hideKeyboard();
+        }
+    }
+
+    @Override
+    public LGHTTPTestFlowConfigurationInfo getTestConfigurationInfo() {
+        Log.d(TAG, "LGHTTPFragment getTestConfigurationInfo()");
+        LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo(this);
+        info.setGoodToGo(isTestConfigurationFinished());
+        // TODO : need to implement to put all the info into 'info'
+        return info;
+    }
+
+    @Override
+    public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
+
+    }
+
+    @Override
+    public void runTest() {
+
+    }
+
+    @Override
+    public void stopTest() {
+
+    }
+
+    @Override
+    public boolean isTestConfigurationFinished() {
+        return false;
+    }
+
+    public class LGHTTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {
+        // TODO : need to implement class that can hold all the info.
+
+        public LGHTTPTestFlowConfigurationInfo(Fragment fragmentInstance) {
+            super(fragmentInstance);
         }
     }
 }

@@ -8,6 +8,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.android.LGSetupWizard.data.LGFTPFile;
+import com.android.LGSetupWizard.data.TestFlowProgressInfo;
 
 import org.apache.commons.net.ProtocolCommandEvent;
 import org.apache.commons.net.ProtocolCommandListener;
@@ -15,7 +16,6 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
 
@@ -41,7 +41,7 @@ import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
  * Created by wonsik.lee on 2018-01-01.
  */
 @Accessors(prefix = "m")
-public class LGFTPClient implements ILGTestFlowController {
+public class LGFTPClient {
     static final private String TAG = LGFTPClient.class.getSimpleName();
 
     final static private int MSG_START_TPUT_CALCULATION_LOOP = 0x00;
@@ -938,30 +938,5 @@ public class LGFTPClient implements ILGTestFlowController {
             Log.d(TAG, "setUseEPSVwithIPv4 false");
             mFTPClient.setUseEPSVwithIPv4(false);
         }
-    }
-
-
-
-    // implements ILGTestFlowController methods
-
-    @Override
-    public void prepareToLaunch() {
-
-    }
-
-    @Override
-    public void launch() {
-
-    }
-
-    @Override
-    public void abort() {
-
-    }
-
-    @Override
-    public TestFlowProgressInfo getProgress() {
-        Log.d(TAG, "getProgress() called.");
-        return new TestFlowProgressInfo();
     }
 }

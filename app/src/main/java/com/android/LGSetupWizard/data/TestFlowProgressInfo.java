@@ -1,4 +1,4 @@
-package com.android.LGSetupWizard.clients;
+package com.android.LGSetupWizard.data;
 
 import lombok.Getter;
 import lombok.Setter;

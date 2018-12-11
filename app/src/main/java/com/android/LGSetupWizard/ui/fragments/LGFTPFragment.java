@@ -1106,20 +1106,6 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     }
 
     @Override
-    public void setPredefinedConfiguration(LGTestFlowConfigurationInfo info) {
-
-        Log.d(TAG, "");
-
-       /* info.setFileCount(this.mFTPFileListVIewAdapter.getSelectedFileCount());
-        info.setFTPBufferSize(Integer.valueOf(this.mEditTextBufferSize.getText().toString()));
-        info.setFTPRepeatCount(Integer.valueOf(this.mEditTextRepeatCount.getText().toString()));
-        info.setFTPRepeatInterval(Integer.valueOf(this.mEditTextTestIntervalInSec.getText().toString()));
-        info.setUsingFTPFileIO(this.mCheckBoxUseFileIO.isChecked());
-        info.setUsingFTPPSV(this.mCheckBoxUsePassiveMode.isChecked());
-        info.setUsingIPv4EPSV(this.mCheckBoxUseEPSVforIPv4.isChecked());*/
-    }
-
-    @Override
     public LGFTPTestFlowConfigurationInfo getTestConfigurationInfo() {
         Log.d(TAG, "LGFTPFragment getTestConfigurationInfo()");
         LGFTPTestFlowConfigurationInfo info = new LGFTPTestFlowConfigurationInfo(this);

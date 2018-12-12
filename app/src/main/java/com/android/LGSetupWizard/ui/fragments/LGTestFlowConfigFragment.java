@@ -22,6 +22,8 @@ import android.widget.Toast;
 import com.android.LGSetupWizard.MainActivity;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
+import com.android.LGSetupWizard.database.TestResultDBManager;
+import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 import com.android.LGSetupWizard.utils.Utils;
 
 import java.util.ArrayList;
@@ -163,7 +165,8 @@ public class LGTestFlowConfigFragment extends Fragment {
     private Button mBtnOpenHttpConf;
 
     private ImageButton mImgBtnShowHistory;
-    
+    private TestResultPopupWindow mTestResultPopupWindow;
+
     // FTP UI instances.
     private TextView mTxtViewFTPUseFileIO;
     private TextView mTxtViewFTPTCPWMem;
@@ -236,7 +239,8 @@ public class LGTestFlowConfigFragment extends Fragment {
 
             this.mImgBtnShowHistory = this.mParentView.findViewById(R.id.imgBtn_history);
             this.mImgBtnShowHistory.setOnClickListener((v) -> {
-                Toast.makeText(mContext, "fffffffffffffffff", Toast.LENGTH_SHORT).show();
+                mTestResultPopupWindow = new TestResultPopupWindow(LGTestFlowConfigFragment.this.mContext);
+                mTestResultPopupWindow.show(LGTestFlowConfigFragment.this.getView(), TestResultDBManager.TestCategory.ALL_TYPE);
             });
             
                     

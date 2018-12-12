@@ -1,10 +1,5 @@
 package com.android.LGSetupWizard.ui.fragments;
 
-import com.android.LGSetupWizard.MainActivity;
-import com.android.LGSetupWizard.R;
-import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
-import com.android.LGSetupWizard.utils.Utils;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
@@ -23,6 +18,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.LGSetupWizard.MainActivity;
+import com.android.LGSetupWizard.R;
+import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
+import com.android.LGSetupWizard.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -177,7 +177,12 @@ public class LGTestFlowConfigFragment extends Fragment {
     // TODO : iPerf UI - hyukbin.ko
 
     //  HTTP UI instances.
-    // TODO : HTTP UI - yunsik.lee
+    private TextView mTxtViewHTTPFileAddress;
+    private TextView mTxtViewHTTPStack;
+    private TextView mTxtViewHTTPUseFileIO;
+    private TextView mTxtViewHTTPRepeatCount;
+    private TextView mTxtViewHTTPRepeatInterval;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -248,7 +253,11 @@ public class LGTestFlowConfigFragment extends Fragment {
             // TODO : hyukbin.ko
 
             // HTTP UI instance init.
-            // TODO : yunsik.
+            this.mTxtViewHTTPFileAddress = this.mParentView.findViewById(R.id.txtView_config_http_file_address_value);
+            this.mTxtViewHTTPStack = this.mParentView.findViewById(R.id.txtView_config_http_stack_value);
+            this.mTxtViewHTTPUseFileIO = this.mParentView.findViewById(R.id.txtView_config_http_use_file_IO_value);
+            this.mTxtViewHTTPRepeatCount = this.mParentView.findViewById(R.id.txtView_config_http_repeat_count_value);
+            this.mTxtViewHTTPRepeatInterval = this.mParentView.findViewById(R.id.txtView_config_http_repeat_interval_value);
 
             resetAllConfigurationInfo();
 
@@ -297,10 +306,15 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mTxtViewFTPRepeatInterval.setText(sFtpTestConfig.getFTPRepeatInterval() + "");
             this.mTxtViewFTPFileCount.setText(sFtpTestConfig.getFileCount() + "");
 
-
         } else if (info instanceof LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGHTTPTestFlowConfigurationInfo returned");
-            // TODO : add codes here - yunsik.lee
+            Log.d(TAG, "returned info : " + info.isGoodToGo());
+            LGHTTPFragment.LGHTTPTestFlowConfigurationInfo sHttpTestConfig = (LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) info;
+            this.mTxtViewHTTPFileAddress.setText(sHttpTestConfig.getHTTPFileAddress());
+            this.mTxtViewHTTPStack.setText(sHttpTestConfig.getHTTPStack());
+            this.mTxtViewHTTPUseFileIO.setText(Utils.getBooleanString(sHttpTestConfig.isUsingHTTPFileIO()));
+            this.mTxtViewHTTPRepeatCount.setText(sHttpTestConfig.getHTTPRepeatCount() + "");
+            this.mTxtViewHTTPRepeatInterval.setText(sHttpTestConfig.getHTTPRepeatInterval() + "");
 
         } else if (info instanceof LGIperfFragment.LGIperfTestFlowConfiguration) {
             Log.d(TAG, "LGIperfTestFlowConfiguration returned");
@@ -340,6 +354,10 @@ public class LGTestFlowConfigFragment extends Fragment {
         // TODO : hyukbin.ko reset code goes here.
 
         // Http configuration reset
-        // TODO : yunsik.lee reset code goes here.
+        this.mTxtViewHTTPFileAddress.setText("N/A");
+        this.mTxtViewHTTPStack.setText("N/A");
+        this.mTxtViewHTTPUseFileIO.setText("N/A");
+        this.mTxtViewHTTPRepeatCount.setText("N/A");
+        this.mTxtViewHTTPRepeatInterval.setText("N/A");
     }
 }

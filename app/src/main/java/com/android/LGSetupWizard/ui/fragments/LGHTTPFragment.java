@@ -28,15 +28,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.R;
-import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPClient;
 import com.android.LGSetupWizard.clients.ILGHTTPDownloadStateChangeListener;
+import com.android.LGSetupWizard.clients.LGApacheHTTPClient;
 import com.android.LGSetupWizard.clients.LGOKHTTPClient;
 import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 import com.android.LGSetupWizard.ui.popup.CounterSettingPopupWindow;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
@@ -84,6 +86,10 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
 
     private TestResultPopupWindow mTestResultPopupWindow;
 
+    private ILGTestFlowStateListener mTestStateListener;
+    private boolean testOngoing = false;
+    private boolean triggeredByTestFlow = false;
+
     public static class DataPool {
         public long totalSize;
         public float totalDuration;
@@ -103,7 +109,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 tmp = LGHTTPFragment.this.mEditTxtIntervalTime.getText().toString();
                 LGHTTPFragment.this.mRepeatInterval = Integer.valueOf(tmp) * 1000;
             } catch (NumberFormatException e) {
-                Log.d(TAG, "numberFormatException " + e + "\ntmp");
+                Log.d(TAG, "numberFormatException " + e + "\n");
                 Toast.makeText(LGHTTPFragment.this.getContext(), "숫자만 됩니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -174,6 +180,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                 case START_TEST:
                     Log.d(TAG, "START_TEST");
                     // switch listener
+                    LGHTTPFragment.this.testOngoing = true;
                     LGHTTPFragment.this.mBtnStartDl.setOnClickListener(LGHTTPFragment.this.mStopTestClickListener);
                     LGHTTPFragment.this.mBtnStartDl.setText(R.string.str_stop_nia_test);
                     LGHTTPFragment.this.mRdoBtnOkHttp.setClickable(false);
@@ -216,6 +223,11 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
                     LGHTTPFragment.this.mRdoBtnOkHttp.setClickable(true);
                     LGHTTPFragment.this.mRdoBtnApache.setClickable(true);
                     LGHTTPFragment.this.mTxtViewHTTPResultHistory.append("\n");
+                    LGHTTPFragment.this.testOngoing = false;
+                    if (LGHTTPFragment.this.triggeredByTestFlow) {
+                        LGHTTPFragment.this.mTestStateListener.onTestFinished();
+                        LGHTTPFragment.this.triggeredByTestFlow = false;
+                    }
                     break;
 
             }
@@ -230,7 +242,7 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    LGHTTPFragment.this.mTxtViewHTTPResult.append("OkHttp started, Test no." + (mRepeatCount + 1) + "\n");
+                    LGHTTPFragment.this.mTxtViewHTTPResult.append("Http started, Test no." + (mRepeatCount + 1) + "\n");
                     LGHTTPFragment.this.mProgressBarHttpProgress.setProgress(0);
                 }
             });
@@ -482,32 +494,70 @@ public class LGHTTPFragment extends Fragment implements RadioButton.OnCheckedCha
         Log.d(TAG, "LGHTTPFragment getTestConfigurationInfo()");
         LGHTTPTestFlowConfigurationInfo info = new LGHTTPTestFlowConfigurationInfo(this);
         info.setGoodToGo(isTestConfigurationFinished());
-        // TODO : need to implement to put all the info into 'info'
+        info.setHTTPFileAddress(LGHTTPFragment.this.mEditTxtFileAddr.getText().toString());
+        info.setHTTPStack(LGHTTPFragment.this.mRdoBtnOkHttp.isChecked() ? "OkHttp" : "Apache");
+        info.setUsingHTTPFileIO(LGHTTPFragment.this.mCheckBoxEnableFileIO.isChecked());
+        info.setHTTPRepeatCount(Integer.valueOf(LGHTTPFragment.this.mEditTxtRepeatCount.getText().toString()));
+        info.setHTTPRepeatInterval(Integer.valueOf(LGHTTPFragment.this.mEditTxtIntervalTime.getText().toString()));
         return info;
     }
 
     @Override
     public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
-
+        this.mTestStateListener = stateChangeListener;
     }
 
     @Override
     public void runTest() {
+        Log.d(TAG, "LGHTTPFragment.runTest()");
+        LGHTTPFragment.this.mTestStateListener.onTestStarted();
+        LGHTTPFragment.this.triggeredByTestFlow = true;
 
+        try {
+            String tmp = LGHTTPFragment.this.mEditTxtRepeatCount.getText().toString();
+            LGHTTPFragment.this.mMaxCount = Integer.valueOf(tmp);
+            LGHTTPFragment.this.mRepeatCount = 0;
+
+            tmp = LGHTTPFragment.this.mEditTxtIntervalTime.getText().toString();
+            LGHTTPFragment.this.mRepeatInterval = Integer.valueOf(tmp) * 1000;
+        } catch (NumberFormatException e) {
+            Log.d(TAG, "numberFormatException " + e + "\n");
+            Toast.makeText(LGHTTPFragment.this.getContext(), "숫자만 됩니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d(TAG, "Repeat count : " + mMaxCount);
+        LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(START_TEST);
+
+        LGHTTPFragment.this.hideKeyboard();
     }
 
     @Override
     public void stopTest() {
-
+        Log.d(TAG, "LGHTTPFragment.stopTest()");
+        LGHTTPFragment.this.mRepeatCount = 0;
+        LGHTTPFragment.this.mMaxCount = 0;
+        LGHTTPFragment.this.mTargetHandler.sendEmptyMessage(END_TEST);
+        LGHTTPFragment.this.mTestStateListener.onTestFinished();
+        LGHTTPFragment.this.triggeredByTestFlow = false;
     }
 
     @Override
     public boolean isTestConfigurationFinished() {
-        return false;
+        if ("".equals(LGHTTPFragment.this.mEditTxtFileAddr.getText().toString())) {
+            return false;
+        } else if (testOngoing) {
+            return false;
+        }
+        return true;
     }
 
     public class LGHTTPTestFlowConfigurationInfo extends LGTestFlowConfigurationInfo {
-        // TODO : need to implement class that can hold all the info.
+        @Getter @Setter private String mHTTPFileAddress;
+        @Getter @Setter private String mHTTPStack;
+        @Getter @Setter private boolean mUsingHTTPFileIO;
+        @Getter @Setter private int mHTTPRepeatCount;
+        @Getter @Setter private int mHTTPRepeatInterval;
 
         public LGHTTPTestFlowConfigurationInfo(Fragment fragmentInstance) {
             super(fragmentInstance);

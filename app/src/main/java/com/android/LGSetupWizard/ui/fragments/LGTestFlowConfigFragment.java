@@ -250,6 +250,8 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mTxtViewHTTPRepeatCount = this.mParentView.findViewById(R.id.txtView_config_http_repeat_count_value);
             this.mTxtViewHTTPRepeatInterval = this.mParentView.findViewById(R.id.txtView_config_http_repeat_interval_value);
 
+            resetAllConfigurationInfo();
+
             if (isThereAnyLegitimateTestTarget()) {
                 this.mBtnStartTestFlow.setEnabled(true);
             } else {

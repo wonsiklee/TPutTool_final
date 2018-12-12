@@ -241,6 +241,8 @@ public class LGTestFlowConfigFragment extends Fragment {
             // HTTP UI instance init.
             // TODO : yunsik.
 
+            resetAllConfigurationInfo();
+
             if (isThereAnyLegitimateTestTarget()) {
                 this.mBtnStartTestFlow.setEnabled(true);
             } else {

@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -161,6 +162,8 @@ public class LGTestFlowConfigFragment extends Fragment {
     private Button mBtnOpeniPerfConf;
     private Button mBtnOpenHttpConf;
 
+    private ImageButton mImgBtnShowHistory;
+    
     // FTP UI instances.
     private TextView mTxtViewFTPUseFileIO;
     private TextView mTxtViewFTPTCPWMem;
@@ -226,6 +229,12 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mTestTargetMap = new HashMap<>();
             this.mTargetConfigurationMap = new HashMap<>();
 
+            this.mImgBtnShowHistory = this.mParentView.findViewById(R.id.imgBtn_history);
+            this.mImgBtnShowHistory.setOnClickListener((v) -> {
+                Toast.makeText(mContext, "fffffffffffffffff", Toast.LENGTH_SHORT).show();
+            });
+            
+                    
             // FTP UI instance init.
             this.mTxtViewFTPUseFileIO = this.mParentView.findViewById(R.id.txtView_config_ftp_use_file_IO_value);
             this.mTxtViewFTPTCPWMem = this.mParentView.findViewById(R.id.txtView_config_ftp_tcp_buffer_size_value);

@@ -5,11 +5,29 @@
     android:orientation="vertical"
     android:scrollbars="vertical">
 
-    <Button
-        android:id="@+id/btn_start_test_flow"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="start test flow" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/imgBtn_history"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_margin="5dp"
+            android:src="@drawable/test_logs"/>
+
+        <Button
+            android:id="@+id/btn_start_test_flow"
+            android:layout_width="0dp"
+            android:layout_weight="10"
+            android:layout_height="wrap_content"
+            android:text="start test flow" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_ftp_configuration"

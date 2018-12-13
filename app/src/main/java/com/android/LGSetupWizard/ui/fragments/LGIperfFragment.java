@@ -54,6 +54,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
@@ -845,13 +847,14 @@ public class LGIperfFragment extends Fragment
         Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
         LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
         info.setGoodToGo(isTestConfigurationFinished());
-        // TODO : need to implement to put all the info into 'info'
+        info.setIperfCommand(mSelectedIperfCommand.toString());
         return info;
     }
 
+    private ILGTestFlowStateListener mTestListener;
     @Override
     public void setOnStateChangeListener(ILGTestFlowStateListener stateChangeListener) {
-
+        mTestListener = stateChangeListener;
     }
 
     @Override
@@ -870,7 +873,7 @@ public class LGIperfFragment extends Fragment
     }
 
     public class LGIperfTestFlowConfiguration extends LGTestFlowConfigurationInfo {
-        // TODO : need to implement class that can hold all the info.
+        @Getter @Setter private String mIperfCommand;
 
         public LGIperfTestFlowConfiguration(Fragment fragmentInstance) {
             super(fragmentInstance);

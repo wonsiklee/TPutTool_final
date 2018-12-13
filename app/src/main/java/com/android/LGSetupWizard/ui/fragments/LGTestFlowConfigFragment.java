@@ -177,7 +177,7 @@ public class LGTestFlowConfigFragment extends Fragment {
     private TextView mTxtViewFTPFileCount;
 
     // iPerf UI instances.
-    // TODO : iPerf UI - hyukbin.ko
+    private TextView mTxtViewIperfCommand;
 
     //  HTTP UI instances.
     private TextView mTxtViewHTTPFileAddress;
@@ -254,7 +254,7 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mTxtViewFTPFileCount = this.mParentView.findViewById(R.id.txtView_config_ftp_file_count_value);
 
             // iPerf UI instance init.
-            // TODO : hyukbin.ko
+            this.mTxtViewIperfCommand = this.mParentView.findViewById(R.id.textView_config_iperf_command);
 
             // HTTP UI instance init.
             this.mTxtViewHTTPFileAddress = this.mParentView.findViewById(R.id.txtView_config_http_file_address_value);
@@ -322,8 +322,8 @@ public class LGTestFlowConfigFragment extends Fragment {
 
         } else if (info instanceof LGIperfFragment.LGIperfTestFlowConfiguration) {
             Log.d(TAG, "LGIperfTestFlowConfiguration returned");
-            // TODO : add codes here - hyukbin.ko
-
+            LGIperfFragment.LGIperfTestFlowConfiguration sIperfConfig = (LGIperfFragment.LGIperfTestFlowConfiguration) info;
+            this.mTxtViewIperfCommand.setText(sIperfConfig.getIperfCommand());
         }
 
         Log.d(TAG, info.getFragmentInstance().hashCode() + ", " + info.isGoodToGo());
@@ -355,7 +355,7 @@ public class LGTestFlowConfigFragment extends Fragment {
         this.mTxtViewFTPFileCount.setText("N/A");
 
         // iPerf configuration reset
-        // TODO : hyukbin.ko reset code goes here.
+        this.mTxtViewIperfCommand.setText("N/A");
 
         // Http configuration reset
         this.mTxtViewHTTPFileAddress.setText("N/A");

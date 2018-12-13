@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
 import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
+import com.android.LGSetupWizard.ui.fragments.LGTestFlowConfigFragment;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -46,19 +47,19 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
                 return true;*/
             case R.id.navigation_auto:
                 Log.d(TAG, "onNavigationItemSelected() " + "0");
-                mViewPager.setCurrentItem(1);
+                mViewPager.setCurrentItem(LGTestFlowConfigFragment.FRAGMENT_INDEX_AUTO_CONFIG);
                 return true;
             case R.id.navigation_ftp:
                 Log.d(TAG, "onNavigationItemSelected() " + "1");
-                mViewPager.setCurrentItem(2);
+                mViewPager.setCurrentItem(LGTestFlowConfigFragment.FRAGMENT_INDEX_FTP);
                 return true;
             case R.id.navigation_iperf:
                 Log.d(TAG, "onNavigationItemSelected() " + "2");
-                mViewPager.setCurrentItem(3);
+                mViewPager.setCurrentItem(LGTestFlowConfigFragment.FRAGMENT_INDEX_IPERF);
                 return true;
             case R.id.navigation_http:
                 Log.d(TAG, "onNavigationItemSelected() " + "3");
-                mViewPager.setCurrentItem(4);
+                mViewPager.setCurrentItem(LGTestFlowConfigFragment.FRAGMENT_INDEX_HTTP);
                 return true;
         }
         return false;
@@ -129,6 +130,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
     @Override
     public void onPageSelected(int position) {
+        Log.d(TAG, "onPageSelected() " + position);
         this.mNavigation.setSelectedItemId(this.mFragmentPagerAdapter.getItem(position).getId());
         this.mNavigation.getMenu().getItem(position).setChecked(true);
     }

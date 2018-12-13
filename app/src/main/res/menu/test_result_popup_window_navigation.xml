@@ -2,16 +2,6 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--<item
-        android:id="@+id/navigation_configuration"
-        android:title="@string/title_configuration"
-        android:icon="@drawable/ic_settings" />-->
-
-    <item
-        android:id="@+id/navigation_auto"
-        android:title="@string/title_auto"
-        android:icon="@drawable/ic_settings" />
-
     <item
         android:id="@+id/navigation_ftp"
         android:title="@string/title_ftp"

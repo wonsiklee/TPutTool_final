@@ -26,7 +26,6 @@
 
     </FrameLayout>
 
-    <!--android:background="?android:attr/windowBackground"-->
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"

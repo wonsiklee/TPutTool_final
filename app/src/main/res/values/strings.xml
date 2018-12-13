@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Throughput Monitor</string>
     <string name="title_configuration">설정</string>
+    <string name="title_auto">Auto</string>
     <string name="title_nia">NIA</string>
     <string name="title_ftp">FTP</string>
     <string name="title_iperf">Iperf</string>

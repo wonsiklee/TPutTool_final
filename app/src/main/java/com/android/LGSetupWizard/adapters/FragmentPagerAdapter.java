@@ -25,7 +25,7 @@ public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
 
         this.mFragmentArrayList = new ArrayList<>();
-        this.mFragmentArrayList.add(new ConfigurationFragment());
+        //this.mFragmentArrayList.add(new ConfigurationFragment());
         this.mFragmentArrayList.add(new LGTestFlowConfigFragment());
         this.mFragmentArrayList.add(new LGFTPFragment());
         this.mFragmentArrayList.add(new LGIperfFragment());

@@ -40,12 +40,12 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.navigation_configuration:
+/*            case R.id.navigation_configuration:
                 Log.d(TAG, "onNavigationItemSelected() " + "0");
                 mViewPager.setCurrentItem(0);
-                return true;
-            case R.id.navigation_nia:
-                Log.d(TAG, "onNavigationItemSelected() " + "1");
+                return true;*/
+            case R.id.navigation_auto:
+                Log.d(TAG, "onNavigationItemSelected() " + "0");
                 mViewPager.setCurrentItem(1);
                 return true;
             case R.id.navigation_ftp:

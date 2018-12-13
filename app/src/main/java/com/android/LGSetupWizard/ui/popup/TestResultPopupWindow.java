@@ -64,7 +64,8 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
                                     dialog.cancel();
                                 }
                             }).setNegativeButton("삭제",
-                            new DialogInterface.OnClickListener() {
+
+                    new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     TestResultDBManager.getInstance(mContext).delete(mTestResultListAdapter.getItem(position).mIndex);
@@ -89,8 +90,8 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
     }
 
     public void show(View parentView, TestResultDBManager.TestCategory category) {
-        this.mTestResultListAdapter.updateDataSet(category);
-        mCategory = category;
+        this.mCategory = category;
+        this.mTestResultListAdapter.updateDataSet(this.mCategory);
 
         this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
         this.showAtLocation(parentView, Gravity.CENTER, 0, 0);

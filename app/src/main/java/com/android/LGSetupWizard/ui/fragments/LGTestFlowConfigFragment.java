@@ -40,10 +40,10 @@ import lombok.experimental.Accessors;
 public class LGTestFlowConfigFragment extends Fragment {
     private static final String TAG = LGTestFlowConfigFragment.class.getSimpleName();
 
-    static private final int FRAGMENT_INDEX_TEST_FLOW = 1;
-    static private final int FRAGMENT_INDEX_FTP = 2;
-    static private final int FRAGMENT_INDEX_IPERF = 3;
-    static private final int FRAGMENT_INDEX_HTTP = 4;
+    static private final int FRAGMENT_INDEX_TEST_FLOW = 0;
+    static private final int FRAGMENT_INDEX_FTP = 1;
+    static private final int FRAGMENT_INDEX_IPERF = 2;
+    static private final int FRAGMENT_INDEX_HTTP = 3;
 
     static final int TEST_FLOW_CTRL_MSG_START_FLOW = 0x00;
     static final int TEST_FLOW_CTRL_MSG_FETCH_NEXT_AND_LAUNCH = 0x01;
@@ -231,7 +231,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 LGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestTestFragment) mParentActivity.getFragmentPagerAdapter().getItem(mParentViewPager.getCurrentItem())).getTestConfigurationInfo();
                 processConfigurationInfo(testConfigurationInfo);
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
-                mParentViewPager.setCurrentItem(1);
+                setFragmentToShow(FRAGMENT_INDEX_TEST_FLOW);
             });
             this.mParentViewPager = mParentActivity.getViewPager();
             this.mTestTargetMap = new HashMap<>();

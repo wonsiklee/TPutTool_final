@@ -848,6 +848,8 @@ public class LGIperfFragment extends Fragment
         LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
         info.setGoodToGo(isTestConfigurationFinished());
         info.setIperfCommand(mSelectedIperfCommand.toString());
+        info.setRepeatCount(mRepeatCount);
+        info.setRepeatInterval(mRepeatInterval);
         return info;
     }
 
@@ -869,11 +871,14 @@ public class LGIperfFragment extends Fragment
 
     @Override
     public boolean isTestConfigurationFinished() {
-        return false;
+        if(currentMode != LAYOUT_MODE_MAIN || mSelectedIperfCommand ==null || !mSelectedIperfCommand.isValid()) return false;
+        return true;
     }
 
     public class LGIperfTestFlowConfiguration extends LGTestFlowConfigurationInfo {
         @Getter @Setter private String mIperfCommand;
+        @Getter @Setter private int mRepeatCount;
+        @Getter @Setter private int mRepeatInterval;
 
         public LGIperfTestFlowConfiguration(Fragment fragmentInstance) {
             super(fragmentInstance);

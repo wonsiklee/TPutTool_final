@@ -178,6 +178,8 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     // iPerf UI instances.
     private TextView mTxtViewIperfCommand;
+    private TextView mTxtViewIperfRepeatCount;
+    private TextView mTxtViewIperfRepeatInterval;
 
     //  HTTP UI instances.
     private TextView mTxtViewHTTPFileAddress;
@@ -255,6 +257,9 @@ public class LGTestFlowConfigFragment extends Fragment {
 
             // iPerf UI instance init.
             this.mTxtViewIperfCommand = this.mParentView.findViewById(R.id.textView_config_iperf_command);
+            this.mTxtViewIperfRepeatCount = this.mParentView.findViewById(R.id.textView_config_iperf_repeat_count);
+            this.mTxtViewIperfRepeatInterval = this.mParentView.findViewById(R.id.textView_config_iperf_repeat_interval);
+
 
             // HTTP UI instance init.
             this.mTxtViewHTTPFileAddress = this.mParentView.findViewById(R.id.txtView_config_http_file_address_value);
@@ -324,6 +329,8 @@ public class LGTestFlowConfigFragment extends Fragment {
             Log.d(TAG, "LGIperfTestFlowConfiguration returned");
             LGIperfFragment.LGIperfTestFlowConfiguration sIperfConfig = (LGIperfFragment.LGIperfTestFlowConfiguration) info;
             this.mTxtViewIperfCommand.setText(sIperfConfig.getIperfCommand());
+            this.mTxtViewIperfRepeatCount.setText(""+sIperfConfig.getRepeatCount());
+            this.mTxtViewIperfRepeatInterval.setText(""+sIperfConfig.getRepeatInterval());
         }
 
         Log.d(TAG, info.getFragmentInstance().hashCode() + ", " + info.isGoodToGo());
@@ -356,6 +363,8 @@ public class LGTestFlowConfigFragment extends Fragment {
 
         // iPerf configuration reset
         this.mTxtViewIperfCommand.setText("N/A");
+        this.mTxtViewIperfRepeatCount.setText("N/A");
+        this.mTxtViewIperfRepeatInterval.setText("N/A");
 
         // Http configuration reset
         this.mTxtViewHTTPFileAddress.setText("N/A");

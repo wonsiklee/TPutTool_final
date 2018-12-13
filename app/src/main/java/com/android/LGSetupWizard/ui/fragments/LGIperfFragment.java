@@ -177,6 +177,7 @@ public class LGIperfFragment extends Fragment
             }
         }
 
+        mSelectedIperfCommand = new LGIperfCommand("iperf --v");
         initDialog();
     }
 
@@ -846,8 +847,9 @@ public class LGIperfFragment extends Fragment
     public LGIperfTestFlowConfiguration getTestConfigurationInfo() {
         Log.d(TAG, "LGIPerfFragment getTestConfigurationInfo()");
         LGIperfTestFlowConfiguration info = new LGIperfTestFlowConfiguration(this);
+        checkCurrentCommand();
         info.setGoodToGo(isTestConfigurationFinished());
-        info.setIperfCommand(mSelectedIperfCommand.toString());
+        info.setIperfCommand((mSelectedIperfCommand!=null)?mSelectedIperfCommand.toString():"N/A");
         info.setRepeatCount(mRepeatCount);
         info.setRepeatInterval(mRepeatInterval);
         return info;
@@ -861,12 +863,20 @@ public class LGIperfFragment extends Fragment
 
     @Override
     public void runTest() {
-
+        Log.i(TAG, "start test");
+        checkCurrentCommand();
+        mCurrentRepeatCount = mRepeatCount;
+        mIperfSserviceHelper.startCommand(mSelectedIperfCommand.toString());
+        toggleBtn_iperf_start_n_stop.setChecked(true);
+        lockComponent(true);
     }
 
     @Override
     public void stopTest() {
-
+        Log.i(TAG, "stop iperf");
+        mIperfSserviceHelper.stopCommand();
+        toggleBtn_iperf_start_n_stop.setChecked(false);
+        lockComponent(false);
     }
 
     @Override

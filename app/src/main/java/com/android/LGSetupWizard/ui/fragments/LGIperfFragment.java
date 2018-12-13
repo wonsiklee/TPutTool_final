@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.android.LGSetupWizard.R;
@@ -149,13 +150,14 @@ public class LGIperfFragment extends Fragment
                 mLGIperfPackageManager = new LGIperfPackageManager(context);
                 mLGIperfPackageManager.setOnInstalledPackaged(new LGIperfPackageManager.OnInstalledPackaged() {
                     @Override
-                    public void packageInstalled(String packageName, int returnCode) {
+                    public void packageInstalled(int returnCode) {
                         if (returnCode == LGIperfPackageManager.INSTALL_SUCCEEDED) {
                             Log.d(TAG, "Install succeeded");
                             requestLoadIperfService();
                         } else {
                             Log.d(TAG, "Install failed: " + returnCode);
                             //TODO fail pacakge...how to?!
+                            Toast.makeText(mContext,"LGIperf Install Package.. please Contact Hyukbin.ko@lge.com", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -303,6 +305,10 @@ public class LGIperfFragment extends Fragment
         super.onDetach();
         Log.i(TAG,"onDetach");
         mContext.unregisterReceiver(mReceiver);
+
+        if (mLGIperfPackageManager!=null ) {
+            mLGIperfPackageManager.detach();
+        }
 
         requestReleaseIperfService();
     }

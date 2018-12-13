@@ -164,7 +164,13 @@ public class LGIperfPackageManager {
             Log.d(TAG, "check!");
         }
         else {
-            mContext.unregisterReceiver(mReceiver);
+            if(mReceiver!=null){
+                try {
+                    mContext.unregisterReceiver(mReceiver);
+                }catch (Exception e){
+                    Log.d(TAG, "unregi fail");
+                }
+            }
         }
     }
 

@@ -113,11 +113,12 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
         if (this.mCategory == TestResultDBManager.TestCategory.ALL_TYPE) {
             Log.d(TAG, "ALL_TYPE");
             this.mNavigation.setVisibility(View.VISIBLE);
+            this.mNavigation.setSelectedItemId(R.id.navigation_ftp);
             this.mTestResultListAdapter.updateDataSet(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO);
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) this.mListViewTestResults.getLayoutParams();
             lp.addRule(RelativeLayout.BELOW, this.mNavigation.getId());
         } else {
-            this.mNavigation.setVisibility(View.INVISIBLE);
+            this.mNavigation.setVisibility(View.GONE);
             this.mTestResultListAdapter.updateDataSet(this.mCategory);
         }
 

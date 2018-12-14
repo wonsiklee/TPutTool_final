@@ -3,22 +3,32 @@ package com.android.LGSetupWizard.ui.popup;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.android.LGSetupWizard.MainActivity;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.adapters.TestResultListAdapter;
 import com.android.LGSetupWizard.database.TestResultDBManager;
 
-public class TestResultPopupWindow extends PopupWindow implements View.OnClickListener {
+import static com.android.LGSetupWizard.database.TestResultDBManager.TestCategory.ALL_TYPE;
+
+public class TestResultPopupWindow extends PopupWindow implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = TestResultPopupWindow.class.getSimpleName();
     private final TestResultListAdapter mTestResultListAdapter;
@@ -26,7 +36,12 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
     private Context mContext;
     private View mPopupViewTestResultContentView;
 
+    private BottomNavigationView mNavigation;
+
     private ListView mListViewTestResults;
+
+    /*private TestResultFragmentPagerAdapter mTestResultFragmentPagerAdapter;
+    private ViewPager mTestViewPager;*/
 
     private Button mBtnExportToFile;
     private Button mBtnDeleteResults;
@@ -78,6 +93,9 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
             }
         });
 
+        this.mNavigation = (BottomNavigationView) this.mPopupViewTestResultContentView.findViewById(R.id.navigation_for_result_popup);
+        this.mNavigation.setOnNavigationItemSelectedListener(this);
+
         this.setContentView(this.mPopupViewTestResultContentView);
 
         DisplayMetrics metrics = new DisplayMetrics();
@@ -91,7 +109,17 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
 
     public void show(View parentView, TestResultDBManager.TestCategory category) {
         this.mCategory = category;
-        this.mTestResultListAdapter.updateDataSet(this.mCategory);
+        Log.d(TAG, "Category : " + this.mCategory);
+        if (this.mCategory == TestResultDBManager.TestCategory.ALL_TYPE) {
+            Log.d(TAG, "ALL_TYPE");
+            this.mNavigation.setVisibility(View.VISIBLE);
+            this.mTestResultListAdapter.updateDataSet(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO);
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) this.mListViewTestResults.getLayoutParams();
+            lp.addRule(RelativeLayout.BELOW, this.mNavigation.getId());
+        } else {
+            this.mNavigation.setVisibility(View.INVISIBLE);
+            this.mTestResultListAdapter.updateDataSet(this.mCategory);
+        }
 
         this.setAnimationStyle(R.style.IperfSwitchTextAppearance);
         this.showAtLocation(parentView, Gravity.CENTER, 0, 0);
@@ -128,5 +156,24 @@ public class TestResultPopupWindow extends PopupWindow implements View.OnClickLi
                 alert.show();
                 break;
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_ftp:
+                Log.d(TAG, "onNavigationItemSelected() " + "1");
+                this.mTestResultListAdapter.updateDataSet(TestResultDBManager.TestCategory.FTP_DL_WITH_FILE_IO);
+                return true;
+            case R.id.navigation_iperf:
+                Log.d(TAG, "onNavigationItemSelected() " + "2");
+                this.mTestResultListAdapter.updateDataSet(TestResultDBManager.TestCategory.iPerf);
+                return true;
+            case R.id.navigation_http:
+                Log.d(TAG, "onNavigationItemSelected() " + "3");
+                this.mTestResultListAdapter.updateDataSet(TestResultDBManager.TestCategory.HTTP_OK_WITH_FILE_IO);
+                return true;
+        }
+        return false;
     }
 }

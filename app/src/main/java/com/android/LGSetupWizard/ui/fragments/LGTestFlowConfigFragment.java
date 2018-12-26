@@ -23,6 +23,7 @@ import com.android.LGSetupWizard.MainActivity;
 import com.android.LGSetupWizard.R;
 import com.android.LGSetupWizard.data.LGTestFlowConfigurationInfo;
 import com.android.LGSetupWizard.database.TestResultDBManager;
+import com.android.LGSetupWizard.ui.SwipePagingOnOffViewPager;
 import com.android.LGSetupWizard.ui.popup.TestResultPopupWindow;
 import com.android.LGSetupWizard.utils.Utils;
 
@@ -56,7 +57,7 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     private View mParentView; // parent View
     private MainActivity mParentActivity;
-    private ViewPager mParentViewPager;
+    private SwipePagingOnOffViewPager mParentViewPager;
     private HashMap<Fragment, Boolean> mTestTargetMap;
     private HashMap<Fragment, LGTestFlowConfigurationInfo> mTargetConfigurationMap;
 
@@ -208,23 +209,27 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mBtnStartTestFlow.setOnClickListener(v -> {
                 Log.d(TAG, "start test flow.");
                 mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_START_FLOW);
+                mParentViewPager.setEnabled(false);
             });
             this.mBtnOpenFTPConf = this.mParentView.findViewById(R.id.btn_open_ftp_config);
             this.mBtnOpenFTPConf.setOnClickListener(v -> {
                 showFetchFabBtn();
                 setFragmentToShow(FRAGMENT_INDEX_FTP);
+                mParentViewPager.setEnabled(false);
             });
 
             this.mBtnOpeniPerfConf = this.mParentView.findViewById(R.id.btn_open_iperf_config);
             this.mBtnOpeniPerfConf.setOnClickListener(v -> {
                 showFetchFabBtn();
                 setFragmentToShow(FRAGMENT_INDEX_IPERF);
+                mParentViewPager.setEnabled(false);
             });
 
             this.mBtnOpenHttpConf = this.mParentView.findViewById(R.id.btn_open_http_config);
             this.mBtnOpenHttpConf.setOnClickListener(v -> {
                 showFetchFabBtn();
                 setFragmentToShow(FRAGMENT_INDEX_HTTP);
+                mParentViewPager.setEnabled(false);
             });
 
             this.mParentActivity = ((MainActivity)(LGTestFlowConfigFragment.this.getActivity()));
@@ -234,6 +239,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 processConfigurationInfo(testConfigurationInfo);
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
                 setFragmentToShow(FRAGMENT_INDEX_AUTO_CONFIG);
+                mParentViewPager.setEnabled(true);
             });
             this.mParentViewPager = mParentActivity.getViewPager();
             this.mTestTargetMap = new HashMap<>();
@@ -351,6 +357,7 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     private void resetAllConfigurationInfo() {
         mBtnStartTestFlow.setEnabled(false);
+        mParentViewPager.setEnabled(true);
 
         // FTP configuration reset
         this.mTxtViewFTPUseFileIO.setText("N/A");

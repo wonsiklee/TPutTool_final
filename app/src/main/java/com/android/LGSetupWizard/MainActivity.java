@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
+import com.android.LGSetupWizard.ui.SwipePagingOnOffViewPager;
 import com.android.LGSetupWizard.ui.fragments.LGIperfFragment;
 import com.android.LGSetupWizard.ui.fragments.LGTestFlowConfigFragment;
 
@@ -30,7 +31,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     private static final String deleteMeString = "phase 2 confirm string";
     private static final String TAG = MainActivity.class.getSimpleName() + " tput";
 
-    @Getter private ViewPager mViewPager;
+    @Getter private SwipePagingOnOffViewPager mViewPager;
     @Getter private FragmentPagerAdapter mFragmentPagerAdapter;
 
     private BottomNavigationView mNavigation;
@@ -114,11 +115,13 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
         this.mFragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager());
 
-        this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        this.mViewPager = (SwipePagingOnOffViewPager) findViewById(R.id.view_pager);
+        this.mViewPager.setEnabled(true);
         this.mViewPager.setAdapter(this.mFragmentPagerAdapter);
         this.mViewPager.addOnPageChangeListener(this);
+        this.mViewPager.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> { Log.d(TAG, "asdf"); });
 
-        this.mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
+        this.mNavigation = findViewById(R.id.navigation);
         this.mNavigation.setOnNavigationItemSelectedListener(this);
 
         this.mFabFetchInfo = findViewById(R.id.fab_reportResult);
@@ -137,11 +140,13 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        Log.d(TAG, "onPageScrolled()");
         // do nothing
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        Log.d(TAG, "onPageScrollStateChanged()");
         // do nothing
     }
 

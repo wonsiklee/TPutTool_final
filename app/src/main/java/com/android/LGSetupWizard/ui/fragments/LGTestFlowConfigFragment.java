@@ -210,12 +210,14 @@ public class LGTestFlowConfigFragment extends Fragment {
                 Log.d(TAG, "start test flow.");
                 mTestFlowHandler.sendEmptyMessage(TEST_FLOW_CTRL_MSG_START_FLOW);
                 mParentViewPager.setEnabled(false);
+                mParentActivity.setNavigationVisibility(false);
             });
             this.mBtnOpenFTPConf = this.mParentView.findViewById(R.id.btn_open_ftp_config);
             this.mBtnOpenFTPConf.setOnClickListener(v -> {
                 showFetchFabBtn();
                 setFragmentToShow(FRAGMENT_INDEX_FTP);
                 mParentViewPager.setEnabled(false);
+                mParentActivity.setNavigationVisibility(false);
             });
 
             this.mBtnOpeniPerfConf = this.mParentView.findViewById(R.id.btn_open_iperf_config);
@@ -223,6 +225,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 showFetchFabBtn();
                 setFragmentToShow(FRAGMENT_INDEX_IPERF);
                 mParentViewPager.setEnabled(false);
+                mParentActivity.setNavigationVisibility(false);
             });
 
             this.mBtnOpenHttpConf = this.mParentView.findViewById(R.id.btn_open_http_config);
@@ -230,6 +233,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 showFetchFabBtn();
                 setFragmentToShow(FRAGMENT_INDEX_HTTP);
                 mParentViewPager.setEnabled(false);
+                mParentActivity.setNavigationVisibility(false);
             });
 
             this.mParentActivity = ((MainActivity)(LGTestFlowConfigFragment.this.getActivity()));
@@ -240,6 +244,7 @@ public class LGTestFlowConfigFragment extends Fragment {
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
                 setFragmentToShow(FRAGMENT_INDEX_AUTO_CONFIG);
                 mParentViewPager.setEnabled(true);
+                mParentActivity.setNavigationVisibility(true);
             });
             this.mParentViewPager = mParentActivity.getViewPager();
             this.mTestTargetMap = new HashMap<>();

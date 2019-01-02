@@ -39,6 +39,14 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     @Getter
     private FloatingActionButton mFabFetchInfo;
 
+    public void setNavigationVisibility(boolean visible) {
+        if (visible) {
+            mNavigation.setVisibility(View.VISIBLE);
+        } else {
+            mNavigation.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {

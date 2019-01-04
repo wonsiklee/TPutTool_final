@@ -158,6 +158,82 @@ public class LGTestFlowConfigFragment extends Fragment {
         }
     };
 
+    private View.OnClickListener mResetBtn = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.imgBtn_reset_ftp:
+                    Log.d(TAG, "reset ftp");
+
+                    // FTP configuration reset
+                    mTxtViewFTPUseFileIO.setText("N/A");
+                    mTxtViewFTPTCPWMem.setText("N/A");
+                    mTxtViewFTPPsv.setText("N/A");
+                    mTxtViewFTPUseEPSV.setText("N/A");
+                    mTxtViewFTPRepeatCount.setText("N/A");
+                    mTxtViewFTPRepeatInterval.setText("N/A");
+                    mTxtViewFTPFileCount.setText("N/A");
+
+                    LGFTPFragment lgftpFragment = null;
+                    for (Fragment fragment : mTestTargetMap.keySet()) {
+                        if (fragment instanceof LGFTPFragment) {
+                            lgftpFragment = (LGFTPFragment) fragment;
+                            break;
+                        }
+                    }
+                    if (lgftpFragment != null) {
+                        mTestTargetMap.put(lgftpFragment, false);
+                    }
+                    break;
+                case R.id.imgBtn_reset_iPerf:
+                    Log.d(TAG, "reset iPerf");
+
+                    // iPerf configuration reset
+                    mTxtViewIperfCommand.setText("N/A");
+                    mTxtViewIperfRepeatCount.setText("N/A");
+                    mTxtViewIperfRepeatInterval.setText("N/A");
+
+                    LGIperfFragment iperfFragment = null;
+                    for (Fragment fragment : mTestTargetMap.keySet()) {
+                        if (fragment instanceof LGIperfFragment) {
+                            iperfFragment = (LGIperfFragment) fragment;
+                            break;
+                        }
+                    }
+                    if (iperfFragment != null) {
+                        mTestTargetMap.put(iperfFragment, false);
+                    }
+                    break;
+                case R.id.imgBtn_reset_http:
+                    Log.d(TAG, "reset http");
+
+                    // Http configuration reset
+                    mTxtViewHTTPFileAddress.setText("N/A");
+                    mTxtViewHTTPStack.setText("N/A");
+                    mTxtViewHTTPUseFileIO.setText("N/A");
+                    mTxtViewHTTPRepeatCount.setText("N/A");
+                    mTxtViewHTTPRepeatInterval.setText("N/A");
+
+                    LGHTTPFragment lghttpFragment = null;
+                    for (Fragment fragment : mTestTargetMap.keySet()) {
+                        if (fragment instanceof LGHTTPFragment) {
+                            lghttpFragment = (LGHTTPFragment) fragment;
+                            break;
+                        }
+                    }
+                    if (lghttpFragment != null) {
+                        mTestTargetMap.put(lghttpFragment, false);
+                    }
+                    break;
+            }
+
+            if (!isThereAnyLegitimateTestTarget()) {
+                mBtnStartTestFlow.setEnabled(false);
+                mParentViewPager.setEnabled(true);
+            }
+        }
+    };
+
     private Button mBtnStartTestFlow;
     private FloatingActionButton mFabFetchFromFragment;
 
@@ -167,6 +243,10 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     private ImageButton mImgBtnShowHistory;
     private TestResultPopupWindow mTestResultPopupWindow;
+
+    private ImageButton mImgBtnResetFTP;
+    private ImageButton mImgBtnResetIperf;
+    private ImageButton mImgBtnResetHttp;
 
     // FTP UI instances.
     private TextView mTxtViewFTPUseFileIO;
@@ -255,7 +335,13 @@ public class LGTestFlowConfigFragment extends Fragment {
                 mTestResultPopupWindow = new TestResultPopupWindow(LGTestFlowConfigFragment.this.mContext);
                 mTestResultPopupWindow.show(LGTestFlowConfigFragment.this.getView(), TestResultDBManager.TestCategory.ALL_TYPE);
             });
-            
+
+            this.mImgBtnResetFTP = this.mParentView.findViewById(R.id.imgBtn_reset_ftp);
+            this.mImgBtnResetFTP.setOnClickListener(this.mResetBtn);
+            this.mImgBtnResetIperf = this.mParentView.findViewById(R.id.imgBtn_reset_iPerf);
+            this.mImgBtnResetIperf.setOnClickListener(this.mResetBtn);
+            this.mImgBtnResetHttp = this.mParentView.findViewById(R.id.imgBtn_reset_http);
+            this.mImgBtnResetHttp.setOnClickListener(this.mResetBtn);
                     
             // FTP UI instance init.
             this.mTxtViewFTPUseFileIO = this.mParentView.findViewById(R.id.txtView_config_ftp_use_file_IO_value);
@@ -384,5 +470,7 @@ public class LGTestFlowConfigFragment extends Fragment {
         this.mTxtViewHTTPUseFileIO.setText("N/A");
         this.mTxtViewHTTPRepeatCount.setText("N/A");
         this.mTxtViewHTTPRepeatInterval.setText("N/A");
+
+        this.mTestTargetMap.clear();
     }
 }

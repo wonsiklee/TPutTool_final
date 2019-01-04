@@ -361,8 +361,8 @@ public class LGTestFlowConfigFragment extends Fragment {
     }
 
     private void resetAllConfigurationInfo() {
-        mBtnStartTestFlow.setEnabled(false);
-        mParentViewPager.setEnabled(true);
+        this.mBtnStartTestFlow.setEnabled(false);
+        this.mParentViewPager.setEnabled(true);
 
         // FTP configuration reset
         this.mTxtViewFTPUseFileIO.setText("N/A");

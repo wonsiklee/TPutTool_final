@@ -1024,11 +1024,11 @@ public class LGFTPFragment extends Fragment implements View.OnKeyListener, Adapt
     };
 
 
-    // history img btn click listener
+    // test_logs img btn click listener
     private View.OnClickListener mClickListenerShowHistory = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "onClick() show history");
+            Log.d(TAG, "onClick() show test_logs");
             hideSoftKeyboard();
             // TODO : DB list show.
 

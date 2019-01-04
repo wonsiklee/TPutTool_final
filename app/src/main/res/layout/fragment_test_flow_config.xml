@@ -13,12 +13,11 @@
 
         <ImageButton
             android:id="@+id/imgBtn_history"
+            android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_width="0dp"
             android:layout_weight="3"
-            android:layout_margin="5dp"
             android:src="@drawable/test_logs"/>
 
         <Button
@@ -53,11 +52,26 @@
             android:orientation="vertical"
             android:layout_weight="10">
 
-            <Button
-                android:id="@+id/btn_open_ftp_config"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Open LG FTP Config" />
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btn_open_ftp_config"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:text="Open LG FTP Config" />
+                <ImageButton
+                    android:id="@+id/imgBtn_reset_ftp"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_reset"/>
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -244,11 +258,26 @@
             android:orientation="vertical"
             android:layout_weight="10">
             <!--TODO : form iperf configuration UI here-->
-            <Button
-                android:id="@+id/btn_open_iperf_config"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Open LG iPerf Config" />
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btn_open_iperf_config"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:text="Open LG iPerf Config"/>
+                <ImageButton
+                    android:id="@+id/imgBtn_reset_iPerf"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_reset"/>
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -336,11 +365,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_weight="10">
-            <Button
-                android:id="@+id/btn_open_http_config"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Open LG Http Config" />
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btn_open_http_config"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:text="Open LG Http Config"/>
+                <ImageButton
+                    android:id="@+id/imgBtn_reset_http"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_reset"/>
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

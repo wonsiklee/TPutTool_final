@@ -15,6 +15,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.LGSetupWizard.adapters.FragmentPagerAdapter;
@@ -45,6 +47,15 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         } else {
             mNavigation.setVisibility(View.GONE);
         }
+
+        Switch s = new Switch(this);
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
+
     }
 
     @Override

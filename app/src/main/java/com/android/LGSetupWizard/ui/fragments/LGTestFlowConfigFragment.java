@@ -424,6 +424,7 @@ public class LGTestFlowConfigFragment extends Fragment {
 
         } else if (info instanceof LGIperfFragment.LGIperfTestFlowConfiguration) {
             Log.d(TAG, "LGIperfTestFlowConfiguration returned");
+            Log.d(TAG, "returned info : " + info.isGoodToGo());
             LGIperfFragment.LGIperfTestFlowConfiguration sIperfConfig = (LGIperfFragment.LGIperfTestFlowConfiguration) info;
             this.mTxtViewIperfCommand.setText(sIperfConfig.getIperfCommand());
             this.mTxtViewIperfRepeatCount.setText(""+sIperfConfig.getRepeatCount());

@@ -58,8 +58,9 @@ public class LGTestFlowConfigFragment extends Fragment {
     private View mParentView; // parent View
     private MainActivity mParentActivity;
     private SwipePagingOnOffViewPager mParentViewPager;
-    private HashMap<Fragment, Boolean> mTestTargetMap;
-    private HashMap<Fragment, LGTestFlowConfigurationInfo> mTargetConfigurationMap;
+
+    private HashMap<Fragment, Boolean> mTestTargetMap;  // mTestTargetMap stores the client fragments with whether to test or not.
+    private HashMap<Fragment, LGTestFlowConfigurationInfo> mTargetConfigurationMap; // mTargetConfigurationMap stores config info for each client's fragment, and only used while test flow is in progress.
 
     ArrayList<ILGTestTestFragment> mTestTargetFragmentList;
     ILGTestTestFragment mCurrentTarget;

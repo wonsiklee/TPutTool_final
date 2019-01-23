@@ -5,7 +5,7 @@ android {
     buildToolsVersion '28.0.3'
     signingConfigs {
         debug {
-            storeFile file("C:\\Users\\user\\AndroidStudioProjects\\TPutTool_final\\app\\src\\main\\res\\raw\\platform.jks")
+            storeFile file("C:\\Users\\user\\StudioProjects\\TPutTool_final_phase2\\platform.jks")
         }
     }
     defaultConfig {

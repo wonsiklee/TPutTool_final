@@ -40,12 +40,13 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
     @Getter
     private FloatingActionButton mFabFetchInfo;
+    private FloatingActionButton mFabDisposeConfig;
 
     public void setNavigationVisibility(boolean visible) {
         if (visible) {
             mNavigation.setVisibility(View.VISIBLE);
         } else {
-            mNavigation.setVisibility(View.GONE);
+            //mNavigation.setVisibility(View.GONE);
         }
 
         Switch s = new Switch(this);
@@ -145,6 +146,9 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
 
         this.mFabFetchInfo = findViewById(R.id.fab_reportResult);
         this.mFabFetchInfo.setVisibility(View.INVISIBLE);
+
+        this.mFabDisposeConfig = findViewById(R.id.fab_dispose_settings);
+        this.mFabDisposeConfig.setVisibility(View.INVISIBLE);
 
         WAKE_LOCK = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
         WAKE_LOCK.acquire();

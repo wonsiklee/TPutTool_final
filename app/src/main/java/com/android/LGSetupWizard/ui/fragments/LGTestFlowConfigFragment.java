@@ -9,7 +9,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -237,6 +236,7 @@ public class LGTestFlowConfigFragment extends Fragment {
 
     private Button mBtnStartTestFlow;
     private FloatingActionButton mFabFetchFromFragment;
+    private FloatingActionButton mFabDisposeConfig;
 
     private Button mBtnOpenFTPConf;
     private Button mBtnOpeniPerfConf;
@@ -321,10 +321,17 @@ public class LGTestFlowConfigFragment extends Fragment {
             this.mFabFetchFromFragment = this.mParentActivity.getFabFetchInfo();
             this.mFabFetchFromFragment.setOnClickListener(v -> {
                 LGTestFlowConfigurationInfo testConfigurationInfo = ((ILGTestTestFragment) mParentActivity.getFragmentPagerAdapter().getItem(mParentViewPager.getCurrentItem())).getTestConfigurationInfo();
-                processConfigurationInfo(testConfigurationInfo);
+                parseConfigurationInfo(testConfigurationInfo);
                 mFabFetchFromFragment.setVisibility(View.INVISIBLE);
+                mFabDisposeConfig.setVisibility(View.INVISIBLE);
                 setFragmentToShow(FRAGMENT_INDEX_AUTO_CONFIG);
-                mParentViewPager.setEnabled(true);
+                mParentActivity.setNavigationVisibility(true);
+            });
+            this.mFabDisposeConfig = this.mParentActivity.getFabFetchInfo();
+            this.mFabDisposeConfig.setOnClickListener(v -> {
+                mFabFetchFromFragment.setVisibility(View.INVISIBLE);
+                mFabDisposeConfig.setVisibility(View.INVISIBLE);
+                setFragmentToShow(FRAGMENT_INDEX_AUTO_CONFIG);
                 mParentActivity.setNavigationVisibility(true);
             });
             this.mParentViewPager = mParentActivity.getViewPager();
@@ -388,9 +395,10 @@ public class LGTestFlowConfigFragment extends Fragment {
     }
 
     private void showFetchFabBtn() {
+        Log.d(TAG, "showFetchFabBtn()");
         int sNavigationBarHeight = 0;
 
-        LGTestFlowConfigFragment.this.mFabFetchFromFragment.setVisibility(View.VISIBLE);
+        this.mFabFetchFromFragment.setVisibility(View.INVISIBLE);
         Resources resources = mContext.getResources();
         int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -398,38 +406,49 @@ public class LGTestFlowConfigFragment extends Fragment {
         }
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mFabFetchFromFragment.getLayoutParams();
         params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, sNavigationBarHeight + 100);
+
+        Log.d(TAG, "X : " + (this.mFabFetchFromFragment.getX() - 50) + ", Y : " + this.mFabFetchFromFragment.getY());
+        //this.mFabDisposeConfig.setVisibility(View.VISIBLE);
+        this.mFabDisposeConfig.setX(this.mFabFetchFromFragment.getX() - 50);
+        this.mFabDisposeConfig.setY(this.mFabFetchFromFragment.getY());
+        // ddddd
     }
 
-    private void processConfigurationInfo(LGTestFlowConfigurationInfo info) {
+    private void parseConfigurationInfo(LGTestFlowConfigurationInfo info) {
         if (info instanceof LGFTPFragment.LGFTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGFTPTestFlowConfigurationInfo returned");
             Log.d(TAG, "returned info : " + info.isGoodToGo());
-            LGFTPFragment.LGFTPTestFlowConfigurationInfo sFtpTestConfig = (LGFTPFragment.LGFTPTestFlowConfigurationInfo) info;
-            this.mTxtViewFTPUseFileIO.setText(Utils.getBooleanString(sFtpTestConfig.isUsingFTPFileIO()));
-            this.mTxtViewFTPTCPWMem.setText(sFtpTestConfig.getFTPBufferSize() + "");
-            this.mTxtViewFTPPsv.setText(Utils.getBooleanString(sFtpTestConfig.isUsingFTPPSV()));
-            this.mTxtViewFTPUseEPSV.setText(Utils.getBooleanString(sFtpTestConfig.isUsingIPv4EPSV()));
-            this.mTxtViewFTPRepeatCount.setText(sFtpTestConfig.getFTPRepeatCount() + "");
-            this.mTxtViewFTPRepeatInterval.setText(sFtpTestConfig.getFTPRepeatInterval() + "");
-            this.mTxtViewFTPFileCount.setText(sFtpTestConfig.getFileCount() + "");
-
+            if (info.isGoodToGo()) {
+                LGFTPFragment.LGFTPTestFlowConfigurationInfo sFtpTestConfig = (LGFTPFragment.LGFTPTestFlowConfigurationInfo) info;
+                this.mTxtViewFTPUseFileIO.setText(Utils.getBooleanString(sFtpTestConfig.isUsingFTPFileIO()));
+                this.mTxtViewFTPTCPWMem.setText(sFtpTestConfig.getFTPBufferSize() + "");
+                this.mTxtViewFTPTCPWMem.setText(sFtpTestConfig.getFTPBufferSize() + "");
+                this.mTxtViewFTPPsv.setText(Utils.getBooleanString(sFtpTestConfig.isUsingFTPPSV()));
+                this.mTxtViewFTPUseEPSV.setText(Utils.getBooleanString(sFtpTestConfig.isUsingIPv4EPSV()));
+                this.mTxtViewFTPRepeatCount.setText(sFtpTestConfig.getFTPRepeatCount() + "");
+                this.mTxtViewFTPRepeatInterval.setText(sFtpTestConfig.getFTPRepeatInterval() + "");
+                this.mTxtViewFTPFileCount.setText(sFtpTestConfig.getFileCount() + "");
+            }
         } else if (info instanceof LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) {
             Log.d(TAG, "LGHTTPTestFlowConfigurationInfo returned");
             Log.d(TAG, "returned info : " + info.isGoodToGo());
-            LGHTTPFragment.LGHTTPTestFlowConfigurationInfo sHttpTestConfig = (LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) info;
-            this.mTxtViewHTTPFileAddress.setText(sHttpTestConfig.getHTTPFileAddress());
-            this.mTxtViewHTTPStack.setText(sHttpTestConfig.getHTTPStack());
-            this.mTxtViewHTTPUseFileIO.setText(Utils.getBooleanString(sHttpTestConfig.isUsingHTTPFileIO()));
-            this.mTxtViewHTTPRepeatCount.setText(sHttpTestConfig.getHTTPRepeatCount() + "");
-            this.mTxtViewHTTPRepeatInterval.setText(sHttpTestConfig.getHTTPRepeatInterval() + "");
-
+            if (info.isGoodToGo()) {
+                LGHTTPFragment.LGHTTPTestFlowConfigurationInfo sHttpTestConfig = (LGHTTPFragment.LGHTTPTestFlowConfigurationInfo) info;
+                this.mTxtViewHTTPFileAddress.setText(sHttpTestConfig.getHTTPFileAddress());
+                this.mTxtViewHTTPStack.setText(sHttpTestConfig.getHTTPStack());
+                this.mTxtViewHTTPUseFileIO.setText(Utils.getBooleanString(sHttpTestConfig.isUsingHTTPFileIO()));
+                this.mTxtViewHTTPRepeatCount.setText(sHttpTestConfig.getHTTPRepeatCount() + "");
+                this.mTxtViewHTTPRepeatInterval.setText(sHttpTestConfig.getHTTPRepeatInterval() + "");
+            }
         } else if (info instanceof LGIperfFragment.LGIperfTestFlowConfiguration) {
             Log.d(TAG, "LGIperfTestFlowConfiguration returned");
             Log.d(TAG, "returned info : " + info.isGoodToGo());
-            LGIperfFragment.LGIperfTestFlowConfiguration sIperfConfig = (LGIperfFragment.LGIperfTestFlowConfiguration) info;
-            this.mTxtViewIperfCommand.setText(sIperfConfig.getIperfCommand());
-            this.mTxtViewIperfRepeatCount.setText(""+sIperfConfig.getRepeatCount());
-            this.mTxtViewIperfRepeatInterval.setText(""+sIperfConfig.getRepeatInterval());
+            if (info.isGoodToGo()) {
+                LGIperfFragment.LGIperfTestFlowConfiguration sIperfConfig = (LGIperfFragment.LGIperfTestFlowConfiguration) info;
+                this.mTxtViewIperfCommand.setText(sIperfConfig.getIperfCommand());
+                this.mTxtViewIperfRepeatCount.setText(""+sIperfConfig.getRepeatCount());
+                this.mTxtViewIperfRepeatInterval.setText(""+sIperfConfig.getRepeatInterval());
+            }
         }
 
         Log.d(TAG, info.getFragmentInstance().hashCode() + ", " + info.isGoodToGo());

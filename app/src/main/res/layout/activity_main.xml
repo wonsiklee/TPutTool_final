@@ -49,10 +49,14 @@
             android:layout_gravity="bottom|end"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-
             android:layout_marginRight="20dp"
             android:src="@drawable/ic_settings" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_dispose_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_f"/>
     </RelativeLayout>
-
-
 </LinearLayout>
